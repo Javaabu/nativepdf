@@ -8,8 +8,10 @@ NativePdf
 
 **NativePdf is an HTML to PDF converter**
 
-NativePdf is a fork of [dompdf](https://github.com/dompdf/dompdf) with added
-support for CSS flexbox, bidirectional text (Arabic and Thaana), and inline SVG.
+NativePdf is built on top of [dompdf](https://github.com/dompdf/dompdf). It is a
+fork of dompdf that adds support for CSS flexbox, bidirectional text (Arabic and
+Thaana), and inline SVG. The HTML and CSS engine underneath is dompdf's work,
+and all credit for it goes to the dompdf team (see [Credits](#credits)).
 
 At its heart, nativepdf is (mostly) a [CSS 2.1](http://www.w3.org/TR/CSS2/) compliant
 HTML layout and rendering engine written in PHP. It is a style-driven renderer:
@@ -261,9 +263,22 @@ Files accessed through the local file system have the following requirement:
  * Does not support CSS Grid: See https://github.com/dompdf/dompdf/issues/2988
  * A single NativePdf instance should not be used to render more than one HTML document
    because persisted parsing and rendering artifacts can impact future renders.
----
 
-[![Donate button](https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif)](http://goo.gl/DSvWf)
+## Credits
 
-*If you find this project useful, please consider making a donation.
-Any funds donated will be used to help further development on this project.)*
+NativePdf is built on top of [dompdf](https://github.com/dompdf/dompdf).
+
+Nearly all of this package is dompdf's work: the HTML parser, the CSS 2.1 layout
+and rendering engine, the PDF backends, the font handling, and the test suite.
+NativePdf only adds flexbox, bidirectional text, and inline SVG on top of that
+base. Without dompdf there would be nothing here to build on.
+
+dompdf was created by **Benj Carson** and is maintained today by **Brian Sweeney**
+and **Till Berger**, with help from a large community. Thank you to every dompdf
+contributor.
+
+ * dompdf project: https://github.com/dompdf/dompdf
+ * dompdf contributors: https://github.com/dompdf/dompdf/graphs/contributors
+ * Full author list, including the dompdf team and alumni: [AUTHORS.md](AUTHORS.md)
+
+NativePdf keeps dompdf's original LGPL 2.1 license: see [LICENSE.LGPL](LICENSE.LGPL).
