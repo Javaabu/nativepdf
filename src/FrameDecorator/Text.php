@@ -106,8 +106,14 @@ class Text extends AbstractFrameDecorator
     public function get_visual_text(): string
     {
         $text = $this->get_text();
+        $rtl = $this->bidi_level !== null && $this->bidi_level % 2 === 1;
 
-        if ($this->bidi_level === null || $this->bidi_level % 2 === 0) {
+        // Mark placement does not depend on the embedding level: a mark the
+        // font draws ahead of its base has to be emitted ahead of it either
+        // way. A left-to-right run only reaches that case through an override
+        // (`<bdo>`, `unicode-bidi: bidi-override`), so skip the grapheme walk
+        // unless the text actually carries right-to-left script characters.
+        if (!$rtl && !preg_match(self::RTL_BLOCK_PATTERN, $text)) {
             return $text;
         }
 
@@ -115,11 +121,12 @@ class Text extends AbstractFrameDecorator
             return $text;
         }
 
-        $clusters = array_reverse($matches[0]);
+        $clusters = $rtl ? array_reverse($matches[0]) : $matches[0];
 
         foreach ($clusters as &$cluster) {
+            $cluster = self::marksBeforeBase($cluster);
             // Mirror single-character clusters (brackets etc.)
-            if (strlen($cluster) <= 4) {
+            if ($rtl && strlen($cluster) <= 4) {
                 $cps = \Dompdf\Text\BidiAnalyzer::toCodePoints($cluster);
                 if (count($cps) === 1) {
                     $mirror = \Dompdf\Text\UnicodeData::mirror($cps[0]);
@@ -132,6 +139,111 @@ class Text extends AbstractFrameDecorator
         unset($cluster);
 
         return implode("", $clusters);
+    }
+
+    /**
+     * Blocks whose non-spacing marks are drawn ahead of their base. Every
+     * block from Hebrew (U+0590) through Arabic Extended-A (U+08FF) belongs to
+     * a right-to-left script, as do the listed presentation-form and
+     * supplementary-plane ranges.
+     */
+    /**
+     * Matches any character of a right-to-left script, i.e. the ranges below.
+     */
+    private const RTL_BLOCK_PATTERN = '/[\x{0590}-\x{08FF}\x{FB1D}-\x{FDFF}\x{FE70}-\x{FEFF}'
+        . '\x{10D00}-\x{10D3F}\x{10EC0}-\x{10EFF}\x{10F30}-\x{10F6F}\x{1E900}-\x{1E95F}]/u';
+
+    private const RTL_MARK_RANGES = [
+        [0x00590, 0x008FF], // Hebrew, Arabic, Syriac, Thaana, NKo, Samaritan, Mandaic
+        [0x0FB1D, 0x0FDFF], // Hebrew and Arabic presentation forms A
+        [0x0FE70, 0x0FEFF], // Arabic presentation forms B
+        [0x10D00, 0x10D3F], // Hanifi Rohingya
+        [0x10EC0, 0x10EFF], // Arabic Extended-C
+        [0x10F30, 0x10F6F], // Sogdian
+        [0x1E900, 0x1E95F], // Adlam
+    ];
+
+    /**
+     * UAX #9 L3: after L2 the combining marks of a right-to-left cluster
+     * precede their base, and the ordering is only reversed back if the
+     * rendering engine expects marks to follow the base. The canvas draws
+     * glyphs left to right using each glyph's own bearings, so which order it
+     * expects depends on how the font draws the mark:
+     *
+     *  - Marks of right-to-left scripts sit to the right of their origin
+     *    (Faruma's thaana abafili starts at +343 font units, DejaVu's arabic
+     *    fatha at +220, Noto's hebrew patah at +52), so they have to be
+     *    painted at the base's origin, i.e. emitted before it. Emitted after,
+     *    the base has already advanced the pen and the mark lands on the next
+     *    letter.
+     *  - Marks shared with left-to-right scripts sit to the left of their
+     *    origin (DejaVu's U+0301 starts at -655, U+0308 at -809), so they are
+     *    already correct where they are and must not be moved.
+     *
+     * Anything that is not a mark of a right-to-left script - generic
+     * diacritics, variation selectors such as U+FE0F - keeps its position.
+     *
+     * @param string $cluster
+     * @return string
+     */
+    private static function marksBeforeBase(string $cluster): string
+    {
+        if (strlen($cluster) <= 1) {
+            return $cluster;
+        }
+
+        $chars = preg_split('//u', $cluster, -1, PREG_SPLIT_NO_EMPTY);
+
+        if ($chars === false || count($chars) < 2) {
+            return $cluster;
+        }
+
+        $leading = [];
+        $rest = [];
+
+        foreach ($chars as $char) {
+            if (self::isPreBaseMark($char)) {
+                $leading[] = $char;
+            } else {
+                $rest[] = $char;
+            }
+        }
+
+        if ($leading === []) {
+            return $cluster;
+        }
+
+        return implode("", array_reverse($leading)) . implode("", $rest);
+    }
+
+    /**
+     * Whether the character is a non-spacing mark of a right-to-left script,
+     * which the font draws to the right of its origin.
+     *
+     * @param string $char A single character
+     * @return bool
+     */
+    private static function isPreBaseMark(string $char): bool
+    {
+        if (!preg_match('/^\p{Mn}$/u', $char)) {
+            return false;
+        }
+
+        $cps = \Dompdf\Text\BidiAnalyzer::toCodePoints($char);
+
+        if (count($cps) !== 1) {
+            return false;
+        }
+
+        $cp = $cps[0];
+
+        foreach (self::RTL_MARK_RANGES as [$from, $to]) {
+            if ($cp >= $from && $cp <= $to) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

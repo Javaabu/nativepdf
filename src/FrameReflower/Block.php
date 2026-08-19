@@ -488,6 +488,7 @@ class Block extends AbstractFrameReflower
                 // the split-off frame
                 $lines = $this->_frame->get_line_boxes();
                 $last_line_index = $this->_frame->is_split ? null : count($lines) - 1;
+                $rtl = $style->direction === "rtl";
 
                 foreach ($lines as $i => $line) {
                     if (!$line->inline) {
@@ -496,13 +497,29 @@ class Block extends AbstractFrameReflower
 
                     $line->trim_trailing_ws();
 
+                    $unjustified = $line->br || $i === $last_line_index;
+
+                    // A line that is not justified - the last one, or one
+                    // ended by a <br> - is aligned to the start edge, which is
+                    // the right edge in right-to-left text.
+                    if ($unjustified && $rtl) {
+                        $indent = $i === 0 ? $text_indent : 0;
+                        $dx = $width - $line->w - $line->right - $indent;
+
+                        foreach ($this->frames_to_move_horizontally($line) as $frame) {
+                            $frame->move($dx, 0);
+                        }
+
+                        continue;
+                    }
+
                     if ($line->left) {
                         foreach ($this->frames_to_move_horizontally($line) as $frame) {
                             $frame->move($line->left, 0);
                         }
                     }
 
-                    if ($line->br || $i === $last_line_index) {
+                    if ($unjustified) {
                         continue;
                     }
 
