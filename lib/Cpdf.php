@@ -134,6 +134,11 @@ class Cpdf
     private $numStates = 0;
 
     /**
+     * @var integer The number of shading (gradient) resources
+     */
+    private $numShadings = 0;
+
+    /**
      * @var array Number of graphic state resources used
      */
     private $gstates = [];
@@ -820,6 +825,10 @@ class Cpdf
                 $o['info']['extGStates'][] = ['objNum' => $options['objNum'], 'stateNum' => $options['stateNum']];
                 break;
 
+            case 'shading':
+                $o['info']['shadings'][] = ['objNum' => $options['objNum'], 'shadingNum' => $options['shadingNum']];
+                break;
+
             case 'xObject':
                 $o['info']['xObjects'][] = ['objNum' => $options['objNum'], 'label' => $options['label']];
                 break;
@@ -835,7 +844,8 @@ class Cpdf
 
                     if ((isset($o['info']['fonts']) && count($o['info']['fonts'])) ||
                         isset($o['info']['procset']) ||
-                        (isset($o['info']['extGStates']) && count($o['info']['extGStates']))
+                        (isset($o['info']['extGStates']) && count($o['info']['extGStates'])) ||
+                        (isset($o['info']['shadings']) && count($o['info']['shadings']))
                     ) {
                         $res .= "\n/Resources <<";
 
@@ -863,6 +873,14 @@ class Cpdf
                             $res .= "\n/ExtGState << ";
                             foreach ($o['info']['extGStates'] as $gstate) {
                                 $res .= "\n/GS" . $gstate['stateNum'] . " " . $gstate['objNum'] . " 0 R";
+                            }
+                            $res .= "\n>>";
+                        }
+
+                        if (isset($o['info']['shadings']) && count($o['info']['shadings'])) {
+                            $res .= "\n/Shading << ";
+                            foreach ($o['info']['shadings'] as $shading) {
+                                $res .= "\n/Sh" . $shading['shadingNum'] . " " . $shading['objNum'] . " 0 R";
                             }
                             $res .= "\n>>";
                         }
@@ -2123,7 +2141,8 @@ EOT;
 
                     if ((isset($pagesInfo['fonts']) && count($pagesInfo['fonts'])) ||
                         isset($pagesInfo['procset']) ||
-                        (isset($pagesInfo['extGStates']) && count($pagesInfo['extGStates']))
+                        (isset($pagesInfo['extGStates']) && count($pagesInfo['extGStates'])) ||
+                        (isset($pagesInfo['shadings']) && count($pagesInfo['shadings']))
                     ) {
                         $res .= "\n/Resources <<";
 
@@ -2151,6 +2170,14 @@ EOT;
                             $res .= "\n/ExtGState << ";
                             foreach ($pagesInfo['extGStates'] as $gstate) {
                                 $res .= "\n/GS" . $gstate['stateNum'] . " " . $gstate['objNum'] . " 0 R";
+                            }
+                            $res .= "\n>>";
+                        }
+
+                        if (isset($pagesInfo['shadings']) && count($pagesInfo['shadings'])) {
+                            $res .= "\n/Shading << ";
+                            foreach ($pagesInfo['shadings'] as $shading) {
+                                $res .= "\n/Sh" . $shading['shadingNum'] . " " . $shading['objNum'] . " 0 R";
                             }
                             $res .= "\n>>";
                         }
@@ -2511,6 +2538,128 @@ EOT;
         }
 
         return null;
+    }
+
+    /**
+     * a shading (gradient) object
+     *
+     * $options["info"] holds:
+     *  - type:   2 (axial) or 3 (radial)
+     *  - coords: [x0, y0, x1, y1] (axial) or [cx0, cy0, r0, cx1, cy1, r1] (radial)
+     *  - stops:  list of [offset (0-1), [r, g, b] (0-1)]
+     *  - extend: [bool, bool]
+     *
+     * @param int    $id
+     * @param string $action
+     * @param array  $options
+     * @return string|null
+     */
+    protected function o_shading($id, $action, $options = "")
+    {
+        switch ($action) {
+            case "new":
+                $this->objects[$id] = ['t' => 'shading', 'info' => $options];
+
+                // Tell the pages about the new resource
+                $this->numShadings++;
+                $this->o_pages($this->currentNode, 'shading', ["objNum" => $id, "shadingNum" => $this->numShadings]);
+                break;
+
+            case "out":
+                $o = &$this->objects[$id];
+                $info = $o["info"];
+                $type = $info["type"];
+                $coords = implode(" ", array_map(function ($v) {
+                    return sprintf('%.3F', $v);
+                }, $info["coords"]));
+                $extend = [
+                    !empty($info["extend"][0]) ? "true" : "false",
+                    !empty($info["extend"][1]) ? "true" : "false",
+                ];
+
+                $res = "\n$id 0 obj\n<< /ShadingType $type /ColorSpace /DeviceRGB";
+                $res .= "\n/Coords [$coords]";
+                $res .= "\n/Extend [" . $extend[0] . " " . $extend[1] . "]";
+                $res .= "\n/Function " . $this->shadingFunctionDict($info["stops"]);
+                $res .= "\n>>\nendobj";
+
+                return $res;
+        }
+
+        return null;
+    }
+
+    /**
+     * Build the PDF function dictionary interpolating between gradient stops:
+     * a type 3 (stitching) function over type 2 (exponential) segments.
+     *
+     * @param array $stops list of [offset (0-1), [r, g, b] (0-1)]
+     * @return string
+     */
+    private function shadingFunctionDict(array $stops)
+    {
+        $color = function ($c) {
+            return sprintf('%.3F %.3F %.3F', $c[0], $c[1], $c[2]);
+        };
+
+        // Normalize. Stops stay in source order: SVG requires an offset
+        // lower than the preceding one to be clamped up to it, which turns
+        // a decreasing pair into a hard transition. Sorting first would
+        // instead reverse the gradient.
+        // https://www.w3.org/TR/SVG11/pservers.html#StopElementOffsetAttribute
+        $prev = 0.0;
+        foreach ($stops as &$stop) {
+            $stop[0] = max($prev, min(1.0, $stop[0]));
+            $prev = $stop[0];
+        }
+        unset($stop);
+
+        // Ensure 0 and 1 endpoints
+        if ($stops[0][0] > 0.0) {
+            array_unshift($stops, [0.0, $stops[0][1]]);
+        }
+        $last = count($stops) - 1;
+        if ($stops[$last][0] < 1.0) {
+            $stops[] = [1.0, $stops[$last][1]];
+        }
+
+        $functions = [];
+        $bounds = [];
+        $encode = [];
+
+        // Only non-degenerate spans become segments. Coincident offsets
+        // (a hard transition, or a single stop padded out to both
+        // endpoints) would otherwise emit repeated /Bounds entries, which
+        // PDF rejects: the values must be strictly increasing.
+        for ($i = 0; $i < count($stops) - 1; $i++) {
+            if ($stops[$i + 1][0] <= $stops[$i][0]) {
+                continue;
+            }
+
+            if (count($functions) > 0) {
+                $bounds[] = sprintf('%.3F', $stops[$i][0]);
+            }
+
+            $functions[] = "<< /FunctionType 2 /Domain [0 1] /C0 [" . $color($stops[$i][1])
+                . "] /C1 [" . $color($stops[$i + 1][1]) . "] /N 1 >>";
+            $encode[] = "0 1";
+        }
+
+        if (count($functions) === 0) {
+            // Every stop shares one offset: a single flat color
+            $tail = end($stops);
+            $flat = $color($tail[1]);
+            return "<< /FunctionType 2 /Domain [0 1] /C0 [$flat] /C1 [$flat] /N 1 >>";
+        }
+
+        if (count($functions) === 1) {
+            return $functions[0];
+        }
+
+        return "<< /FunctionType 3 /Domain [0 1]"
+            . "\n/Functions [" . implode(" ", $functions) . "]"
+            . "\n/Bounds [" . implode(" ", $bounds) . "]"
+            . "\n/Encode [" . implode(" ", $encode) . "] >>";
     }
 
     /**
@@ -4053,6 +4202,70 @@ EOT;
             $this->gstates[$gstate] = $parameters;
         }
         $this->addContent("\n/GS$gstate gs");
+    }
+
+    /**
+     * Register an axial (linear) gradient shading resource.
+     *
+     * @param float $x0     Start point abscissa, in current user space
+     * @param float $y0     Start point ordinate
+     * @param float $x1     End point abscissa
+     * @param float $y1     End point ordinate
+     * @param array $stops  List of [offset (0-1), [r, g, b] (0-1)]
+     * @return string The shading resource name (e.g. "Sh1")
+     */
+    function addLinearGradient($x0, $y0, $x1, $y1, array $stops)
+    {
+        return $this->addShading(2, [$x0, $y0, $x1, $y1], $stops);
+    }
+
+    /**
+     * Register a radial gradient shading resource.
+     *
+     * @param float $cx0    Start circle center abscissa, in current user space
+     * @param float $cy0    Start circle center ordinate
+     * @param float $r0     Start circle radius
+     * @param float $cx1    End circle center abscissa
+     * @param float $cy1    End circle center ordinate
+     * @param float $r1     End circle radius
+     * @param array $stops  List of [offset (0-1), [r, g, b] (0-1)]
+     * @return string The shading resource name (e.g. "Sh1")
+     */
+    function addRadialGradient($cx0, $cy0, $r0, $cx1, $cy1, $r1, array $stops)
+    {
+        return $this->addShading(3, [$cx0, $cy0, $r0, $cx1, $cy1, $r1], $stops);
+    }
+
+    /**
+     * @param int   $type
+     * @param array $coords
+     * @param array $stops
+     * @return string
+     */
+    private function addShading($type, array $coords, array $stops)
+    {
+        $this->numObj++;
+        $this->o_shading($this->numObj, 'new', [
+            "type" => $type,
+            "coords" => $coords,
+            "stops" => $stops,
+            "extend" => [true, true],
+        ]);
+
+        return "Sh" . $this->numShadings;
+    }
+
+    /**
+     * Paint a previously registered shading across the current clipping
+     * region. Callers are expected to have set up an appropriate clip
+     * (e.g. the outline of the shape being filled) beforehand.
+     *
+     * @param string $name The shading resource name returned by
+     *        addLinearGradient()/addRadialGradient()
+     */
+    function applyShading($name)
+    {
+        $this->addContent("\n/$name sh");
     }
 
     /**
@@ -6302,31 +6515,251 @@ EOT;
     }
 
     /**
+     * Cache of parsed SVG documents and their viewport properties, keyed by
+     * file path (parsing is the expensive part; rendering re-reads the
+     * file).
+     *
+     * @var array
+     */
+    private $svgCache = [];
+
+    /**
      * add an SVG image into the document from a file
+     *
+     * The target box acts as the SVG viewport: the content (viewBox if
+     * present, else the intrinsic size) is fitted per the root element's
+     * preserveAspectRatio and clipped to the viewport.
      *
      * @param $file
      * @param $x
-     * @param $y
+     * @param $y  Bottom edge of the target box
      * @param int $w
      * @param int $h
      */
     function addSvgFromFile($file, $x, $y, $w = 0, $h = 0)
     {
-        $doc = new \Svg\Document();
-        if (property_exists($doc, 'allowExternalReferences')) {
-            $doc->allowExternalReferences = true;
+        if ($w <= 0 || $h <= 0) {
+            return;
         }
-        $doc->loadFile($file);
-        $dimensions = $doc->getDimensions();
+
+        if (!isset($this->svgCache[$file])) {
+            // Only immutable metadata is cached. Svg\Document accumulates
+            // parse state across render() calls -- most visibly the root
+            // element's own attributes, which make a second render treat
+            // the root <svg> as a nested group -- so every render needs a
+            // fresh instance.
+            $doc = $this->createSvgDocument($file);
+
+            $this->svgCache[$file] = [
+                "dimensions" => $doc->getDimensions(),
+                "root" => $this->parseSvgRootAttributes($file),
+            ];
+
+            // Keep the cache bounded
+            if (count($this->svgCache) > 100) {
+                array_shift($this->svgCache);
+            }
+        }
+
+        $root = $this->svgCache[$file]["root"];
+        $dimensions = $this->svgCache[$file]["dimensions"];
+        $dw = (float) $dimensions["width"];
+        $dh = (float) $dimensions["height"];
+
+        // Content coordinate system: the viewBox if present (the renderer
+        // translates its origin away), else the intrinsic size
+        if ($root["viewBox"] !== null) {
+            [, , $cw, $ch] = $root["viewBox"];
+        } else {
+            $cw = $dw;
+            $ch = $dh;
+        }
+
+        // An SVG with a zero-sized viewport or content system does not
+        // render
+        if ($dw <= 0 || $dh <= 0 || $cw <= 0 || $ch <= 0) {
+            return;
+        }
+
+        // preserveAspectRatio only maps a viewBox. Without one there is no
+        // viewBox transform to constrain, and the content scales onto the
+        // concrete viewport the same way any other replaced image does.
+        // https://www.w3.org/TR/SVG11/coords.html#PreserveAspectRatioAttribute
+        $align = $root["viewBox"] === null ? "none" : $root["align"];
+        $meetOrSlice = $root["meetOrSlice"];
+
+        if ($align === "none") {
+            $sx = $w / $cw;
+            $sy = $h / $ch;
+            $tx = 0.0;
+            $ty = 0.0;
+        } else {
+            $sx = $sy = $meetOrSlice === "slice"
+                ? max($w / $cw, $h / $ch)
+                : min($w / $cw, $h / $ch);
+
+            $alignFactor = ["Min" => 0.0, "Mid" => 0.5, "Max" => 1.0];
+            $xAlign = $alignFactor[substr($align, 1, 3)] ?? 0.5;
+            $yAlign = $alignFactor[substr($align, 5, 3)] ?? 0.5;
+
+            $tx = ($w - $cw * $sx) * $xAlign;
+            $ty = ($h - $ch * $sy) * $yAlign;
+        }
 
         $this->save();
 
-        $this->transform([$w / $dimensions["width"], 0, 0, $h / $dimensions["height"], $x, $y]);
+        // Clip to the viewport box
+        $this->clippingRectangle($x, $y, $w, $h);
 
-        $surface = new \Svg\Surface\SurfaceCpdf($doc, $this);
+        // Compose with the y-flip the SVG surface applies around the
+        // document height: content point (u, v) must land at
+        // (x + tx + sx*u, y + h - ty - sy*v)
+        $this->transform([$sx, 0, 0, $sy, $x + $tx, $y + $h - $ty - $sy * $dh]);
+
+        $doc = $this->createSvgDocument($file);
+        $surface = new \Dompdf\Svg\GradientAwareSurface($doc, $this, $file);
         $doc->render($surface);
 
+        $this->clippingEnd();
         $this->restore();
+    }
+
+    /**
+     * Build a fresh Svg\Document for a file.
+     *
+     * Svg\Document keeps parse state between render() calls, so instances
+     * are never shared across renders.
+     *
+     * @param string $file
+     * @return \Svg\Document
+     */
+    private function createSvgDocument($file)
+    {
+        $doc = new \Svg\Document();
+
+        if (property_exists($doc, 'allowExternalReferences')) {
+            $doc->allowExternalReferences = true;
+        }
+
+        $doc->loadFile($file);
+
+        return $doc;
+    }
+
+    /**
+     * Read viewBox and preserveAspectRatio from an SVG file's root element.
+     *
+     * @param string $file
+     * @return array ["viewBox" => float[4]|null, "align" => string, "meetOrSlice" => string]
+     */
+    private function parseSvgRootAttributes($file)
+    {
+        $result = [
+            "viewBox" => null,
+            "align" => "xMidYMid",
+            "meetOrSlice" => "meet",
+        ];
+
+        $attributes = $this->readSvgRootAttributes($file);
+
+        if ($attributes === null) {
+            return $result;
+        }
+
+        foreach ($attributes as $name => $value) {
+            $name = strtolower($name);
+
+            if ($name === "viewbox") {
+                $parts = preg_split('/[\s,]+/', trim($value));
+                if (count($parts) === 4 && (float) $parts[2] >= 0 && (float) $parts[3] >= 0) {
+                    $result["viewBox"] = array_map("floatval", $parts);
+                }
+            } elseif ($name === "preserveaspectratio") {
+                $parts = preg_split('/\s+/', trim($value));
+                // An optional leading "defer" is ignored
+                if (isset($parts[0]) && strtolower($parts[0]) === "defer") {
+                    array_shift($parts);
+                }
+                if (isset($parts[0])
+                    && preg_match('/^(none|x(?:Min|Mid|Max)Y(?:Min|Mid|Max))$/i', $parts[0])
+                ) {
+                    $result["align"] = $parts[0] === "none" ? "none" : $parts[0];
+                }
+                if (isset($parts[1]) && in_array(strtolower($parts[1]), ["meet", "slice"], true)) {
+                    $result["meetOrSlice"] = strtolower($parts[1]);
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Read the attributes of an SVG file's root element as a name => value
+     * map, or null if the file has no usable root element.
+     *
+     * XMLReader stops at the root element instead of building a tree, but
+     * it lives in an extension this package does not require, so DOM --
+     * which it does require -- serves as the fallback.
+     *
+     * @param string $file
+     * @return array|null
+     */
+    private function readSvgRootAttributes($file)
+    {
+        if (class_exists('XMLReader')) {
+            $reader = new \XMLReader();
+
+            if (@$reader->open($file) === false) {
+                return null;
+            }
+
+            $attributes = null;
+
+            while (@$reader->read()) {
+                if ($reader->nodeType !== \XMLReader::ELEMENT) {
+                    continue;
+                }
+
+                $attributes = [];
+
+                if (strtolower($reader->localName) === "svg") {
+                    while ($reader->moveToNextAttribute()) {
+                        $attributes[$reader->name] = $reader->value;
+                    }
+                }
+
+                break;
+            }
+
+            $reader->close();
+
+            return $attributes;
+        }
+
+        $previous = libxml_use_internal_errors(true);
+        $dom = new \DOMDocument();
+        $loaded = @$dom->load($file, LIBXML_NONET);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+
+        if ($loaded === false || $dom->documentElement === null) {
+            return null;
+        }
+
+        $root = $dom->documentElement;
+
+        if (strtolower($root->localName) !== "svg") {
+            return [];
+        }
+
+        $attributes = [];
+
+        foreach ($root->attributes as $attribute) {
+            $attributes[$attribute->nodeName] = $attribute->nodeValue;
+        }
+
+        return $attributes;
     }
 
     /**

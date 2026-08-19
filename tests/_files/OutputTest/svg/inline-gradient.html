@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    @page {
+        size: 300pt 220pt;
+        margin: 10pt;
+    }
+
+    body {
+        margin: 0;
+    }
+</style>
+</head>
+<body>
+<svg width="260" height="90" viewBox="0 0 260 90">
+    <defs>
+        <linearGradient id="lin" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="260" y2="0">
+            <stop offset="0" stop-color="#dc322f"/>
+            <stop offset="0.5" stop-color="#b58900"/>
+            <stop offset="1" stop-color="#268bd2"/>
+        </linearGradient>
+    </defs>
+    <rect x="0" y="0" width="260" height="90" fill="url(#lin)"/>
+</svg>
+<svg width="260" height="90" viewBox="0 0 260 90">
+    <defs>
+        <radialGradient id="rad" gradientUnits="userSpaceOnUse" cx="130" cy="45" r="90">
+            <stop offset="0" stop-color="#fdf6e3"/>
+            <stop offset="1" stop-color="#6c71c4"/>
+        </radialGradient>
+    </defs>
+    <rect x="0" y="0" width="260" height="90" fill="url(#rad)"/>
+</svg>
+<svg width="260" height="60" viewBox="0 0 260 60">
+    <defs>
+        <linearGradient id="obb">
+            <stop offset="0" stop-color="#dc322f"/>
+            <stop offset="1" stop-color="#268bd2"/>
+        </linearGradient>
+        <linearGradient id="rot" href="#obb" gradientTransform="rotate(90 0.5 0.5)"/>
+        <radialGradient id="focal" cx="0.5" cy="0.5" r="0.6" fx="0.3" fy="0.3">
+            <stop offset="0" stop-color="#fdf6e3"/>
+            <stop offset="1" stop-color="#859900"/>
+        </radialGradient>
+    </defs>
+    <rect x="0" y="5" width="80" height="50" fill="url(#obb)"/>
+    <rect x="90" y="5" width="80" height="50" fill="url(#rot)"/>
+    <circle cx="215" cy="30" r="25" fill="url(#focal)"/>
+</svg>
+</body>
+</html>

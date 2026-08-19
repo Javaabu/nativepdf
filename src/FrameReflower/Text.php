@@ -74,7 +74,7 @@ class Text extends AbstractFrameReflower
      * @param string $text
      * @return string
      */
-    protected function pre_process_text(string $text): string
+    public function pre_process_text(string $text): string
     {
         $style = $this->_frame->get_style();
 
@@ -113,6 +113,32 @@ class Text extends AbstractFrameReflower
         }
 
         return $text;
+    }
+
+    /**
+     * Split text into extended grapheme clusters.
+     *
+     * Character-level break opportunities land between typographic units,
+     * not between code points: breaking inside a cluster would strand a
+     * combining mark on a line of its own.
+     *
+     * @param string $text
+     * @return string[]
+     */
+    protected function grapheme_clusters(string $text): array
+    {
+        if ($text === "") {
+            return [];
+        }
+
+        if (preg_match_all('/\X/u', $text, $matches) > 0) {
+            return $matches[0];
+        }
+
+        // Not valid UTF-8; fall back to code points
+        $codepoints = preg_split('//u', $text, -1, PREG_SPLIT_NO_EMPTY);
+
+        return $codepoints === false ? [] : $codepoints;
     }
 
     /**
@@ -175,6 +201,8 @@ class Text extends AbstractFrameReflower
         $shy_width = $fontMetrics->getTextWidth(self::SOFT_HYPHEN, $font, $size);
 
         // @todo support <wbr>
+        $broke = false;
+
         for ($i = 0; $i < $wc; $i += 2) {
             // Allow trailing white space to overflow. White space is always
             // collapsed to the standard space character currently, so only
@@ -191,6 +219,7 @@ class Text extends AbstractFrameReflower
                 if (isset($words[$i - 1]) && self::SOFT_HYPHEN === $words[$i - 1]) {
                     $width += $shy_width;
                 }
+                $broke = true;
                 break;
             }
 
@@ -209,6 +238,33 @@ class Text extends AbstractFrameReflower
             }
         }
 
+        // word-break: break-all turns every character boundary into a break
+        // opportunity: fill the line with as many characters of the
+        // overflowing word as fit, even when part of it fits
+        // https://www.w3.org/TR/css-text-3/#word-break-property
+        if ($broke && $style->word_break === "break-all") {
+            $s = "";
+            $clusters = $this->grapheme_clusters($word);
+
+            foreach ($clusters as $c) {
+                $w = $fontMetrics->getTextWidth($str . $s . $c, $font, $size, $word_spacing, $letter_spacing);
+
+                if (Helpers::lengthGreater($w + $mbp_width, $available_width)) {
+                    break;
+                }
+
+                $s .= $c;
+            }
+
+            // Always force at least one character onto an otherwise empty
+            // line
+            if ($force_first && $str === "" && $s === "") {
+                $s = isset($clusters[0]) ? $clusters[0] : "";
+            }
+
+            return mb_strlen($str . $s, "UTF-8");
+        }
+
         // The first word has overflowed. Force it onto the line, or as many
         // characters as fit if breaking words is allowed
         if ($force_first && $width === 0.0) {
@@ -222,10 +278,11 @@ class Text extends AbstractFrameReflower
 
             if ($break_word) {
                 $s = "";
-                $len = mb_strlen($word, "UTF-8");
+                $clusters = $this->grapheme_clusters($word);
+                $count = count($clusters);
 
-                for ($j = 0; $j < $len; $j++) {
-                    $c = mb_substr($word, $j, 1, "UTF-8");
+                for ($j = 0; $j < $count; $j++) {
+                    $c = $clusters[$j];
                     $w = $fontMetrics->getTextWidth($s . $c, $font, $size, $word_spacing, $letter_spacing);
 
                     if (Helpers::lengthGreater($w, $available_width)) {
@@ -235,8 +292,8 @@ class Text extends AbstractFrameReflower
                     $s .= $c;
                 }
 
-                // Always force the first character onto the line
-                $str = $j === 0 ? $s . $c : $s;
+                // Always force the first cluster onto the line
+                $str = $j === 0 && $count > 0 ? $clusters[0] : $s;
             } else {
                 $str = $word;
             }
@@ -503,11 +560,12 @@ class Text extends AbstractFrameReflower
             case "pre-line":
             case "pre-wrap":
                 // The min width is the longest word or, if breaking words is
-                // allowed with the `anywhere` keyword, the widest character.
-                // For performance reasons, we only check the first character in
-                // the latter case.
+                // allowed with the `anywhere` keyword or `break-all`, the
+                // widest character. For performance reasons, we only check
+                // the first character in the latter case.
                 // https://www.w3.org/TR/css-text-3/#overflow-wrap-property
-                if ($style->overflow_wrap === "anywhere") {
+                // https://www.w3.org/TR/css-text-3/#word-break-property
+                if ($style->overflow_wrap === "anywhere" || $style->word_break === "break-all") {
                     $char = mb_substr($visible_text, 0, 1, "UTF-8");
                     $min = $fontMetrics->getTextWidth($char, $font, $size, $word_spacing, $letter_spacing);
                 } else {

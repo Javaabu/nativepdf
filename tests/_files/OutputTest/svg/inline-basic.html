@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    @page {
+        size: 300pt 200pt;
+        margin: 10pt;
+    }
+
+    body {
+        margin: 0;
+        font-family: Helvetica;
+        font-size: 10pt;
+    }
+</style>
+</head>
+<body>
+<p style="margin: 0 0 5pt 0">Shapes:</p>
+<svg width="200" height="100" viewBox="0 0 200 100">
+    <rect x="5" y="5" width="60" height="40" fill="#d33682" stroke="#000000" stroke-width="2"/>
+    <circle cx="110" cy="30" r="22" fill="#268bd2"/>
+    <ellipse cx="165" cy="30" rx="28" ry="15" fill="#859900"/>
+    <line x1="5" y1="60" x2="195" y2="60" stroke="#cb4b16" stroke-width="3"/>
+    <polygon points="20,95 40,65 60,95" fill="#b58900"/>
+    <path d="M 80 95 C 100 60 140 60 160 95 Z" fill="#6c71c4"/>
+</svg>
+<p style="margin: 5pt 0 0 0">Below the SVG.</p>
+</body>
+</html>

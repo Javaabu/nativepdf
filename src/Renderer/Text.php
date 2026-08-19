@@ -19,6 +19,12 @@ class Text extends AbstractRenderer
     /** Thickness of underline. Screen: 0.08, print: better less, e.g. 0.04 */
     const DECO_THICKNESS = 0.02;
 
+    /**
+     * Upper bound on the number of segments used to draw a `wavy`
+     * decoration, past which a plain line is drawn instead.
+     */
+    const MAX_DECO_SEGMENTS = 2000;
+
     //Tweaking if $base and $descent are not accurate.
     //Check method_exists( $this->_canvas, "get_cpdf" )
     //- For cpdf these can and must stay 0, because font metrics are used directly.
@@ -43,7 +49,7 @@ class Text extends AbstractRenderer
     function render(Frame $frame)
     {
         $style = $frame->get_style();
-        $text = $frame->get_text();
+        $text = $frame->get_visual_text();
 
         if ($text === "") {
             return;
@@ -119,35 +125,47 @@ class Text extends AbstractRenderer
 
         while (isset($stack[0])) {
             $f = array_pop($stack);
+            $deco_style = $f->get_style();
+            $lines = $deco_style->text_decoration_line;
 
-            if (($text_deco = $f->get_style()->text_decoration) === "none") {
+            if ($lines === "none" || $lines === "") {
                 continue;
             }
 
-            $deco_y = $y; //$line->y;
-            $color = $f->get_style()->color;
-
-            switch ($text_deco) {
-                default:
-                    continue 2;
-
-                case "underline":
-                    $deco_y += $base - $descent + $underline_offset + $line_thickness / 2;
-                    break;
-
-                case "overline":
-                    $deco_y += $overline_offset + $line_thickness / 2;
-                    break;
-
-                case "line-through":
-                    $deco_y += $base * 0.7 + $linethrough_offset;
-                    break;
+            $deco_color = $deco_style->text_decoration_color;
+            if ($deco_color === "currentcolor" || $deco_color === "") {
+                $deco_color = $deco_style->color;
+            } else {
+                $deco_color = \Dompdf\Css\Color::parse($deco_color);
             }
 
-            $dx = 0;
-            $x1 = $x - self::DECO_EXTENSION;
-            $x2 = $x + $width + $dx + self::DECO_EXTENSION;
-            $this->_canvas->line($x1, $deco_y, $x2, $deco_y, $color, $line_thickness);
+            $deco_line_style = $deco_style->text_decoration_style;
+
+            foreach (explode(" ", $lines) as $text_deco) {
+                $deco_y = $y; //$line->y;
+
+                switch ($text_deco) {
+                    default:
+                        continue 2;
+
+                    case "underline":
+                        $deco_y += $base - $descent + $underline_offset + $line_thickness / 2;
+                        break;
+
+                    case "overline":
+                        $deco_y += $overline_offset + $line_thickness / 2;
+                        break;
+
+                    case "line-through":
+                        $deco_y += $base * 0.7 + $linethrough_offset;
+                        break;
+                }
+
+                $x1 = $x - self::DECO_EXTENSION;
+                $x2 = $x + $width + self::DECO_EXTENSION;
+
+                $this->render_decoration_line($x1, $x2, $deco_y, $deco_color, $line_thickness, $deco_line_style);
+            }
         }
 
         $options = $this->_dompdf->getOptions();
@@ -156,6 +174,70 @@ class Text extends AbstractRenderer
             $fontMetrics = $this->_dompdf->getFontMetrics();
             $textWidth = $fontMetrics->getTextWidth($text, $font, $size, $word_spacing, $letter_spacing);
             $this->debugLayout([$x, $y, $textWidth, $frame_font_size], "orange", [0.5, 0.5]);
+        }
+    }
+
+    /**
+     * Draw one decoration line in the given text-decoration-style.
+     *
+     * @param float $x1
+     * @param float $x2
+     * @param float $y
+     * @param mixed $color
+     * @param float $thickness
+     * @param string $style `solid`, `double`, `dotted`, `dashed`, or `wavy`
+     */
+    protected function render_decoration_line(float $x1, float $x2, float $y, $color, float $thickness, string $style): void
+    {
+        switch ($style) {
+            case "double":
+                // Two lines separated by a gap of one thickness
+                $this->_canvas->line($x1, $y - $thickness, $x2, $y - $thickness, $color, $thickness);
+                $this->_canvas->line($x1, $y + $thickness, $x2, $y + $thickness, $color, $thickness);
+                break;
+
+            case "dotted":
+                $this->_canvas->line($x1, $y, $x2, $y, $color, $thickness, [$thickness, $thickness], "round");
+                break;
+
+            case "dashed":
+                $this->_canvas->line($x1, $y, $x2, $y, $color, $thickness, [3 * $thickness]);
+                break;
+
+            case "wavy":
+                // Zigzag with an amplitude and half-period scaled to the
+                // line thickness
+                $amp = $thickness * 1.5;
+                $step = $thickness * 3;
+
+                // A non-positive step never advances the cursor, and a
+                // step small enough relative to the run would take an
+                // unbounded number of segments to cover it. Both are
+                // reachable with a tiny or zero font size combined with
+                // letter spacing, and neither is visually distinguishable
+                // from a plain line, so draw one instead.
+                if (!($step > 0) || ($x2 - $x1) / $step > self::MAX_DECO_SEGMENTS) {
+                    $this->_canvas->line($x1, $y, $x2, $y, $color, $thickness);
+                    break;
+                }
+
+                $up = true;
+                $cx = $x1;
+
+                while ($cx < $x2) {
+                    $nx = min($cx + $step, $x2);
+                    $y1 = $up ? $y + $amp : $y - $amp;
+                    $y2 = $up ? $y - $amp : $y + $amp;
+                    $this->_canvas->line($cx, $y1, $nx, $y2, $color, $thickness);
+                    $cx = $nx;
+                    $up = !$up;
+                }
+                break;
+
+            case "solid":
+            default:
+                $this->_canvas->line($x1, $y, $x2, $y, $color, $thickness);
+                break;
         }
     }
 }

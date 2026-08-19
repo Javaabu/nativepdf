@@ -279,12 +279,147 @@ abstract class AbstractRenderer
      *
      * @throws \Exception
      */
-    protected function _background_image(string $url, float $x, float $y, float $width, float $height, Style $style): void
-    {
-        if (!function_exists("imagecreatetruecolor")) {
-            throw new \Exception("The PHP GD extension is required, but is not installed.");
+    /**
+     * Draw an SVG background image as vector tiles on the PDF canvas.
+     *
+     * @param string $img         Resolved image path
+     * @param float  $x           Border-box x in canvas coordinates
+     * @param float  $y           Border-box y
+     * @param float  $width       Paint-area width in pt
+     * @param float  $height      Paint-area height in pt
+     * @param float  $intrinsic_w Intrinsic width in px
+     * @param float  $intrinsic_h Intrinsic height in px
+     * @param Style  $style
+     */
+    protected function _render_svg_background(
+        string $img,
+        float $x,
+        float $y,
+        float $width,
+        float $height,
+        float $intrinsic_w,
+        float $intrinsic_h,
+        Style $style
+    ): void {
+        $dpi = $this->_dompdf->getOptions()->getDpi();
+
+        // Intrinsic tile size in pt
+        $tile_w = $intrinsic_w * 72 / $dpi;
+        $tile_h = $intrinsic_h * 72 / $dpi;
+        $ratio = $intrinsic_h > 0 ? $intrinsic_w / $intrinsic_h : 1.0;
+
+        if ($tile_w <= 0 || $tile_h <= 0) {
+            return;
         }
 
+        // background-size
+        $size = $style->background_size;
+
+        if ($size === "cover" || $size === "contain") {
+            $scale = $size === "cover"
+                ? max($width / $tile_w, $height / $tile_h)
+                : min($width / $tile_w, $height / $tile_h);
+            $tile_w *= $scale;
+            $tile_h *= $scale;
+        } else {
+            [$sw, $sh] = $size;
+            $w_spec = $sw === "auto" ? null : (float)$style->length_in_pt($sw, $width);
+            $h_spec = $sh === "auto" ? null : (float)$style->length_in_pt($sh, $height);
+
+            if ($w_spec !== null && $h_spec !== null) {
+                $tile_w = $w_spec;
+                $tile_h = $h_spec;
+            } elseif ($w_spec !== null) {
+                $tile_w = $w_spec;
+                $tile_h = $ratio > 0 ? $w_spec / $ratio : $tile_h;
+            } elseif ($h_spec !== null) {
+                $tile_h = $h_spec;
+                $tile_w = $h_spec * $ratio;
+            }
+        }
+
+        if ($tile_w <= 0 || $tile_h <= 0) {
+            return;
+        }
+
+        // background-position: a percentage aligns that point of the tile
+        // with the same point of the area; the position origin is the
+        // padding box (offset by the border widths)
+        [$bg_x, $bg_y] = $style->background_position;
+
+        if (Helpers::is_percent($bg_x)) {
+            $pos_x = ((float)$bg_x / 100) * ($width - $tile_w);
+        } else {
+            $pos_x = (float)$style->length_in_pt($bg_x, $width);
+        }
+
+        if (Helpers::is_percent($bg_y)) {
+            $pos_y = ((float)$bg_y / 100) * ($height - $tile_h);
+        } else {
+            $pos_y = (float)$style->length_in_pt($bg_y, $height);
+        }
+
+        $pos_x += (float)$style->length_in_pt($style->border_left_width, $width);
+        $pos_y += (float)$style->length_in_pt($style->border_top_width, $width);
+
+        // background-repeat
+        $repeat = $style->background_repeat;
+        $repeat_x = $repeat === "repeat" || $repeat === "repeat-x";
+        $repeat_y = $repeat === "repeat" || $repeat === "repeat-y";
+
+        $start_x = $pos_x;
+        if ($repeat_x) {
+            $start_x = fmod($pos_x, $tile_w);
+            if ($start_x > 0) {
+                $start_x -= $tile_w;
+            }
+        }
+
+        $start_y = $pos_y;
+        if ($repeat_y) {
+            $start_y = fmod($pos_y, $tile_h);
+            if ($start_y > 0) {
+                $start_y -= $tile_h;
+            }
+        }
+
+        $count_x = $repeat_x ? (int)ceil(($width - $start_x) / $tile_w) : 1;
+        $count_y = $repeat_y ? (int)ceil(($height - $start_y) / $tile_h) : 1;
+
+        // Cap the number of vector tiles
+        $max_tiles = 1000;
+        if ($count_x * $count_y > $max_tiles) {
+            trigger_error("SVG background tile count capped at $max_tiles", E_USER_WARNING);
+            $count_y = max(1, (int)($max_tiles / max(1, $count_x)));
+            if ($count_x > $max_tiles) {
+                $count_x = $max_tiles;
+                $count_y = 1;
+            }
+        }
+
+        $this->_canvas->clipping_rectangle($x, $y, $width, $height);
+
+        for ($j = 0; $j < $count_y; $j++) {
+            for ($i = 0; $i < $count_x; $i++) {
+                $tx = $x + $start_x + $i * $tile_w;
+                $ty = $y + $start_y + $j * $tile_h;
+
+                // Skip tiles fully outside the paint area
+                if ($tx >= $x + $width || $ty >= $y + $height
+                    || $tx + $tile_w <= $x || $ty + $tile_h <= $y
+                ) {
+                    continue;
+                }
+
+                $this->_canvas->image($img, $tx, $ty, $tile_w, $tile_h);
+            }
+        }
+
+        $this->_canvas->clipping_end();
+    }
+
+    protected function _background_image(string $url, float $x, float $y, float $width, float $height, Style $style): void
+    {
         $sheet = $style->get_stylesheet();
 
         // Skip degenerate cases
@@ -319,9 +454,22 @@ abstract class AbstractRenderer
         //Therefore read dimension directly from file, instead of creating gd object first.
         //$img_w = imagesx($src); $img_h = imagesy($src);
 
-        list($img_w, $img_h) = Helpers::dompdf_getimagesize($img, $this->_dompdf->getHttpContext());
+        list($img_w, $img_h, $img_type) = Helpers::dompdf_getimagesize($img, $this->_dompdf->getHttpContext());
         if ($img_w == 0 || $img_h == 0) {
             return;
+        }
+
+        // SVG backgrounds are drawn as vectors on the PDF canvas; the
+        // GD-based compositing below only handles raster types
+        if ($img_type === "svg") {
+            if ($this->_canvas instanceof \Dompdf\Adapter\CPDF) {
+                $this->_render_svg_background($img, $x, $y, $width, $height, (float)$img_w, (float)$img_h, $style);
+            }
+            return;
+        }
+
+        if (!function_exists("imagecreatetruecolor")) {
+            throw new \Exception("The PHP GD extension is required, but is not installed.");
         }
 
         // save for later check if file needs to be resized.

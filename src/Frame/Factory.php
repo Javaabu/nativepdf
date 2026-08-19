@@ -68,6 +68,44 @@ class Factory
         $style = $frame->get_style();
         $display = $style->display;
 
+        // Flex items: every in-flow element child of a flex container is a
+        // flex item with a blockified display
+        // https://www.w3.org/TR/css-flexbox-1/#flex-items
+        $parent = $frame->get_parent();
+        $is_flex_item = $parent !== null
+            && !$frame->is_text_node()
+            && $style->is_in_flow()
+            && $parent->get_style() !== null
+            && in_array($parent->get_style()->display, ["flex", "inline-flex"], true);
+
+        if ($is_flex_item) {
+            // https://www.w3.org/TR/css-display-3/#blockify
+            static $blockify = [
+                "inline" => "block",
+                "inline-block" => "block",
+                "inline-table" => "table",
+                "inline-flex" => "flex",
+                "table-row-group" => "block",
+                "table-header-group" => "block",
+                "table-footer-group" => "block",
+                "table-row" => "block",
+                "table-cell" => "block",
+                "table-column" => "block",
+                "table-column-group" => "block",
+                "table-caption" => "block",
+            ];
+
+            if (isset($blockify[$display])) {
+                $style->set_prop("display", $blockify[$display]);
+                $display = $style->display;
+            }
+
+            // Floats do not apply to flex items
+            if ($style->float !== "none") {
+                $style->set_prop("float", "none");
+            }
+        }
+
         switch ($display) {
 
             case "block":
@@ -131,6 +169,18 @@ class Factory
                 $reflower = "Block";
                 break;
 
+            case "flex":
+                $positioner = "Block";
+                $decorator = "Flex";
+                $reflower = "Flex";
+                break;
+
+            case "inline-flex":
+                $positioner = "Inline";
+                $decorator = "Flex";
+                $reflower = "Flex";
+                break;
+
             case "-dompdf-list-bullet":
                 if ($style->list_style_position === "inside") {
                     $positioner = "Inline";
@@ -189,6 +239,11 @@ class Factory
             $style->set_prop("display", "-dompdf-image");
             $decorator = "Image";
             $reflower = "Image";
+        }
+
+        // Flex items are positioned by their container
+        if ($is_flex_item && $style->display !== "none") {
+            $positioner = "FlexItem";
         }
 
         $decorator  = "Dompdf\\FrameDecorator\\$decorator";
@@ -251,7 +306,7 @@ class Factory
      *
      * @return AbstractPositioner
      */
-    protected static function getPositionerInstance(string $type): AbstractPositioner
+    public static function getPositionerInstance(string $type): AbstractPositioner
     {
         if (!isset(self::$_positioners[$type])) {
             $class = '\\Dompdf\\Positioner\\'.$type;

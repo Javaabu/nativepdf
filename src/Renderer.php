@@ -107,6 +107,8 @@ class Renderer extends AbstractRenderer
             case "inline-block":
             case "table":
             case "inline-table":
+            case "flex":
+            case "inline-flex":
                 $this->_render_frame("block", $frame);
                 break;
 
@@ -182,7 +184,7 @@ class Renderer extends AbstractRenderer
 
         $stack = [];
 
-        foreach ($frame->get_children() as $child) {
+        foreach ($frame->get_children_in_paint_order() as $child) {
             // < 0 : negative z-index
             // = 0 : no z-index, no stacking context
             // = 1 : stacking context without z-index

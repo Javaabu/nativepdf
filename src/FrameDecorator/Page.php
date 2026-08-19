@@ -43,6 +43,13 @@ class Page extends AbstractFrameDecorator
     protected $_in_table;
 
     /**
+     * Number of flex containers currently being reflowed
+     *
+     * @var int
+     */
+    protected $_in_flex;
+
+    /**
      * The pdf renderer
      *
      * @var Renderer
@@ -69,6 +76,7 @@ class Page extends AbstractFrameDecorator
         parent::__construct($frame, $dompdf);
         $this->_page_full = false;
         $this->_in_table = 0;
+        $this->_in_flex = 0;
         $this->bottom_page_edge = null;
     }
 
@@ -126,6 +134,24 @@ class Page extends AbstractFrameDecorator
     }
 
     /**
+     * Indicate to the page that a flex container is currently being
+     * reflowed. Page breaks inside flex containers are suppressed; an
+     * overflowing container is moved to the next page as a whole.
+     */
+    function flex_reflow_start()
+    {
+        $this->_in_flex++;
+    }
+
+    /**
+     * Indicate to the page that flex-container reflow is finished.
+     */
+    function flex_reflow_end()
+    {
+        $this->_in_flex--;
+    }
+
+    /**
      * Indicate to the page that a table is currently being reflowed.
      */
     function table_reflow_start()
@@ -166,6 +192,12 @@ class Page extends AbstractFrameDecorator
     {
         // Skip check if page is already split and for the body
         if ($this->_page_full || $frame->get_node()->nodeName === "body") {
+            return false;
+        }
+
+        // Forced breaks inside flex containers are suppressed; the container
+        // itself is checked by its parent before flex reflow starts
+        if ($this->_in_flex > 0) {
             return false;
         }
 
@@ -334,6 +366,13 @@ class Page extends AbstractFrameDecorator
                 return false;
             }
 
+            // Avoid breaks within flex containers
+            if ($this->_in_flex > ($frame->is_flex_container() ? 1 : 0)) {
+                Helpers::dompdf_debug("page-break", "In flex: " . $this->_in_flex);
+
+                return false;
+            }
+
             // Rule A
             if ($frame->get_style()->page_break_before === "avoid") {
                 Helpers::dompdf_debug("page-break", "before: avoid");
@@ -400,6 +439,13 @@ class Page extends AbstractFrameDecorator
                 // Avoid breaks within table-cells
                 if ($this->_in_table) {
                     Helpers::dompdf_debug("page-break", "In table: " . $this->_in_table);
+
+                    return false;
+                }
+
+                // Avoid breaks within flex containers
+                if ($this->_in_flex) {
+                    Helpers::dompdf_debug("page-break", "In flex: " . $this->_in_flex);
 
                     return false;
                 }
@@ -601,6 +647,7 @@ class Page extends AbstractFrameDecorator
         $pushed_flg = false;
 
         $in_table = $this->_in_table;
+        $in_flex = $this->_in_flex;
 
         Helpers::dompdf_debug("page-break", "Starting search");
         while ($iter) {
@@ -618,6 +665,7 @@ class Page extends AbstractFrameDecorator
                 $iter->split(null, true);
                 $this->_page_full = true;
                 $this->_in_table = $in_table;
+                $this->_in_flex = $in_flex;
                 $iter->_already_pushed = true;
                 $frame->_already_pushed = true;
 
@@ -629,6 +677,9 @@ class Page extends AbstractFrameDecorator
 
                 if ($next->is_table()) {
                     $this->_in_table++;
+                }
+                if ($next->is_flex_container()) {
+                    $this->_in_flex++;
                 }
 
                 $iter = $next;
@@ -656,6 +707,12 @@ class Page extends AbstractFrameDecorator
                     $this->_in_table--;
                 }
 
+                if ($next->is_flex_container() && !$iter->is_flex_container()) {
+                    $this->_in_flex++;
+                } elseif (!$next->is_flex_container() && $iter->is_flex_container()) {
+                    $this->_in_flex--;
+                }
+
                 $iter = $next;
                 $flg = false;
                 continue;
@@ -667,6 +724,9 @@ class Page extends AbstractFrameDecorator
                 if ($iter->is_table()) {
                     $this->_in_table--;
                 }
+                if ($iter->is_flex_container()) {
+                    $this->_in_flex--;
+                }
 
                 $iter = $next;
                 $flg = true;
@@ -677,12 +737,27 @@ class Page extends AbstractFrameDecorator
         }
 
         $this->_in_table = $in_table;
+        $this->_in_flex = $in_flex;
 
         // No valid page break found.  Just break at $frame.
         Helpers::dompdf_debug("page-break", "no valid break found, just splitting.");
 
-        // If we are in a table, backtrack to the nearest top-level table row
-        if ($this->_in_table) {
+        // If we are in a flex container, backtrack to the nearest flex
+        // container that has not been pushed yet and move it as a whole
+        if ($this->_in_flex) {
+            $iter = $frame;
+            while ($iter && !($iter->is_flex_container() && $iter->_already_pushed === false)) {
+                $iter = $iter->get_parent();
+            }
+
+            if ($iter) {
+                $iter->split(null, true);
+                $iter->_already_pushed = true;
+            } else {
+                return false;
+            }
+        } elseif ($this->_in_table) {
+            // If we are in a table, backtrack to the nearest top-level table row
             $iter = $frame;
             while ($iter && $iter->get_style()->display !== "table-row" && $iter->get_style()->display !== 'table-row-group' && $iter->_already_pushed === false) {
                 $iter = $iter->get_parent();

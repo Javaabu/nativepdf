@@ -274,6 +274,61 @@ class Color
             return $cache[$color] = self::getArray(vsprintf("%02X%02X%02X", $triplet), $alpha);
         }
 
+        // hsl( h s l [/α] ) / hsl( h,s,l[,α] ) format and alias hsla()
+        // https://www.w3.org/TR/css-color-4/#the-hsl-notation
+        if (mb_substr($color, 0, 4) === "hsl(" || mb_substr($color, 0, 5) === "hsla(") {
+            $components = self::parseColorFunction($color, 3);
+
+            if ($components === null) {
+                return null;
+            }
+
+            [$triplet, $alpha] = $components;
+            $h = self::parseHue($triplet[0]);
+            $s = self::parseFraction($triplet[1]);
+            $l = self::parseFraction($triplet[2]);
+
+            if ($h === null || $s === null || $l === null) {
+                return null;
+            }
+
+            [$r, $g, $b] = self::hslToRgb($h, $s, $l);
+
+            return $cache[$color] = self::getArray(sprintf("%02X%02X%02X", $r, $g, $b), $alpha);
+        }
+
+        // hwb( h w b [/α] ) format
+        // https://www.w3.org/TR/css-color-4/#the-hwb-notation
+        if (mb_substr($color, 0, 4) === "hwb(") {
+            $components = self::parseColorFunction($color, 3);
+
+            if ($components === null) {
+                return null;
+            }
+
+            [$triplet, $alpha] = $components;
+            $h = self::parseHue($triplet[0]);
+            $w = self::parseFraction($triplet[1]);
+            $bl = self::parseFraction($triplet[2]);
+
+            if ($h === null || $w === null || $bl === null) {
+                return null;
+            }
+
+            if ($w + $bl >= 1) {
+                $gray = (int) round($w / ($w + $bl) * 255);
+                $rgb = [$gray, $gray, $gray];
+            } else {
+                $rgb = self::hslToRgb($h, 1.0, 0.5);
+                foreach ($rgb as &$channel) {
+                    $channel = (int) round(($channel / 255 * (1 - $w - $bl) + $w) * 255);
+                }
+                unset($channel);
+            }
+
+            return $cache[$color] = self::getArray(sprintf("%02X%02X%02X", $rgb[0], $rgb[1], $rgb[2]), $alpha);
+        }
+
         // cmyk( c,m,y,k ) format
         // http://www.w3.org/TR/css3-gcpm/#cmyk-colors
         if (mb_substr($color, 0, 5) === "cmyk(") {
@@ -335,5 +390,134 @@ class Color
         }
 
         return $c;
+    }
+
+    /**
+     * Split a color function's arguments into a component triplet and an
+     * alpha value; supports the comma-separated and the space-with-slash
+     * syntaxes.
+     *
+     * @param string $color
+     * @param int    $count Number of components before the alpha
+     *
+     * @return array|null [components, alpha]
+     */
+    protected static function parseColorFunction(string $color, int $count): ?array
+    {
+        $i = mb_strpos($color, "(");
+        $j = mb_strpos($color, ")");
+
+        if ($i === false || $j === false) {
+            return null;
+        }
+
+        $value_decl = trim(mb_substr($color, $i + 1, $j - $i - 1));
+
+        if (mb_strpos($value_decl, ",") === false) {
+            $parts = preg_split("/\s*\/\s*/", $value_decl);
+            $components = preg_split("/\s+/", $parts[0]);
+            $alpha = $parts[1] ?? 1.0;
+        } else {
+            $parts = preg_split("/\s*,\s*/", $value_decl);
+            $components = array_slice($parts, 0, $count);
+            $alpha = $parts[$count] ?? 1.0;
+        }
+
+        if (count($components) !== $count) {
+            return null;
+        }
+
+        if (Helpers::is_percent($alpha)) {
+            $alpha = (float) $alpha / 100;
+        } else {
+            $alpha = (float) $alpha;
+        }
+
+        return [$components, max(0.0, min($alpha, 1.0))];
+    }
+
+    /**
+     * Parse a hue component into degrees; supports deg, grad, rad, and
+     * turn units.
+     *
+     * @param string $value
+     * @return float|null
+     */
+    protected static function parseHue(string $value): ?float
+    {
+        $value = trim($value);
+
+        if (preg_match('/^(-?\d*\.?\d+)(deg|grad|rad|turn)?$/', $value, $m)) {
+            $number = (float) $m[1];
+
+            switch ($m[2] ?? "deg") {
+                case "grad":
+                    return $number * 0.9;
+                case "rad":
+                    return $number * 180 / M_PI;
+                case "turn":
+                    return $number * 360;
+                default:
+                    return $number;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Parse a percentage (or unitless number in [0, 1]) into a fraction.
+     *
+     * @param string $value
+     * @return float|null
+     */
+    protected static function parseFraction(string $value): ?float
+    {
+        $value = trim($value);
+
+        if (Helpers::is_percent($value)) {
+            $fraction = (float) $value / 100;
+        } elseif (is_numeric($value)) {
+            $fraction = (float) $value;
+        } else {
+            return null;
+        }
+
+        return max(0.0, min($fraction, 1.0));
+    }
+
+    /**
+     * @param float $h Hue in degrees
+     * @param float $s Saturation fraction
+     * @param float $l Lightness fraction
+     *
+     * @return int[] [r, g, b] in 0-255
+     */
+    protected static function hslToRgb(float $h, float $s, float $l): array
+    {
+        $h = fmod(fmod($h, 360) + 360, 360);
+        $c = (1 - abs(2 * $l - 1)) * $s;
+        $hp = $h / 60;
+        $x = $c * (1 - abs(fmod($hp, 2) - 1));
+
+        if ($hp < 1) {
+            $rgb = [$c, $x, 0];
+        } elseif ($hp < 2) {
+            $rgb = [$x, $c, 0];
+        } elseif ($hp < 3) {
+            $rgb = [0, $c, $x];
+        } elseif ($hp < 4) {
+            $rgb = [0, $x, $c];
+        } elseif ($hp < 5) {
+            $rgb = [$x, 0, $c];
+        } else {
+            $rgb = [$c, 0, $x];
+        }
+
+        $m = $l - $c / 2;
+
+        return array_map(function ($channel) use ($m) {
+            return (int) round(($channel + $m) * 255);
+        }, $rgb);
     }
 }

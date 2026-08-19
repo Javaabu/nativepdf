@@ -14,6 +14,7 @@ use Dompdf\Exception;
 use Dompdf\FontMetrics;
 use Dompdf\Frame\FrameTree;
 use Dompdf\Helpers;
+use Dompdf\InlineSvg;
 
 /**
  * The master stylesheet class
@@ -431,6 +432,51 @@ class Stylesheet
     {
         $a = ($selector === "!attr") ? 1 : 0;
 
+        // Functional pseudo-classes have their own specificity rules:
+        // `:where()` contributes nothing, `:is()` and `:not()` the
+        // specificity of their most specific argument
+        // https://www.w3.org/TR/selectors-4/#specificity-rules
+        if (strpos($selector, ":is(") !== false
+            || strpos($selector, ":not(") !== false
+            || strpos($selector, ":where(") !== false
+        ) {
+            $selector = preg_replace_callback(
+                '/:(is|not|where)\(([^)]*)\)/i',
+                function ($m) {
+                    if (strtolower($m[1]) === "where") {
+                        return "";
+                    }
+
+                    $best = "";
+                    $bestValue = -1;
+
+                    foreach (explode(",", $m[2]) as $arg) {
+                        $arg = trim($arg);
+                        // A leading type selector counts towards the type
+                        // component whether or not the same compound also
+                        // carries an attribute selector
+                        $value = (min(mb_substr_count($arg, "#"), 255) << 16)
+                            | (min(mb_substr_count($arg, ".") + mb_substr_count($arg, "["), 255) << 8)
+                            | (preg_match('/^[-\w]/', $arg) ? 1 : 0);
+
+                        if ($value > $bestValue) {
+                            $bestValue = $value;
+                            $best = $arg;
+                        }
+                    }
+
+                    return $best;
+                },
+                $selector
+            );
+        }
+
+        // A selector that consisted only of `:where()` has been replaced by
+        // nothing and contributes no specificity at all
+        if ($selector === "") {
+            return self::$_stylesheet_origins[$origin];
+        }
+
         $b = min(mb_substr_count($selector, "#"), 255);
 
         $c = min(mb_substr_count($selector, ".") +
@@ -475,6 +521,258 @@ class Stylesheet
      *
      * @return array|null
      */
+    /**
+     * Translate a comma-separated list of compound selectors into a single
+     * XPath condition (used for the arguments of `:is()`, `:where()`, and
+     * `:not()`).
+     *
+     * @param string $list
+     * @return string|null The condition, or null for unsupported arguments
+     */
+    protected function selectorListToCondition(string $list): ?string
+    {
+        if ($list === "") {
+            return null;
+        }
+
+        $conditions = [];
+
+        foreach ($this->splitSelectorList($list) as $compound) {
+            $condition = $this->compoundToCondition(trim($compound));
+
+            if ($condition === null) {
+                return null;
+            }
+
+            $conditions[] = $condition;
+        }
+
+        return count($conditions) > 1
+            ? "(" . implode(") or (", $conditions) . ")"
+            : $conditions[0];
+    }
+
+    /**
+     * The XPath node test for a type selector.
+     *
+     * Inline `<svg>` elements are rewritten to `<img>` before selectors are
+     * matched, so a type selector naming them has to match the replacement
+     * too, or root rules such as `svg { width: 200pt }` would silently stop
+     * applying.
+     *
+     * @param string $name A lowercased tag name, or `*`
+     * @return string
+     */
+    protected function type_node_test(string $name): string
+    {
+        if ($name !== "svg") {
+            return $name;
+        }
+
+        return "*[self::svg or self::img[@" . InlineSvg::CONVERTED_ATTR . "]]";
+    }
+
+    /**
+     * The same test as {@see type_node_test()}, in predicate form.
+     *
+     * @param string $name A lowercased tag name
+     * @return string
+     */
+    protected function type_predicate(string $name): string
+    {
+        if ($name !== "svg") {
+            return "name() = '$name'";
+        }
+
+        return "(self::svg or self::img[@" . InlineSvg::CONVERTED_ATTR . "])";
+    }
+
+    /**
+     * Split a comma-separated selector list on the commas that actually
+     * separate compounds, leaving those inside attribute selectors,
+     * functional-pseudo arguments and quoted values alone.
+     *
+     * Delimiters are all ASCII, and UTF-8 continuation bytes never collide
+     * with them, so this walks bytes.
+     *
+     * @param string $list
+     * @return string[]
+     */
+    protected function splitSelectorList(string $list): array
+    {
+        $parts = [];
+        $current = "";
+        $depth = 0;
+        $quote = "";
+        $length = strlen($list);
+
+        for ($i = 0; $i < $length; $i++) {
+            $c = $list[$i];
+
+            if ($quote !== "") {
+                $current .= $c;
+
+                if ($c === "\\" && $i + 1 < $length) {
+                    $current .= $list[++$i];
+                } elseif ($c === $quote) {
+                    $quote = "";
+                }
+
+                continue;
+            }
+
+            if ($c === '"' || $c === "'") {
+                $quote = $c;
+            } elseif ($c === "[" || $c === "(") {
+                $depth++;
+            } elseif ($c === "]" || $c === ")") {
+                $depth = max(0, $depth - 1);
+            } elseif ($c === "," && $depth === 0) {
+                $parts[] = $current;
+                $current = "";
+                continue;
+            }
+
+            $current .= $c;
+        }
+
+        $parts[] = $current;
+
+        return $parts;
+    }
+
+    /**
+     * Build an XPath string literal for an arbitrary value.
+     *
+     * XPath 1.0 has no escape syntax inside literals, so a value carrying
+     * both quote characters has to be assembled with concat().
+     *
+     * @param string $value
+     * @return string
+     */
+    protected function xpathLiteral(string $value): string
+    {
+        if (strpos($value, "'") === false) {
+            return "'" . $value . "'";
+        }
+
+        if (strpos($value, '"') === false) {
+            return '"' . $value . '"';
+        }
+
+        $parts = [];
+
+        foreach (explode("'", $value) as $i => $chunk) {
+            if ($i > 0) {
+                $parts[] = '"\'"';
+            }
+
+            if ($chunk !== "") {
+                $parts[] = "'" . $chunk . "'";
+            }
+        }
+
+        return "concat(" . implode(", ", $parts) . ")";
+    }
+
+    /**
+     * Translate a compound selector (tag, classes, id, attribute selectors;
+     * no combinators) into an XPath condition.
+     *
+     * @param string $compound
+     * @return string|null
+     */
+    protected function compoundToCondition(string $compound): ?string
+    {
+        if ($compound === ""
+            || !preg_match('/^(\*|[-\w]+)?((?:\.[-\w]+|#[-\w]+|\[[^\]]+\])*)$/u', $compound, $m)
+        ) {
+            return null;
+        }
+
+        $tag = $m[1] ?? "";
+        $rest = $m[2] ?? "";
+        $conditions = [];
+
+        if ($tag !== "" && $tag !== "*") {
+            // Tag names are case-insensitive
+            $conditions[] = "name() = '" . strtolower($tag) . "'";
+        }
+
+        if ($rest !== "") {
+            preg_match_all('/\.([-\w]+)|#([-\w]+)|\[([^\]]+)\]/u', $rest, $parts, PREG_SET_ORDER);
+
+            foreach ($parts as $part) {
+                if (isset($part[1]) && $part[1] !== "") {
+                    $class = $part[1];
+                    $conditions[] = "contains(concat(' ', normalize-space(@class), ' '), concat(' ', '$class', ' '))";
+                } elseif (isset($part[2]) && $part[2] !== "") {
+                    $conditions[] = "@id = '" . $part[2] . "'";
+                } else {
+                    $condition = $this->attributeToCondition($part[3]);
+
+                    if ($condition === null) {
+                        return null;
+                    }
+
+                    $conditions[] = $condition;
+                }
+            }
+        }
+
+        return count($conditions) > 0 ? implode(" and ", $conditions) : "true()";
+    }
+
+    /**
+     * Translate the contents of an attribute selector into an XPath
+     * condition.
+     *
+     * @param string $expr
+     * @return string|null
+     */
+    protected function attributeToCondition(string $expr): ?string
+    {
+        if (!preg_match('/^([-\w:]+)\s*(?:([~^$*|]?=)\s*(.*))?$/u', trim($expr), $m)) {
+            return null;
+        }
+
+        $attr = $m[1];
+
+        if (!isset($m[2])) {
+            return "@$attr";
+        }
+
+        $value = trim($m[3] ?? "");
+        // Strip quotes
+        if (strlen($value) >= 2
+            && ($value[0] === '"' || $value[0] === "'")
+            && substr($value, -1) === $value[0]
+        ) {
+            $value = substr($value, 1, -1);
+        }
+
+        $literal = $this->xpathLiteral($value);
+
+        switch ($m[2]) {
+            case "=":
+                return "@$attr = $literal";
+            case "~=":
+                return "contains(concat(' ', normalize-space(@$attr), ' '), concat(' ', $literal, ' '))";
+            case "^=":
+                return "starts-with(@$attr, $literal)";
+            case "$=":
+                $len = mb_strlen($value, "UTF-8");
+                return "substring(@$attr, string-length(@$attr) - $len + 1) = $literal";
+            case "*=":
+                return "contains(@$attr, $literal)";
+            case "|=":
+                $prefix = $this->xpathLiteral($value . "-");
+                return "(@$attr = $literal or starts-with(@$attr, $prefix))";
+        }
+
+        return null;
+    }
+
     protected function selectorToXpath(string $selector, bool $firstPass = false): ?array
     {
         // Collapse white space and strip whitespace around delimiters
@@ -561,7 +859,7 @@ class Stylesheet
 
                     // Tag names are case-insensitive
                     $name = $tok === "" ? "*" : strtolower($tok);
-                    $query .= "/$expr::$name";
+                    $query .= "/$expr::" . $this->type_node_test($name);
                     break;
 
                 case "+":
@@ -573,7 +871,7 @@ class Stylesheet
                     $query .= "/following-sibling::*[1]";
 
                     if ($name !== "*") {
-                        $query .= "[name() = '$name']";
+                        $query .= "[" . $this->type_predicate($name) . "]";
                     }
                     break;
 
@@ -583,7 +881,7 @@ class Stylesheet
 
                     // Tag names are case-insensitive
                     $name = $tok === "" ? "*" : strtolower($tok);
-                    $query .= "/following-sibling::$name";
+                    $query .= "/following-sibling::" . $this->type_node_test($name);
                     break;
 
                 case "#":
@@ -661,15 +959,15 @@ class Stylesheet
                         // to their `:*-child` counterparts here. They might
                         // not be properly expressible in XPath 1.0
                         case "first-of-type":
-                            $query .= "[not(preceding-sibling::$name)]";
+                            $query .= "[not(preceding-sibling::" . $this->type_node_test($name) . ")]";
                             break;
 
                         case "last-of-type":
-                            $query .= "[not(following-sibling::$name)]";
+                            $query .= "[not(following-sibling::" . $this->type_node_test($name) . ")]";
                             break;
 
                         case "only-of-type":
-                            $query .= "[not(preceding-sibling::$name) and not(following-sibling::$name)]";
+                            $query .= "[not(preceding-sibling::" . $this->type_node_test($name) . ") and not(following-sibling::" . $this->type_node_test($name) . ")]";
                             break;
 
                         // https://www.w3.org/TR/selectors-3/#nth-of-type-pseudo
@@ -680,8 +978,8 @@ class Stylesheet
                             $p = $i + 1;
                             $nth = trim(mb_substr($selector, $p, mb_strpos($selector, ")", $i, "UTF-8") - $p, "UTF-8"));
                             $position = $last
-                                ? "(count(following-sibling::$name) + 1)"
-                                : "(count(preceding-sibling::$name) + 1)";
+                                ? "(count(following-sibling::" . $this->type_node_test($name) . ") + 1)"
+                                : "(count(preceding-sibling::" . $this->type_node_test($name) . ") + 1)";
 
                             $condition = $this->selectorAnPlusB($nth, $position);
                             $query .= "[$condition]";
@@ -690,6 +988,38 @@ class Stylesheet
                         // https://www.w3.org/TR/selectors-4/#empty-pseudo
                         case "empty":
                             $query .= "[not(*) and not(normalize-space())]";
+                            break;
+
+                        // https://www.w3.org/TR/selectors-4/#negation
+                        // https://www.w3.org/TR/selectors-4/#matches-pseudo
+                        // https://www.w3.org/TR/selectors-4/#zero-matches
+                        // Arguments are limited to compound selectors
+                        // (no combinators or functional pseudo-classes)
+                        case "not":
+                        case "is":
+                        case "where":
+                            $p = $i + 1;
+                            $close = mb_strpos($selector, ")", $i, "UTF-8");
+
+                            if ($close === false) {
+                                return null;
+                            }
+
+                            $argList = trim(mb_substr($selector, $p, $close - $p, "UTF-8"));
+                            $condition = $this->selectorListToCondition($argList);
+
+                            if ($condition === null) {
+                                return null;
+                            }
+
+                            $query .= $tok === "not"
+                                ? "[not($condition)]"
+                                : "[$condition]";
+
+                            // Consume the argument list; class and id
+                            // tokens within it would otherwise be
+                            // re-processed as part of the selector
+                            $i = $close + 1;
                             break;
 
                         // TODO: bit of a hack attempt at matches support, currently only matches against elements

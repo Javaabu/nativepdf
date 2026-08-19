@@ -384,6 +384,17 @@ class Frame
         return new FrameListIterator($this);
     }
 
+    /**
+     * The children in the order they are to be painted, which is document
+     * order except where a layout mode reorders them.
+     *
+     * @return iterable<Frame>
+     */
+    public function get_children_in_paint_order(): iterable
+    {
+        return $this->get_children();
+    }
+
     // Layout property accessors
 
     /**
@@ -873,6 +884,22 @@ class Frame
         $display = $this->get_style()->display;
 
         return $this->_is_cache["inline_level"] = in_array($display, Style::INLINE_LEVEL_TYPES, true);
+    }
+
+    /**
+     * Whether the frame is a flex container.
+     *
+     * @return bool
+     */
+    public function is_flex_container(): bool
+    {
+        if (isset($this->_is_cache["flex_container"])) {
+            return $this->_is_cache["flex_container"];
+        }
+
+        $display = $this->get_style()->display;
+
+        return $this->_is_cache["flex_container"] = ($display === "flex" || $display === "inline-flex");
     }
 
     /**

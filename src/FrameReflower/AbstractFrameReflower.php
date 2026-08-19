@@ -14,6 +14,7 @@ use Dompdf\Css\Content\NoCloseQuote;
 use Dompdf\Css\Content\NoOpenQuote;
 use Dompdf\Css\Content\OpenQuote;
 use Dompdf\Css\Content\StringPart;
+use Dompdf\Css\Style;
 use Dompdf\Dompdf;
 use Dompdf\Frame;
 use Dompdf\Frame\Factory;
@@ -315,13 +316,71 @@ abstract class AbstractFrameReflower
      *
      * @return float
      */
+    /**
+     * The horizontal border and padding widths to subtract from a specified
+     * width-type value when `box-sizing: border-box` applies, else 0.
+     *
+     * @param float|null $cbw Width of the containing block.
+     *
+     * @return float
+     */
+    protected function border_box_width_delta(?float $cbw): float
+    {
+        $style = $this->_frame->get_style();
+
+        // Tables already treat their specified width as including border and
+        // padding (see FrameReflower\Table::_assign_widths), so `box-sizing`
+        // does not modify their sizing here
+        if ($style->box_sizing !== "border-box"
+            || in_array($style->display, Style::TABLE_TYPES, true)
+        ) {
+            return 0.0;
+        }
+
+        return (float)$style->length_in_pt([
+            $style->border_left_width,
+            $style->border_right_width,
+            $style->padding_left,
+            $style->padding_right
+        ], $cbw ?? 0);
+    }
+
+    /**
+     * The vertical border and padding widths to subtract from a specified
+     * height-type value when `box-sizing: border-box` applies, else 0.
+     *
+     * Percentage paddings resolve against the width of the containing block.
+     *
+     * @param float|null $cbw Width of the containing block.
+     *
+     * @return float
+     */
+    protected function border_box_height_delta(?float $cbw): float
+    {
+        $style = $this->_frame->get_style();
+
+        // See border_box_width_delta() for the table exception
+        if ($style->box_sizing !== "border-box"
+            || in_array($style->display, Style::TABLE_TYPES, true)
+        ) {
+            return 0.0;
+        }
+
+        return (float)$style->length_in_pt([
+            $style->border_top_width,
+            $style->border_bottom_width,
+            $style->padding_top,
+            $style->padding_bottom
+        ], $cbw ?? 0);
+    }
+
     protected function resolve_min_width(?float $cbw): float
     {
         $style = $this->_frame->get_style();
         $min_width = $style->min_width;
 
         return $min_width !== "auto"
-            ? $style->length_in_pt($min_width, $cbw ?? 0)
+            ? max(0.0, $style->length_in_pt($min_width, $cbw ?? 0) - $this->border_box_width_delta($cbw))
             : 0.0;
     }
 
@@ -341,7 +400,7 @@ abstract class AbstractFrameReflower
         $max_width = $style->max_width;
 
         return $max_width !== "none"
-            ? $style->length_in_pt($max_width, $cbw ?? INF)
+            ? max(0.0, $style->length_in_pt($max_width, $cbw ?? INF) - $this->border_box_width_delta($cbw))
             : INF;
     }
 
@@ -355,13 +414,13 @@ abstract class AbstractFrameReflower
      *
      * @return float
      */
-    protected function resolve_min_height(?float $cbh): float
+    protected function resolve_min_height(?float $cbh, ?float $cbw = null): float
     {
         $style = $this->_frame->get_style();
         $min_height = $style->min_height;
 
         return $min_height !== "auto"
-            ? $style->length_in_pt($min_height, $cbh ?? 0)
+            ? max(0.0, $style->length_in_pt($min_height, $cbh ?? 0) - $this->border_box_height_delta($cbw))
             : 0.0;
     }
 
@@ -372,16 +431,18 @@ abstract class AbstractFrameReflower
      * height is not defined.
      *
      * @param float|null $cbh Height of the containing block.
+     * @param float|null $cbw Width of the containing block, used to resolve
+     *        the border and padding subtracted for `box-sizing: border-box`.
      *
      * @return float
      */
-    protected function resolve_max_height(?float $cbh): float
+    protected function resolve_max_height(?float $cbh, ?float $cbw = null): float
     {
         $style = $this->_frame->get_style();
         $max_height = $style->max_height;
 
         return $max_height !== "none"
-            ? $style->length_in_pt($style->max_height, $cbh ?? INF)
+            ? max(0.0, $style->length_in_pt($style->max_height, $cbh ?? INF) - $this->border_box_height_delta($cbw))
             : INF;
     }
 

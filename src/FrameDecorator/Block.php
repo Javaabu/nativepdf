@@ -41,6 +41,23 @@ class Block extends AbstractFrameDecorator
     protected $dangling_markers;
 
     /**
+     * Whether bidi analysis has run for this block's inline content.
+     * Deliberately not cleared by reset(): analysis runs once per document
+     * and stays valid across page re-reflows.
+     *
+     * @var bool
+     */
+    public $bidi_analyzed = false;
+
+    /**
+     * The paragraph embedding level of this block's inline content
+     * (0 = LTR, 1 = RTL).
+     *
+     * @var int
+     */
+    public $bidi_base = 0;
+
+    /**
      * Block constructor.
      * @param Frame $frame
      * @param Dompdf $dompdf

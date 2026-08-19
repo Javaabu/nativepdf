@@ -95,6 +95,46 @@ class Text extends AbstractFrameDecorator
     }
 
     /**
+     * The text as it is to be drawn: frames on an odd (right-to-left)
+     * embedding level render their text in reverse grapheme order with
+     * mirrored characters substituted (UAX #9 rules L2/L4). Measurement
+     * continues to use get_text(); per-character width sums are
+     * order-independent.
+     *
+     * @return string
+     */
+    public function get_visual_text(): string
+    {
+        $text = $this->get_text();
+
+        if ($this->bidi_level === null || $this->bidi_level % 2 === 0) {
+            return $text;
+        }
+
+        if (!preg_match_all('/\X/u', $text, $matches)) {
+            return $text;
+        }
+
+        $clusters = array_reverse($matches[0]);
+
+        foreach ($clusters as &$cluster) {
+            // Mirror single-character clusters (brackets etc.)
+            if (strlen($cluster) <= 4) {
+                $cps = \Dompdf\Text\BidiAnalyzer::toCodePoints($cluster);
+                if (count($cps) === 1) {
+                    $mirror = \Dompdf\Text\UnicodeData::mirror($cps[0]);
+                    if ($mirror !== null) {
+                        $cluster = \Dompdf\Text\ArabicShaper::encode($mirror);
+                    }
+                }
+            }
+        }
+        unset($cluster);
+
+        return implode("", $clusters);
+    }
+
+    /**
      * @return string
      */
     function get_text()
@@ -211,6 +251,9 @@ class Text extends AbstractFrameDecorator
             $split_style->set_used("font_family", $this->mapped_font);
             $deco->mapped_font = $this->mapped_font;
         }
+
+        // Both halves of a split stay within the same bidi level run
+        $deco->bidi_level = $this->bidi_level;
 
         // Clear decoration widths at the split point. They might have been
         // copied from the parent frame during inline reflow

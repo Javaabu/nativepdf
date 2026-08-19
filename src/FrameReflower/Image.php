@@ -108,10 +108,18 @@ class Image extends AbstractFrameReflower
         $height = $cbh === null && Helpers::is_percent($computed_height)
             ? "auto"
             : $style->length_in_pt($computed_height, $cbh ?? 0);
+
+        if ($width !== "auto") {
+            $width = max(0.0, $width - $this->border_box_width_delta($cbw));
+        }
+        if ($height !== "auto") {
+            $height = max(0.0, $height - $this->border_box_height_delta($cbw));
+        }
+
         $min_width = $this->resolve_min_width($cbw);
         $max_width = $this->resolve_max_width($cbw);
-        $min_height = $this->resolve_min_height($cbh);
-        $max_height = $this->resolve_max_height($cbh);
+        $min_height = $this->resolve_min_height($cbh, $cbw);
+        $max_height = $this->resolve_max_height($cbh, $cbw);
 
         if ($width === "auto" && $height === "auto") {
             // Use intrinsic dimensions, resampled to pt

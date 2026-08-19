@@ -407,6 +407,10 @@ class Dompdf
      */
     public function loadDOM($doc, $quirksmode = false)
     {
+        // Convert inline <svg> elements to <img> elements with a data URI,
+        // so they render through the image pipeline
+        InlineSvg::convert($doc, $this->protocol, $this->baseHost, $this->basePath);
+
         // Remove #text children nodes in nodes that shouldn't have
         $tag_names = ["html", "head", "table", "tbody", "thead", "tfoot", "tr"];
         foreach ($tag_names as $tag_name) {
@@ -516,6 +520,11 @@ class Dompdf
 
             $html5 = new HTML5(["encoding" => "UTF-8", "disable_html_ns" => true]);
             $dom = $html5->loadHTML($str);
+
+            // Convert inline <svg> elements while the DOM still has
+            // attribute-case fidelity; the loadHTML normalization below is
+            // namespace-blind and would mangle SVG content (e.g. `viewBox`)
+            InlineSvg::convert($dom, $this->protocol, $this->baseHost, $this->basePath);
 
             // extra step to normalize the HTML document structure
             // see Masterminds/html5-php#166

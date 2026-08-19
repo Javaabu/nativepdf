@@ -2,6 +2,8 @@
 <!--suppress XmlUnboundNsPrefix -->
 <ruleset name="PHP-SDK">
  <description>Coding standard ruleset based on the PSR-2 coding standard.</description>
+ <!-- Generated Unicode data tables (bin/generate-unicode-data.php) -->
+ <exclude-pattern>lib/res/unicode/*</exclude-pattern>
  <rule ref="PSR2"/>
  <rule ref="Generic.Files.LineLength.TooLong">
   <severity>0</severity>

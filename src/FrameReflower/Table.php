@@ -278,8 +278,8 @@ class Table extends AbstractFrameReflower
 
         // Handle min/max height
         // https://www.w3.org/TR/CSS21/visudet.html#min-max-heights
-        $min_height = $this->resolve_min_height($cb["h"]);
-        $max_height = $this->resolve_max_height($cb["h"]);
+        $min_height = $this->resolve_min_height($cb["h"], $cb["w"]);
+        $max_height = $this->resolve_max_height($cb["h"], $cb["w"]);
         $height = Helpers::clamp($height, $min_height, $max_height);
 
         // Use the content height or the height value, whichever is greater

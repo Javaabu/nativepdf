@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    @page {
+        size: 300pt 260pt;
+        margin: 10pt;
+    }
+
+    body {
+        margin: 0;
+        font-family: Helvetica;
+        font-size: 8pt;
+    }
+
+    .row {
+        display: flex;
+        gap: 8pt;
+        background: #f5f5f5;
+        margin-bottom: 6pt;
+    }
+
+    .row > div {
+        width: 40pt;
+        height: 20pt;
+        background: #268bd2;
+    }
+</style>
+</head>
+<body>
+<div class="row" style="justify-content: flex-start;"><div></div><div></div><div></div></div>
+<div class="row" style="justify-content: center;"><div></div><div></div><div></div></div>
+<div class="row" style="justify-content: flex-end;"><div></div><div></div><div></div></div>
+<div class="row" style="justify-content: space-between;"><div></div><div></div><div></div></div>
+<div class="row" style="justify-content: space-around;"><div></div><div></div><div></div></div>
+<div class="row" style="justify-content: space-evenly;"><div></div><div></div><div></div></div>
+<div class="row" style="flex-direction: row-reverse;"><div style="background:#dc322f"></div><div></div><div></div></div>
+</body>
+</html>

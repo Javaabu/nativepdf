@@ -747,6 +747,32 @@ class SelectorTest extends TestCase
             "escaped classname characters" => [
                 '.w-\[var\(--sidebar-width\)\]',
                 '<body><div class="w-\[var\(--sidebar-width\)\]"></div></body>'
+            ],
+
+            // Selectors Level 4 functional pseudo-classes
+            ":not class" => [
+                'div:not(.skip)',
+                '<body><div class="skip"></div><div class="keep" data-match></div></body>'
+            ],
+            ":not attribute" => [
+                'span:not([data-x="1"])',
+                '<body><span data-x="1"></span><span data-x="2" data-match></span></body>'
+            ],
+            ":not chained" => [
+                'div:not(.a):not(.b)',
+                '<body><div class="a"></div><div class="b"></div><div class="c" data-match></div></body>'
+            ],
+            ":is tags and class" => [
+                ':is(h1, h2, .pick)',
+                '<body><h2 data-match></h2><span class="pick" data-match></span><span class="other"></span></body>'
+            ],
+            ":is compound arguments" => [
+                'li:is(.a, #b)',
+                '<body><li class="a" data-match></li><li id="b" data-match></li><li class="c"></li><span class="a"></span></body>'
+            ],
+            ":where class" => [
+                'p:where(.low)',
+                '<body><p class="low" data-match></p><p class="high"></p></body>'
             ]
         ];
     }

@@ -233,6 +233,33 @@ class StyleTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    public static function boxSizingProvider(): array
+    {
+        return [
+            ["content-box", "content-box"],
+            ["border-box", "border-box"],
+            ["BORDER-BOX", "border-box"],
+
+            // Invalid values fall back to the initial value
+            ["padding-box", "content-box"],
+            ["invalid", "content-box"]
+        ];
+    }
+
+    /**
+     * @dataProvider boxSizingProvider
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('boxSizingProvider')]
+    public function testBoxSizing(string $value, string $expected): void
+    {
+        $dompdf = new Dompdf();
+        $sheet = new Stylesheet($dompdf);
+        $s = new Style($sheet);
+
+        $s->set_prop("box_sizing", $value);
+        $this->assertSame($expected, $s->box_sizing);
+    }
+
     public static function cssImageBasicProvider(): array
     {
         return [

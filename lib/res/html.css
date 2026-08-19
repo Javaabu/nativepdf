@@ -293,14 +293,14 @@ ul, menu, dir {
   display: block;
   list-style-type: disc;
   margin: 1em 0;
-  padding-left: 40px;
+  padding-inline-start: 40px;
 }
 
 ol {
   display: block;
   list-style-type: decimal;
   margin: 1em 0;
-  padding-left: 40px;
+  padding-inline-start: 40px;
 }
 
 li {
@@ -516,6 +516,38 @@ img, img_generated {
 
 dompdf_generated {
   display: inline;
+}
+
+/* bidirectional text
+   The [dir] attribute selectors only match the lowercase attribute values;
+   dir="auto" additionally triggers first-strong detection in the layout
+   engine. */
+[dir="ltr"] {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+[dir="rtl"] {
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+
+[dir="auto"] {
+  unicode-bidi: isolate;
+}
+
+bdi {
+  unicode-bidi: isolate;
+}
+
+bdo[dir="ltr"] {
+  direction: ltr;
+  unicode-bidi: bidi-override;
+}
+
+bdo[dir="rtl"] {
+  direction: rtl;
+  unicode-bidi: bidi-override;
 }
 
 /* hidden elements */

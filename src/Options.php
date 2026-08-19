@@ -271,6 +271,13 @@ class Options
     private $isFontSubsettingEnabled = true;
 
     /**
+     * Enable bidirectional text processing (UAX #9) and Arabic shaping
+     *
+     * @var bool
+     */
+    private $isBidiEnabled = true;
+
+    /**
      * @var bool
      */
     private $debugPng = false;
@@ -926,6 +933,32 @@ class Options
     public function getImageByteSizeLimit()
     {
         return $this->imageByteSizeLimit;
+    }
+
+    /**
+     * @param boolean $isBidiEnabled
+     * @return $this
+     */
+    public function setIsBidiEnabled($isBidiEnabled)
+    {
+        $this->isBidiEnabled = $isBidiEnabled;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getIsBidiEnabled()
+    {
+        return $this->isBidiEnabled;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isBidiEnabled()
+    {
+        return $this->isBidiEnabled;
     }
 
     /**

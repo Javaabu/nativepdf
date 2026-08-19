@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    @page {
+        size: 300pt 200pt;
+        margin: 10pt;
+    }
+
+    body {
+        margin: 0;
+        font-family: Helvetica;
+        font-size: 8pt;
+    }
+
+    .outer {
+        display: flex;
+        gap: 6pt;
+        height: 120pt;
+    }
+
+    .sidebar {
+        flex: 0 0 70pt;
+        background: #073642;
+        color: #fdf6e3;
+        padding: 5pt;
+    }
+
+    .main {
+        flex: 1;
+        display: flex;
+        flex-direction: row;
+        gap: 6pt;
+    }
+
+    .card {
+        flex: 1;
+        background: #eee8d5;
+        border: 1pt solid #93a1a1;
+        padding: 5pt;
+    }
+</style>
+</head>
+<body>
+<div class="outer">
+    <div class="sidebar">sidebar</div>
+    <div class="main">
+        <div class="card">card one</div>
+        <div class="card">card two with longer text that wraps onto multiple lines</div>
+    </div>
+</div>
+</body>
+</html>

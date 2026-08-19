@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    @page {
+        size: 300pt 260pt;
+        margin: 10pt;
+    }
+
+    body {
+        margin: 0;
+        font-family: Helvetica;
+        font-size: 8pt;
+    }
+
+    div {
+        height: 50pt;
+        margin-bottom: 6pt;
+        border: 1pt solid #93a1a1;
+    }
+
+    .norepeat {
+        background: url("../../square.svg") no-repeat;
+    }
+
+    .repeat {
+        background: url("../../square.svg") repeat;
+        background-size: 20pt 20pt;
+    }
+
+    .repeatx {
+        background: url("../../square.svg") repeat-x;
+        background-size: 25pt 25pt;
+        background-position: 10pt 10pt;
+    }
+
+    .cover {
+        background: url("../../square.svg") no-repeat;
+        background-size: cover;
+    }
+
+    .positioned {
+        background: url("../../square.svg") no-repeat;
+        background-size: 30pt 30pt;
+        background-position: 50% 50%;
+    }
+</style>
+</head>
+<body>
+<div class="norepeat">no-repeat</div>
+<div class="repeat">repeat 20pt</div>
+<div class="repeatx">repeat-x at 10pt 10pt</div>
+<div class="cover">cover</div>
+<div class="positioned">centered 30pt</div>
+</body>
+</html>

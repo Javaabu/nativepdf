@@ -81,6 +81,7 @@ use Dompdf\Helpers;
  * @property float|string         $border_top_right_radius     Radius in pt or a percentage value
  * @property string               $border_radius               Only use for setting all corners to the same radius
  * @property float|string         $bottom                      Length in pt, a percentage value, or `auto`
+ * @property string               $box_sizing                  `content-box` or `border-box`
  * @property string               $caption_side
  * @property string               $clear
  * @property string               $clip
@@ -96,6 +97,21 @@ use Dompdf\Helpers;
  * @property string               $display
  * @property string               $elevation
  * @property string               $empty_cells
+ * @property string               $align_content
+ * @property string               $align_items
+ * @property string               $align_self
+ * @property float|string         $column_gap                  Length in pt or a percentage value
+ * @property string               $flex                        Only use for setting flex grow, shrink, and basis at once
+ * @property float|string         $flex_basis                  Length in pt, a percentage value, `auto`, or `content`
+ * @property string               $flex_direction
+ * @property string               $flex_flow                   Only use for setting flex direction and wrap at once
+ * @property float                $flex_grow
+ * @property float                $flex_shrink
+ * @property string               $flex_wrap
+ * @property string               $gap                         Only use for setting row and column gap at once
+ * @property string               $justify_content
+ * @property int                  $order
+ * @property float|string         $row_gap                     Length in pt or a percentage value
  * @property string               $float
  * @property string               $font_family
  * @property float                $font_size                   Length in pt
@@ -156,7 +172,10 @@ use Dompdf\Helpers;
  * @property string               $stress
  * @property string               $table_layout
  * @property string               $text_align
- * @property string               $text_decoration
+ * @property string               $text_decoration             Only use for setting text-decoration line, color, and style at once
+ * @property string               $text_decoration_line        Space-separated list of `underline`, `overline`, `line-through`, or `none`
+ * @property string               $text_decoration_color       Color or `currentcolor`
+ * @property string               $text_decoration_style       `solid`, `double`, `dotted`, `dashed`, or `wavy`
  * @property float|string         $text_indent                 Length in pt or a percentage value
  * @property string               $text_transform
  * @property float|string         $top                         Length in pt, a percentage value, or `auto`
@@ -276,7 +295,7 @@ class Style
         "block",
         // "flow-root",
         "list-item",
-        // "flex",
+        "flex",
         // "grid",
         "table"
     ];
@@ -289,7 +308,7 @@ class Style
     public const INLINE_LEVEL_TYPES = [
         "inline",
         "inline-block",
-        // "inline-flex",
+        "inline-flex",
         // "inline-grid",
         "inline-table"
     ];
@@ -317,7 +336,7 @@ class Style
     /**
      * List of all block (inner) display types.
      */
-    public const BLOCK_TYPES = ["block", "inline-block", "table-cell", "list-item"];
+    public const BLOCK_TYPES = ["block", "inline-block", "table-cell", "list-item", "flex", "inline-flex"];
 
     /**
      * List of all table (inner) display types.
@@ -434,6 +453,15 @@ class Style
             "border_bottom_right_radius",
             "border_bottom_left_radius"
         ],
+        "flex" => [
+            "flex_grow",
+            "flex_shrink",
+            "flex_basis"
+        ],
+        "flex_flow" => [
+            "flex_direction",
+            "flex_wrap"
+        ],
         "font" => [
             "font_family",
             "font_size",
@@ -442,6 +470,15 @@ class Style
             "font_variant",
             "font_weight",
             "line_height"
+        ],
+        "gap" => [
+            "row_gap",
+            "column_gap"
+        ],
+        "text_decoration" => [
+            "text_decoration_line",
+            "text_decoration_color",
+            "text_decoration_style"
         ],
         "inset" => [
             "top",
@@ -567,7 +604,9 @@ class Style
             "border_right_width"
         ],
         "direction" => [
-            "text_align"
+            "text_align",
+            "padding_left",
+            "padding_right"
         ],
         "font_size" => [
             "background_position",
@@ -811,6 +850,7 @@ class Style
             $d["border_radius"] = "";
             $d["border"] = "";
             $d["bottom"] = "auto";
+            $d["box_sizing"] = "content-box";
             $d["caption_side"] = "top";
             $d["clear"] = "none";
             $d["clip"] = "auto";
@@ -826,6 +866,25 @@ class Style
             $d["display"] = "inline";
             $d["elevation"] = "level";
             $d["empty_cells"] = "show";
+
+            // Flexible box layout
+            // https://www.w3.org/TR/css-flexbox-1/
+            $d["align_content"] = "stretch";
+            $d["align_items"] = "stretch";
+            $d["align_self"] = "auto";
+            $d["column_gap"] = 0.0;
+            $d["flex"] = "";
+            $d["flex_basis"] = "auto";
+            $d["flex_direction"] = "row";
+            $d["flex_flow"] = "";
+            $d["flex_grow"] = 0.0;
+            $d["flex_shrink"] = 1.0;
+            $d["flex_wrap"] = "nowrap";
+            $d["gap"] = "";
+            $d["justify_content"] = "flex-start";
+            $d["order"] = 0;
+            $d["row_gap"] = 0.0;
+
             $d["float"] = "none";
             $d["font_family"] = $stylesheet->get_dompdf()->getOptions()->getDefaultFont();
             $d["font_size"] = "medium";
@@ -864,6 +923,8 @@ class Style
             $d["padding_right"] = 0.0;
             $d["padding_bottom"] = 0.0;
             $d["padding_left"] = 0.0;
+            $d["padding_inline_start"] = "";
+            $d["padding_inline_end"] = "";
             $d["padding"] = "";
             $d["page_break_after"] = "auto";
             $d["page_break_before"] = "auto";
@@ -887,7 +948,10 @@ class Style
             $d["stress"] = "50";
             $d["table_layout"] = "auto";
             $d["text_align"] = "";
-            $d["text_decoration"] = "none";
+            $d["text_decoration"] = "";
+            $d["text_decoration_line"] = "none";
+            $d["text_decoration_color"] = "currentcolor";
+            $d["text_decoration_style"] = "solid";
             $d["text_indent"] = 0.0;
             $d["text_transform"] = "none";
             $d["top"] = "auto";
@@ -1161,6 +1225,48 @@ class Style
         elseif ($unit === "ex") {
             // FIXME: em:ex ratio?
             $value = $v * $font_size / 2;
+        }
+
+        elseif ($unit === "ch") {
+            // Advance width of the "0" glyph in the current font
+            $metrics = $this->_stylesheet->get_dompdf()->getFontMetrics();
+            $zero = $metrics->getTextWidth("0", $this->__get("font_family"), $font_size);
+            $value = $v * ($zero > 0 ? $zero : $font_size / 2);
+
+            // Skip caching: the font family is not part of the cache key
+            return $value;
+        }
+
+        elseif ($unit === "vw" || $unit === "vh" || $unit === "vmin" || $unit === "vmax") {
+            // Viewport-percentage lengths resolve against the initial
+            // containing block (the size of the first page; later `@page`
+            // size changes are not reflected)
+            $canvas = $this->_stylesheet->get_dompdf()->getCanvas();
+
+            if ($canvas === null) {
+                return null;
+            }
+
+            $vw = $canvas->get_width();
+            $vh = $canvas->get_height();
+
+            switch ($unit) {
+                case "vw":
+                    $value = $v / 100 * $vw;
+                    break;
+                case "vh":
+                    $value = $v / 100 * $vh;
+                    break;
+                case "vmin":
+                    $value = $v / 100 * min($vw, $vh);
+                    break;
+                default:
+                    $value = $v / 100 * max($vw, $vh);
+                    break;
+            }
+
+            // Skip caching: the viewport size is not part of the cache key
+            return $value;
         }
 
         elseif ($unit === "in") {
@@ -2565,7 +2671,7 @@ class Style
         return $val === "currentcolor"
             || $val === "transparent"
             || isset(Color::$cssColorNames[$val])
-            || preg_match("/^#|rgb\(|rgba\(|cmyk\(/", $val);
+            || preg_match("/^#|rgb\(|rgba\(|hsl\(|hsla\(|hwb\(|cmyk\(/", $val);
     }
 
     /**
@@ -2879,6 +2985,253 @@ class Style
     /**
      * @link https://www.w3.org/TR/CSS21/visuren.html#display-prop
      */
+    /**
+     * @link https://www.w3.org/TR/css-text-decor-3/#text-decoration-line-property
+     */
+    protected function _compute_text_decoration_line(string $val)
+    {
+        $val = strtolower($val);
+
+        if ($val === "none") {
+            return $val;
+        }
+
+        $parts = array_unique(preg_split("/\s+/", trim($val)));
+        $valid = ["underline", "overline", "line-through", "blink"];
+
+        foreach ($parts as $part) {
+            if (!in_array($part, $valid, true)) {
+                return null;
+            }
+        }
+
+        return implode(" ", $parts);
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-text-decor-3/#text-decoration-color-property
+     */
+    protected function _compute_text_decoration_color(string $val)
+    {
+        return $this->compute_color_value($val);
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-text-decor-3/#text-decoration-style-property
+     */
+    protected function _compute_text_decoration_style(string $val)
+    {
+        $val = strtolower($val);
+
+        return in_array($val, ["solid", "double", "dotted", "dashed", "wavy"], true)
+            ? $val
+            : null;
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-text-3/#word-break-property
+     */
+    protected function _compute_word_break(string $val)
+    {
+        $val = strtolower($val);
+
+        return in_array($val, ["normal", "break-all", "keep-all"], true)
+            ? $val
+            : null;
+    }
+
+    /**
+     * @link https://www.w3.org/TR/CSS21/visuren.html#propdef-direction
+     */
+    protected function _compute_direction(string $val)
+    {
+        $val = strtolower($val);
+
+        return $val === "ltr" || $val === "rtl" ? $val : null;
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-writing-modes-4/#propdef-unicode-bidi
+     */
+    protected function _compute_unicode_bidi(string $val)
+    {
+        $val = strtolower($val);
+
+        return in_array($val, ["normal", "embed", "isolate", "bidi-override", "isolate-override", "plaintext"], true)
+            ? $val
+            : null;
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-flexbox-1/#propdef-flex-direction
+     */
+    protected function _compute_flex_direction(string $val)
+    {
+        $val = strtolower($val);
+
+        return in_array($val, ["row", "row-reverse", "column", "column-reverse"], true)
+            ? $val
+            : null;
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-flexbox-1/#propdef-flex-wrap
+     */
+    protected function _compute_flex_wrap(string $val)
+    {
+        $val = strtolower($val);
+
+        return in_array($val, ["nowrap", "wrap", "wrap-reverse"], true)
+            ? $val
+            : null;
+    }
+
+    /**
+     * `start` and `end` are preserved as computed values: they are
+     * flow-relative and only coincide with `flex-start`/`flex-end` when the
+     * main axis is not reversed.
+     *
+     * @link https://www.w3.org/TR/css-align-3/#propdef-justify-content
+     */
+    protected function _compute_justify_content(string $val)
+    {
+        $val = strtolower($val);
+
+        if ($val === "normal") {
+            return "flex-start";
+        }
+
+        return in_array($val, ["flex-start", "flex-end", "center", "space-between", "space-around", "space-evenly", "start", "end"], true)
+            ? $val
+            : null;
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-align-3/#propdef-align-items
+     */
+    protected function _compute_align_items(string $val)
+    {
+        $val = strtolower($val);
+
+        if ($val === "normal") {
+            return "stretch";
+        }
+
+        return in_array($val, ["stretch", "flex-start", "flex-end", "center", "baseline", "start", "end"], true)
+            ? $val
+            : null;
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-align-3/#propdef-align-self
+     */
+    protected function _compute_align_self(string $val)
+    {
+        $val = strtolower($val);
+
+        if ($val === "normal") {
+            return "stretch";
+        }
+
+        return in_array($val, ["auto", "stretch", "flex-start", "flex-end", "center", "baseline", "start", "end"], true)
+            ? $val
+            : null;
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-align-3/#propdef-align-content
+     */
+    protected function _compute_align_content(string $val)
+    {
+        $val = strtolower($val);
+
+        if ($val === "normal") {
+            return "stretch";
+        }
+
+        return in_array($val, ["stretch", "flex-start", "flex-end", "center", "space-between", "space-around", "space-evenly", "start", "end"], true)
+            ? $val
+            : null;
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-flexbox-1/#propdef-flex-grow
+     */
+    protected function _compute_flex_grow(string $val)
+    {
+        $number = $this->compute_number($val);
+
+        return $number !== null && $number >= 0 ? $number : null;
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-flexbox-1/#propdef-flex-shrink
+     */
+    protected function _compute_flex_shrink(string $val)
+    {
+        $number = $this->compute_number($val);
+
+        return $number !== null && $number >= 0 ? $number : null;
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-flexbox-1/#propdef-flex-basis
+     */
+    protected function _compute_flex_basis(string $val)
+    {
+        $lower = strtolower($val);
+
+        if ($lower === "auto" || $lower === "content") {
+            return $lower;
+        }
+
+        return $this->compute_length_percentage_positive($val);
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-flexbox-1/#propdef-order
+     */
+    protected function _compute_order(string $val)
+    {
+        return $this->compute_integer($val);
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-align-3/#propdef-row-gap
+     */
+    protected function _compute_row_gap(string $val)
+    {
+        if (strtolower($val) === "normal") {
+            return 0.0;
+        }
+
+        return $this->compute_length_percentage_positive($val);
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-align-3/#propdef-column-gap
+     */
+    protected function _compute_column_gap(string $val)
+    {
+        if (strtolower($val) === "normal") {
+            return 0.0;
+        }
+
+        return $this->compute_length_percentage_positive($val);
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-sizing-3/#box-sizing
+     */
+    protected function _compute_box_sizing(string $val)
+    {
+        $val = strtolower($val);
+
+        return $val === "content-box" || $val === "border-box"
+            ? $val
+            : null;
+    }
+
     protected function _compute_display(string $val)
     {
         $val = strtolower($val);
@@ -2887,12 +3240,10 @@ class Style
         // appropriate fallback display type
         switch ($val) {
             case "flow-root":
-            case "flex":
             case "grid":
             case "table-caption":
                 $val = "block";
                 break;
-            case "inline-flex":
             case "inline-grid":
                 $val = "inline-block";
                 break;
@@ -2920,6 +3271,8 @@ class Style
                     return "block";
                 case "inline-table":
                     return "table";
+                case "inline-flex":
+                    return "flex";
                 default:
                     return $val;
             }
@@ -3649,6 +4002,55 @@ class Style
         return $this->compute_padding($val);
     }
 
+    protected function _get_padding_left($computed)
+    {
+        return $this->used_logical_padding("padding_left", $computed);
+    }
+
+    protected function _get_padding_right($computed)
+    {
+        return $this->used_logical_padding("padding_right", $computed);
+    }
+
+    protected function _compute_padding_inline_start(string $val)
+    {
+        return $val === "" ? "" : $this->compute_padding($val);
+    }
+
+    protected function _compute_padding_inline_end(string $val)
+    {
+        return $val === "" ? "" : $this->compute_padding($val);
+    }
+
+    /**
+     * The used value of a physical padding edge, honouring the logical
+     * `padding-inline-*` properties.
+     *
+     * A specified physical value always wins: nothing here can order
+     * declarations of two different properties against each other, and the
+     * physical property is what an author reaches for to override a UA rule
+     * (`ul { padding-left: 0 }`).
+     *
+     * @param string $physical The physical property name
+     * @param mixed  $computed Its computed value
+     *
+     * @return mixed
+     */
+    protected function used_logical_padding(string $physical, $computed)
+    {
+        if (isset($this->_props[$physical])) {
+            return $computed;
+        }
+
+        $logical = $this->__get("direction") === "rtl"
+            ? ($physical === "padding_left" ? "padding_inline_end" : "padding_inline_start")
+            : ($physical === "padding_left" ? "padding_inline_start" : "padding_inline_end");
+
+        $value = $this->computed($logical);
+
+        return $value === "" || $value === null ? $computed : $value;
+    }
+
     /**
      * @param string   $value  `width || style || color`
      * @param string[] $styles The list of border styles to accept.
@@ -3963,6 +4365,132 @@ class Style
      *
      * @link https://www.w3.org/TR/css-lists-3/#list-style-property
      */
+    /**
+     * @link https://www.w3.org/TR/css-text-decor-3/#text-decoration-property
+     */
+    protected function _set_text_decoration(string $value): array
+    {
+        $components = $this->parse_property_value($value);
+        $lines = [];
+        $color = null;
+        $decoStyle = null;
+
+        foreach ($components as $val) {
+            $lower = strtolower($val);
+
+            if (in_array($lower, ["underline", "overline", "line-through", "blink"], true)) {
+                $lines[] = $lower;
+            } elseif ($lower === "none" && count($lines) === 0) {
+                $lines = ["none"];
+            } elseif ($decoStyle === null
+                && in_array($lower, ["solid", "double", "dotted", "dashed", "wavy"], true)
+            ) {
+                $decoStyle = $lower;
+            } elseif ($color === null
+                && ($lower === "currentcolor" || $this->is_color_value($lower))
+            ) {
+                $color = $val;
+            } else {
+                return [];
+            }
+        }
+
+        return [
+            "text_decoration_line" => count($lines) > 0 ? implode(" ", $lines) : null,
+            "text_decoration_color" => $color,
+            "text_decoration_style" => $decoStyle
+        ];
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-flexbox-1/#flex-property
+     */
+    protected function _set_flex(string $value): array
+    {
+        $lower = strtolower($value);
+
+        if ($lower === "none") {
+            return ["flex_grow" => "0", "flex_shrink" => "0", "flex_basis" => "auto"];
+        }
+        if ($lower === "auto") {
+            return ["flex_grow" => "1", "flex_shrink" => "1", "flex_basis" => "auto"];
+        }
+
+        $components = $this->parse_property_value($value);
+        $numbers = [];
+        $basis = null;
+
+        foreach ($components as $val) {
+            if (is_numeric($val) && count($numbers) < 2) {
+                $numbers[] = $val;
+            } elseif ($basis === null) {
+                $basis = $val;
+            } else {
+                return [];
+            }
+        }
+
+        if (count($components) === 0) {
+            return [];
+        }
+
+        // A single flex factor implies a basis of 0; a basis without flex
+        // factors implies a grow of 1
+        return [
+            "flex_grow" => isset($numbers[0]) ? $numbers[0] : "1",
+            "flex_shrink" => isset($numbers[1]) ? $numbers[1] : "1",
+            "flex_basis" => $basis !== null ? $basis : "0"
+        ];
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-flexbox-1/#propdef-flex-flow
+     */
+    protected function _set_flex_flow(string $value): array
+    {
+        $components = $this->parse_property_value($value);
+        $direction = null;
+        $wrap = null;
+
+        foreach ($components as $val) {
+            $lower = strtolower($val);
+
+            if ($direction === null
+                && in_array($lower, ["row", "row-reverse", "column", "column-reverse"], true)
+            ) {
+                $direction = $lower;
+            } elseif ($wrap === null
+                && in_array($lower, ["nowrap", "wrap", "wrap-reverse"], true)
+            ) {
+                $wrap = $lower;
+            } else {
+                return [];
+            }
+        }
+
+        return [
+            "flex_direction" => $direction,
+            "flex_wrap" => $wrap
+        ];
+    }
+
+    /**
+     * @link https://www.w3.org/TR/css-align-3/#propdef-gap
+     */
+    protected function _set_gap(string $value): array
+    {
+        $components = $this->parse_property_value($value);
+
+        if (count($components) === 0 || count($components) > 2) {
+            return [];
+        }
+
+        return [
+            "row_gap" => $components[0],
+            "column_gap" => isset($components[1]) ? $components[1] : $components[0]
+        ];
+    }
+
     protected function _set_list_style(string $value): array
     {
         $components = $this->parse_property_value($value);

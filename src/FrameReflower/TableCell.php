@@ -11,6 +11,7 @@ use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
 use Dompdf\FrameDecorator\Table as TableFrameDecorator;
 use Dompdf\FrameDecorator\TableCell as TableCellFrameDecorator;
 use Dompdf\Helpers;
+use Dompdf\Text\BidiParagraph;
 
 /**
  * Reflows table cells
@@ -42,6 +43,9 @@ class TableCell extends Block
 
         // Counters and generated content
         $this->_set_content();
+
+        // Bidirectional analysis of the inline content
+        BidiParagraph::process($frame);
 
         $style = $frame->get_style();
         $cellmap = $table->get_cellmap();
@@ -128,6 +132,10 @@ class TableCell extends Block
         $style->set_used("height", $height);
 
         $this->_text_align();
+
+        // Reorder line content into visual order (UAX #9 L2)
+        BidiParagraph::reorderLines($frame);
+
         $this->vertical_align();
 
         // Handle relative positioning
@@ -149,7 +157,7 @@ class TableCell extends Block
         // For table cells: Use specified width if it is greater than the
         // minimum defined by the content
         if ($fixed_width) {
-            $width = (float) $style->length_in_pt($width, 0);
+            $width = max(0.0, (float) $style->length_in_pt($width, 0) - $this->border_box_width_delta(null));
             $min = max($width, $min);
             $max = $min;
         }

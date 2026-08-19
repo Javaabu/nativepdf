@@ -26,6 +26,16 @@ use Dompdf\Positioner\AbstractPositioner;
  */
 abstract class AbstractFrameDecorator extends Frame
 {
+    /**
+     * Resolved bidi embedding level of this frame (UAX #9), when the frame
+     * is part of an analyzed paragraph. Deliberately not cleared by reset():
+     * bidi analysis runs once per document and the levels stay valid across
+     * page re-reflows.
+     *
+     * @var int|null
+     */
+    public $bidi_level;
+
     const DEFAULT_COUNTER = "-dompdf-default-counter";
 
     /**

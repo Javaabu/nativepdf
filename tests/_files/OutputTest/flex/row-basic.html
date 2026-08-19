@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    @page {
+        size: 300pt 200pt;
+        margin: 10pt;
+    }
+
+    body {
+        margin: 0;
+        font-family: Helvetica;
+        font-size: 9pt;
+    }
+
+    .row {
+        display: flex;
+        background: #eee8d5;
+    }
+
+    .row > div {
+        border: 1pt solid #586e75;
+        padding: 4pt;
+    }
+
+    .grow1 { flex: 1; background: #b3d9ff; }
+    .grow2 { flex: 2; background: #ffd1b3; }
+    .fixed { flex: 0 0 60pt; background: #d9f2b3; }
+</style>
+</head>
+<body>
+<div class="row">
+    <div class="grow1">one</div>
+    <div class="grow2">two</div>
+    <div class="fixed">fixed</div>
+</div>
+<p>Text after the flex row.</p>
+<div class="row" style="align-items: center; height: 60pt;">
+    <div class="grow1" style="height: 20pt;">centered fixed</div>
+    <div class="grow1">centered auto</div>
+</div>
+<div class="row" style="height: 40pt; margin-top: 6pt;">
+    <div class="grow1">stretched</div>
+    <div class="grow2" style="align-self: flex-end; height: 12pt;">self end</div>
+</div>
+</body>
+</html>

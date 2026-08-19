@@ -197,8 +197,16 @@ class ListBullet extends AbstractRenderer
                     $text_width = $this->_dompdf->getFontMetrics()->getTextWidth($text, $font_family, $font_size, $word_spacing, $letter_spacing);
 
                     [$x, $y] = $frame->get_position();
-                    // Correct for static frame width applied by positioner
-                    $x += $frame->get_width() - $text_width;
+
+                    if ($li->get_style()->direction === "rtl") {
+                        // The marker sits to the right of the item: the text
+                        // is flush against the item content (left edge of
+                        // the marker box) and rendered in visual order
+                        $text = $this->bidi_marker_text($text);
+                    } else {
+                        // Correct for static frame width applied by positioner
+                        $x += $frame->get_width() - $text_width;
+                    }
 
                     $this->_canvas->text($x, $y, $text,
                         $font_family, $font_size,
@@ -209,5 +217,26 @@ class ListBullet extends AbstractRenderer
                     break;
             }
         }
+    }
+
+    /**
+     * Reorder a counter marker string (e.g. "12.") into visual order for a
+     * right-to-left list item (UAX #9 with an RTL base level).
+     *
+     * @param string $text
+     * @return string
+     */
+    protected function bidi_marker_text(string $text): string
+    {
+        $cps = \Dompdf\Text\BidiAnalyzer::toCodePoints($text);
+        $result = \Dompdf\Text\BidiAnalyzer::computeLevels($cps, 1);
+        $order = \Dompdf\Text\BidiAnalyzer::visualOrder($result["levels"], $result["removed"]);
+
+        $out = "";
+        foreach ($order as $i) {
+            $out .= \Dompdf\Text\ArabicShaper::encode($cps[$i]);
+        }
+
+        return $out;
     }
 }

@@ -8,11 +8,14 @@ namespace Dompdf\FrameReflower;
 
 use Dompdf\FrameDecorator\AbstractFrameDecorator;
 use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
+use Dompdf\FrameDecorator\ListBullet as ListBulletFrameDecorator;
 use Dompdf\FrameDecorator\TableCell as TableCellFrameDecorator;
 use Dompdf\FrameDecorator\Text as TextFrameDecorator;
 use Dompdf\Exception;
 use Dompdf\Css\Style;
 use Dompdf\Helpers;
+use Dompdf\LineBox;
+use Dompdf\Text\BidiParagraph;
 
 /**
  * Reflows block frames
@@ -156,7 +159,9 @@ class Block extends AbstractFrameReflower
                     }
                 }
             }
-        } elseif ($style->float !== "none" || $style->display === "inline-block") {
+        } elseif ($style->float !== "none" || $style->display === "inline-block"
+            || $style->display === "inline-flex"
+        ) {
             // Shrink-to-fit width for float and inline block
             // https://www.w3.org/TR/CSS21/visudet.html#float-width
             // https://www.w3.org/TR/CSS21/visudet.html#inlineblock-width
@@ -233,6 +238,10 @@ class Block extends AbstractFrameReflower
 
         $width = $style->length_in_pt($style->width, $cb["w"]);
 
+        if ($width !== "auto") {
+            $width = max(0.0, $width - $this->border_box_width_delta($cb["w"]));
+        }
+
         $values = $this->_calculate_width($width);
         $margin_left = $values["margin_left"];
         $margin_right = $values["margin_right"];
@@ -300,6 +309,10 @@ class Block extends AbstractFrameReflower
         $height = $style->length_in_pt($style->height, $cb["h"]);
         $margin_top = $style->length_in_pt($style->margin_top, $cb["w"]);
         $margin_bottom = $style->length_in_pt($style->margin_bottom, $cb["w"]);
+
+        if ($height !== "auto") {
+            $height = max(0.0, $height - $this->border_box_height_delta($cb["w"]));
+        }
 
         $top = $style->length_in_pt($style->top, $cb["h"]);
         $bottom = $style->length_in_pt($style->bottom, $cb["h"]);
@@ -409,8 +422,8 @@ class Block extends AbstractFrameReflower
 
             // Handle min/max height
             // https://www.w3.org/TR/CSS21/visudet.html#min-max-heights
-            $min_height = $this->resolve_min_height($cb["h"]);
-            $max_height = $this->resolve_max_height($cb["h"]);
+            $min_height = $this->resolve_min_height($cb["h"], $cb["w"]);
+            $max_height = $this->resolve_max_height($cb["h"], $cb["w"]);
             $height = Helpers::clamp($height, $min_height, $max_height);
         }
 
@@ -445,7 +458,7 @@ class Block extends AbstractFrameReflower
                     $line->trim_trailing_ws();
 
                     if ($line->left) {
-                        foreach ($line->frames_to_align() as $frame) {
+                        foreach ($this->frames_to_move_horizontally($line) as $frame) {
                             $frame->move($line->left, 0);
                         }
                     }
@@ -463,7 +476,7 @@ class Block extends AbstractFrameReflower
                     $indent = $i === 0 ? $text_indent : 0;
                     $dx = $width - $line->w - $line->right - $indent;
 
-                    foreach ($line->frames_to_align() as $frame) {
+                    foreach ($this->frames_to_move_horizontally($line) as $frame) {
                         $frame->move($dx, 0);
                     }
                 }
@@ -484,7 +497,7 @@ class Block extends AbstractFrameReflower
                     $line->trim_trailing_ws();
 
                     if ($line->left) {
-                        foreach ($line->frames_to_align() as $frame) {
+                        foreach ($this->frames_to_move_horizontally($line) as $frame) {
                             $frame->move($line->left, 0);
                         }
                     }
@@ -544,11 +557,36 @@ class Block extends AbstractFrameReflower
                     $indent = $i === 0 ? $text_indent : 0;
                     $dx = ($width + $line->left - $line->w - $line->right - $indent) / 2;
 
-                    foreach ($line->frames_to_align() as $frame) {
+                    foreach ($this->frames_to_move_horizontally($line) as $frame) {
                         $frame->move($dx, 0);
                     }
                 }
                 break;
+        }
+    }
+
+    /**
+     * The frames of a line that horizontal alignment moves. List markers of
+     * right-to-left list items are anchored at the item's right border edge
+     * and do not travel with the line content.
+     *
+     * @param LineBox $line
+     * @return iterable<AbstractFrameDecorator>
+     */
+    protected function frames_to_move_horizontally(LineBox $line): iterable
+    {
+        foreach ($line->frames_to_align() as $frame) {
+            // Only an outside marker is anchored to the border edge. An
+            // inside marker is ordinary inline content, so it takes part in
+            // alignment and bidi reordering like any other frame.
+            if ($frame instanceof ListBulletFrameDecorator
+                && $frame->get_parent()->get_style()->direction === "rtl"
+                && $frame->get_parent()->get_style()->list_style_position === "outside"
+            ) {
+                continue;
+            }
+
+            yield $frame;
         }
     }
 
@@ -795,6 +833,9 @@ class Block extends AbstractFrameReflower
         // Counters and generated content
         $this->_set_content();
 
+        // Bidirectional analysis of the inline content
+        BidiParagraph::process($this->_frame);
+
         // Inherit any dangling list markers
         if ($block && $this->_frame->is_in_flow()) {
             $this->_frame->inherit_dangling_markers($block);
@@ -902,6 +943,10 @@ class Block extends AbstractFrameReflower
         }
 
         $this->_text_align();
+
+        // Reorder line content into visual order (UAX #9 L2)
+        BidiParagraph::reorderLines($this->_frame);
+
         $this->vertical_align();
 
         // Handle relative positioning
@@ -931,7 +976,7 @@ class Block extends AbstractFrameReflower
         // If the frame has a specified width, then we don't need to check
         // its children
         if ($fixed_width) {
-            $min = (float) $style->length_in_pt($width, 0);
+            $min = max(0.0, (float) $style->length_in_pt($width, 0) - $this->border_box_width_delta(null));
             $max = $min;
         } else {
             [$min, $max] = $this->get_min_max_child_width();

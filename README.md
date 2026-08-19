@@ -21,8 +21,27 @@ release. For released code please
 
 ## Features
 
- * Handles most CSS 2.1 and a few CSS3 properties, including @import, @media &
+ * Handles most CSS 2.1 and many CSS3 properties, including @import, @media &
    @page rules
+ * CSS flexbox layout (`display: flex` / `inline-flex`): `flex-direction`
+   (row and column, including reverses), `flex-wrap`, `flex`/`flex-grow`/
+   `flex-shrink`/`flex-basis`, `order`, `gap`, `justify-content`,
+   `align-items`/`align-self` (`baseline` behaves as `flex-start`), and
+   `align-content`. Page breaks move an overflowing flex container to the
+   next page as a whole.
+ * Bidirectional text (full UAX #9 implementation, validated against the
+   official Unicode conformance suites) with Arabic contextual shaping
+   (presentation forms and the mandatory lam-alef ligatures), the `dir`
+   attribute, `<bdo>`/`<bdi>`, `direction`/`unicode-bidi`, and
+   right-to-left lists. Disable with
+   `$options->setIsBidiEnabled(false)`. Note: PDF text extraction of shaped
+   Arabic yields presentation forms (NFKC-normalizable).
+ * `box-sizing`, `word-break: break-all`, viewport units (`vw`/`vh`/
+   `vmin`/`vmax`, resolved against the first page size) and `ch`,
+   `hsl()`/`hsla()`/`hwb()` colors, multi-keyword `text-decoration` with
+   `text-decoration-color`/`-style` (solid, double, dotted, dashed, wavy),
+   and the `:not()`/`:is()`/`:where()` pseudo-classes (compound-selector
+   arguments, Selectors 4 specificity)
  * Supports most presentational HTML 4.0 attributes
  * Supports external stylesheets, either local or through http/ftp (via
    fopen-wrappers)
@@ -31,7 +50,31 @@ release. For released code please
  * Image support (gif, png (8, 24 and 32 bit with alpha channel), bmp & jpeg)
  * No dependencies on external PDF libraries, thanks to the R&OS PDF class
  * Inline PHP support
- * Basic SVG support (see "Limitations" below)
+ * SVG support (see the support matrix below)
+
+### SVG support matrix
+
+Delivery paths (CPDF backend, true vector output):
+
+ * `<img src="*.svg">` and SVG data URIs: supported
+ * Inline `<svg>` elements: supported (converted internally to an image;
+   page CSS selectors do not reach the SVG's internals — presentation
+   attributes, inline `style`, and `<style>` inside the SVG do work)
+ * `background-image: url(*.svg)`: supported, including
+   `background-size`/`-position`/`-repeat` (vector tiles)
+
+Feature notes:
+
+ * The root `viewBox` (including non-zero origins) and
+   `preserveAspectRatio` (all alignments, `meet`/`slice`, `none`) are
+   honored, and content is clipped to the viewport
+ * Linear and radial gradient fills: `gradientUnits` (objectBoundingBox
+   and userSpaceOnUse), `gradientTransform`, `href`/`xlink:href` template
+   inheritance, radial focal points (`fx`/`fy`/`fr`); `spreadMethod`
+   `reflect`/`repeat` fall back to `pad`; gradient strokes and gradient
+   text fills fall back to the first stop color; `stop-opacity` is ignored
+ * Filters, masks, and patterns are not supported
+ * The GD backend skips SVG content; PDFLib uses its own SVG importer
  
 ## Requirements
 
@@ -206,12 +249,13 @@ Files accessed through the local file system have the following requirement:
 
  * Table cells are not pageable, meaning a table row must fit on a single page: See https://github.com/dompdf/dompdf/issues/98
  * Elements are rendered on the active page when they are parsed.
- * Embedding "raw" SVG's (`<svg><path...></svg>`) isn't working yet: See https://github.com/dompdf/dompdf/issues/320  
-   Workaround: Either link to an external SVG file, or use a DataURI like this:
-     ```php
-     $html = '<img src="data:image/svg+xml;base64,' . base64_encode($svg) . '">';
-     ```
- * Does not support CSS flexbox: See https://github.com/dompdf/dompdf/issues/971
+ * Flexbox: `baseline` alignment behaves as `flex-start`; page breaks do
+   not occur inside a flex container (it moves to the next page as a
+   whole); wrapping is not supported for column direction
+ * Bidirectional text: table columns and `@page :left/:right` are not
+   mirrored for `direction: rtl`; shaping is limited to Unicode
+   presentation forms (fonts that only provide shaping through OpenType
+   GSUB tables are not supported)
  * Does not support CSS Grid: See https://github.com/dompdf/dompdf/issues/2988
  * A single Dompdf instance should not be used to render more than one HTML document
    because persisted parsing and rendering artifacts can impact future renders.
