@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Inline SVG and colour in dompdf</title>
+<link rel="stylesheet" href="../assets/demo.css">
+<style>
+.swatches { display: flex; gap: 6pt; }
+.swatch { flex: 1; text-align: center; }
+.swatch svg { width: 34pt; height: 34pt; }
+.swatch .cap { font-size: 6.5pt; color: #64748b; margin-top: 2pt; }
+
+.sources { display: flex; gap: 6pt; }
+.sources .src {
+    flex: 1;
+    text-align: center;
+    border: 0.5pt solid #e2e8f0;
+    border-radius: 4pt;
+    padding: 6pt 4pt;
+}
+.sources .src svg { width: 30pt; height: 30pt; }
+.sources .src .cap { font-size: 6.5pt; color: #334155; margin-top: 3pt; }
+
+.grads { display: flex; gap: 6pt; }
+.grads div { flex: 1; text-align: center; }
+.grads svg { width: 100%; height: 46pt; }
+.grads .cap { font-size: 6.5pt; color: #64748b; margin-top: 2pt; }
+
+.band {
+    background-image: url("../assets/brand-gradient.svg");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    border-radius: 5pt;
+    color: #ffffff;
+    padding: 10pt 12pt;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.band strong { font-size: 11pt; }
+.band span { font-size: 7.5pt; color: #e0f2fe; }
+
+.charts { display: flex; gap: 8pt; align-items: stretch; }
+.charts .panel {
+    flex: 1;
+    border: 0.5pt solid #e2e8f0;
+    border-radius: 4pt;
+    padding: 8pt;
+}
+.charts h3 { margin: 0 0 6pt 0; font-size: 8pt; color: #334155; }
+.charts svg { width: 100%; }
+
+.legend { margin-top: 5pt; }
+.legend .row { display: flex; align-items: center; gap: 5pt; margin-bottom: 2pt; }
+.legend .dot { width: 7pt; height: 7pt; border-radius: 4pt; }
+.legend .who { flex: 1; font-size: 7.5pt; }
+.legend .pct { font-size: 7.5pt; color: #475569; }
+
+.themes { display: flex; gap: 8pt; }
+.themes .t { flex: 1; border-radius: 5pt; padding: 10pt; text-align: center; }
+.themes .light { background: #ffffff; border: 0.5pt solid #e2e8f0; }
+.themes .dark  { background: #0f172a; }
+.themes svg { width: 96pt; height: 30pt; }
+.themes .cap { font-size: 6.5pt; margin-top: 4pt; }
+.themes .light .cap { color: #64748b; }
+.themes .dark .cap { color: #94a3b8; }
+
+.icons { display: flex; flex-wrap: wrap; gap: 6pt; }
+.icons .tile {
+    flex: 0 0 10.5%;
+    text-align: center;
+    border: 0.5pt solid #e2e8f0;
+    border-radius: 4pt;
+    padding: 6pt 2pt 4pt 2pt;
+}
+.icons .tile svg { width: 22pt; height: 22pt; }
+.icons .tile .cap { font-size: 6pt; color: #64748b; margin-top: 2pt; }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+    <h1>Inline SVG</h1>
+    <span class="tag">vector, not raster</span>
+</div>
+
+<p class="lead">
+    An <code>&lt;svg&gt;</code> element written straight into the HTML is drawn into the PDF as real vector
+    artwork. Zoom in as far as you like: the edges stay sharp because there is no bitmap anywhere.
+</p>
+
+<h2 class="section">One shape, many colours</h2>
+<div class="card">
+    <div class="swatches">
+        <div class="swatch">
+            <svg viewBox="0 0 24 24"><path fill="#2563eb" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+            <div class="cap">#2563eb</div>
+        </div>
+        <div class="swatch">
+            <svg viewBox="0 0 24 24"><path fill="#0d9488" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+            <div class="cap">#0d9488</div>
+        </div>
+        <div class="swatch">
+            <svg viewBox="0 0 24 24"><path fill="#7c3aed" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+            <div class="cap">#7c3aed</div>
+        </div>
+        <div class="swatch">
+            <svg viewBox="0 0 24 24"><path fill="#f59e0b" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+            <div class="cap">#f59e0b</div>
+        </div>
+        <div class="swatch">
+            <svg viewBox="0 0 24 24"><path fill="#e11d48" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+            <div class="cap">#e11d48</div>
+        </div>
+        <div class="swatch">
+            <svg viewBox="0 0 24 24"><path fill="#0f172a" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+            <div class="cap">#0f172a</div>
+        </div>
+    </div>
+</div>
+
+<h2 class="section">Four ways to set the colour</h2>
+<div class="card">
+    <div class="sources">
+        <div class="src">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#2563eb"/><path d="M7 12.4l3.3 3.3L17 9" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="cap">fill attribute</div>
+        </div>
+        <div class="src">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" style="fill:#0d9488"/><path d="M7 12.4l3.3 3.3L17 9" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="cap">style="fill:..."</div>
+        </div>
+        <div class="src">
+            <svg viewBox="0 0 24 24"><style>.mark { fill: #7c3aed; }</style><circle class="mark" cx="12" cy="12" r="10"/><path d="M7 12.4l3.3 3.3L17 9" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="cap">&lt;style&gt; inside the svg</div>
+        </div>
+        <div class="src">
+            <svg viewBox="0 0 24 24" color="#e11d48"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M7 12.4l3.3 3.3L17 9" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="cap">currentColor</div>
+        </div>
+    </div>
+    <p class="note">
+        The page stylesheet does <strong>not</strong> reach inside an inline <code>&lt;svg&gt;</code>, so a rule such as
+        <code>svg circle { fill: red }</code> in the page CSS is ignored. Colour the artwork from inside the SVG:
+        presentation attributes, its own <code>style</code> attributes, a <code>&lt;style&gt;</code> element, or
+        <code>currentColor</code> fed by a <code>color</code> attribute on the root.
+    </p>
+</div>
+
+<h2 class="section">Gradients</h2>
+<div class="card">
+    <div class="grads">
+        <div>
+            <svg viewBox="0 0 100 46" preserveAspectRatio="none">
+                <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#2563eb"/></linearGradient></defs>
+                <rect width="100" height="46" rx="3" fill="url(#lg)"/>
+            </svg>
+            <div class="cap">linearGradient</div>
+        </div>
+        <div>
+            <svg viewBox="0 0 100 46" preserveAspectRatio="none">
+                <defs><linearGradient id="lgr" gradientTransform="rotate(38 0.5 0.5)">
+                    <stop offset="0" stop-color="#f43f5e"/><stop offset="1" stop-color="#fbbf24"/></linearGradient></defs>
+                <rect width="100" height="46" rx="3" fill="url(#lgr)"/>
+            </svg>
+            <div class="cap">gradientTransform</div>
+        </div>
+        <div>
+            <svg viewBox="0 0 100 46" preserveAspectRatio="none">
+                <defs><radialGradient id="rg" cx="0.35" cy="0.35" r="0.75">
+                    <stop offset="0" stop-color="#a7f3d0"/><stop offset="1" stop-color="#065f46"/></radialGradient></defs>
+                <rect width="100" height="46" rx="3" fill="url(#rg)"/>
+            </svg>
+            <div class="cap">radialGradient</div>
+        </div>
+        <div>
+            <svg viewBox="0 0 100 46" preserveAspectRatio="none">
+                <defs><linearGradient id="lgs"><stop offset="0" stop-color="#7c3aed"/><stop offset="0.5" stop-color="#db2777"/><stop offset="1" stop-color="#f59e0b"/></linearGradient></defs>
+                <rect width="100" height="46" rx="3" fill="url(#lgs)"/>
+            </svg>
+            <div class="cap">three stops</div>
+        </div>
+    </div>
+</div>
+
+<div class="band">
+    <strong>Gradient page furniture</strong>
+    <span>background-image: url(brand-gradient.svg)</span>
+</div>
+<p class="note">CSS gradient functions are not supported, but an SVG file used as a background image gives the same result, stretched with <code>background-size</code> and clipped by <code>border-radius</code>.</p>
+
+<h2 class="section">Charts as vector artwork</h2>
+<div class="charts">
+    <div class="panel">
+        <h3>Arrivals by market</h3>
+        <svg viewBox="0 0 120 120" style="height:96pt;">
+            <g transform="rotate(-90 60 60)" fill="none" stroke-width="16">
+                <circle cx="60" cy="60" r="32" stroke="#2563eb" stroke-dasharray="84.45 116.62" stroke-dashoffset="0"/>
+                <circle cx="60" cy="60" r="32" stroke="#0d9488" stroke-dasharray="54.29 146.78" stroke-dashoffset="-84.45"/>
+                <circle cx="60" cy="60" r="32" stroke="#f59e0b" stroke-dasharray="36.19 164.87" stroke-dashoffset="-138.73"/>
+                <circle cx="60" cy="60" r="32" stroke="#e11d48" stroke-dasharray="26.14 174.92" stroke-dashoffset="-174.92"/>
+            </g>
+            <text x="60" y="58" text-anchor="middle" font-size="13" font-weight="bold" fill="#0f172a">1.42M</text>
+            <text x="60" y="70" text-anchor="middle" font-size="7" fill="#64748b">arrivals</text>
+        </svg>
+        <div class="legend">
+            <div class="row"><span class="dot" style="background:#2563eb"></span><span class="who">Europe</span><span class="pct">42%</span></div>
+            <div class="row"><span class="dot" style="background:#0d9488"></span><span class="who">Asia</span><span class="pct">27%</span></div>
+            <div class="row"><span class="dot" style="background:#f59e0b"></span><span class="who">Middle East</span><span class="pct">18%</span></div>
+            <div class="row"><span class="dot" style="background:#e11d48"></span><span class="who">Americas</span><span class="pct">13%</span></div>
+        </div>
+    </div>
+    <div class="panel">
+        <h3>Monthly bed nights</h3>
+        <svg viewBox="0 0 240 130" style="height:96pt;">
+            <defs><linearGradient id="bar" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#2563eb"/></linearGradient></defs>
+            <line x1="0" y1="110" x2="240" y2="110" stroke="#cbd5e1" stroke-width="1"/>
+            <rect x="6"   y="52"  width="22" height="58" rx="2" fill="url(#bar)"/>
+            <rect x="36"  y="40"  width="22" height="70" rx="2" fill="url(#bar)"/>
+            <rect x="66"  y="28"  width="22" height="82" rx="2" fill="url(#bar)"/>
+            <rect x="96"  y="46"  width="22" height="64" rx="2" fill="url(#bar)"/>
+            <rect x="126" y="66"  width="22" height="44" rx="2" fill="url(#bar)"/>
+            <rect x="156" y="76"  width="22" height="34" rx="2" fill="url(#bar)"/>
+            <rect x="186" y="58"  width="22" height="52" rx="2" fill="url(#bar)"/>
+            <rect x="216" y="34"  width="22" height="76" rx="2" fill="#7c3aed"/>
+            <polyline points="17,52 47,40 77,28 107,46 137,66 167,76 197,58 227,34"
+                      fill="none" stroke="#0f172a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 3"/>
+            <text x="6"   y="124" font-size="8" fill="#64748b">Jan</text>
+            <text x="66"  y="124" font-size="8" fill="#64748b">Mar</text>
+            <text x="126" y="124" font-size="8" fill="#64748b">May</text>
+            <text x="186" y="124" font-size="8" fill="#64748b">Jul</text>
+        </svg>
+        <p class="note">Bars share one gradient; the last one is recoloured with a plain <code>fill</code>.</p>
+    </div>
+</div>
+
+<h2 class="section">Recolouring for a dark panel</h2>
+<div class="themes">
+    <div class="t light">
+        <svg viewBox="0 0 160 50" color="#0f172a">
+            <circle cx="25" cy="25" r="16" fill="#0d9488"/>
+            <path d="M25 12 L34 34 L16 34 Z" fill="#ffffff"/>
+            <text x="50" y="24" font-size="15" font-weight="bold" fill="currentColor">Raajje</text>
+            <text x="50" y="38" font-size="9" fill="#64748b">reporting suite</text>
+        </svg>
+        <div class="cap">light panel</div>
+    </div>
+    <div class="t dark">
+        <svg viewBox="0 0 160 50" color="#ffffff">
+            <circle cx="25" cy="25" r="16" fill="#5eead4"/>
+            <path d="M25 12 L34 34 L16 34 Z" fill="#0f172a"/>
+            <text x="50" y="24" font-size="15" font-weight="bold" fill="currentColor">Raajje</text>
+            <text x="50" y="38" font-size="9" fill="#94a3b8">reporting suite</text>
+        </svg>
+        <div class="cap">dark panel, same markup, different colours</div>
+    </div>
+</div>
+
+
+<h2 class="section">An icon set, drawn by the PDF itself</h2>
+<div class="card">
+    <div class="icons">
+        <div class="tile"><svg viewBox="0 0 24 24" fill="#2563eb"><path d="M3 11.5 12 4l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><div class="cap">home</div></div>
+        <div class="tile"><svg viewBox="0 0 24 24" fill="#0d9488"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg><div class="cap">user</div></div>
+        <div class="tile"><svg viewBox="0 0 24 24" fill="#7c3aed"><path d="M6 2h8l4 4v16H6z"/><path d="M14 2v4h4" fill="#ffffff" opacity="0.55"/></svg><div class="cap">file</div></div>
+        <div class="tile"><svg viewBox="0 0 24 24" fill="#f59e0b"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="6" width="4" height="15"/><rect x="17" y="9" width="4" height="12"/></svg><div class="cap">chart</div></div>
+        <div class="tile"><svg viewBox="0 0 24 24" fill="#e11d48"><path d="M12 2a6 6 0 0 0-6 6v4l-2 4h16l-2-4V8a6 6 0 0 0-6-6z"/><circle cx="12" cy="20" r="2"/></svg><div class="cap">bell</div></div>
+        <div class="tile"><svg viewBox="0 0 24 24" fill="#16a34a"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg><div class="cap">pin</div></div>
+        <div class="tile"><svg viewBox="0 0 24 24" fill="#0891b2"><path d="M2 12 12 2h9v9L11 21z"/><circle cx="17" cy="7" r="2" fill="#ffffff"/></svg><div class="cap">tag</div></div>
+        <div class="tile"><svg viewBox="0 0 24 24" fill="#db2777"><path d="M12 2.5l3 6.1 6.7 1-4.8 4.7 1.1 6.7L12 17.8 6 21l1.1-6.7L2.3 9.6l6.7-1z"/></svg><div class="cap">star</div></div>
+    </div>
+    <p class="note">Solid icons: one <code>fill</code> per tile, no image files and nothing to rasterise.</p>
+</div>
+<div class="card">
+    <div class="icons">
+        <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><div class="cap">search</div></div>
+        <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.4l3.4 2"/></svg><div class="cap">clock</div></div>
+        <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2"/></svg><div class="cap">upload</div></div>
+        <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 14.5a4 4 0 0 1 0-5.6l2.8-2.8a4 4 0 0 1 5.6 5.6l-1.4 1.4"/><path d="M14.5 9.5a4 4 0 0 1 0 5.6l-2.8 2.8a4 4 0 0 1-5.6-5.6l1.4-1.4"/></svg><div class="cap">link</div></div>
+        <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg><div class="cap">filter</div></div>
+        <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5 12 13l8.5-6.5"/></svg><div class="cap">mail</div></div>
+        <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.4 8.3-8 9.6C7.4 20.3 4 17 4 12V6z"/><path d="M8.5 12.3l2.4 2.4 4.6-4.9"/></svg><div class="cap">shield</div></div>
+        <div class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><div class="cap">plus</div></div>
+    </div>
+    <p class="note">Outline icons: <code>fill: none</code> with <code>stroke</code>, <code>stroke-width</code>,
+       <code>stroke-linecap</code> and <code>stroke-linejoin</code>.</p>
+</div>
+
+</body>
+</html>

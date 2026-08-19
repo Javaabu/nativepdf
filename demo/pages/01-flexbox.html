@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CSS3 flexbox in dompdf</title>
+<link rel="stylesheet" href="../assets/demo.css">
+<style>
+/* ---- growth ratios ---- */
+.bars { display: flex; gap: 4pt; margin-bottom: 5pt; }
+.bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 24pt;
+    border-radius: 4pt;
+    color: #ffffff;
+    font-size: 7.5pt;
+}
+.b1 { background: #2563eb; }
+.b2 { background: #0d9488; }
+.b3 { background: #7c3aed; }
+.b4 { background: #f59e0b; }
+
+/* ---- justify-content / align-items tracks ---- */
+.demo-row { display: flex; align-items: center; gap: 8pt; margin-bottom: 4pt; }
+.demo-row .label { width: 84pt; font-size: 7.5pt; color: #475569; }
+.track {
+    display: flex;
+    flex: 1;
+    gap: 3pt;
+    background: #f8fafc;
+    border: 0.5pt solid #e2e8f0;
+    border-radius: 3pt;
+    padding: 3pt;
+}
+.chip { width: 30pt; height: 13pt; border-radius: 2pt; background: #94a3b8; }
+.chip.a { background: #2563eb; }
+.chip.b { background: #0d9488; }
+.chip.c { background: #7c3aed; }
+
+.cross { display: flex; gap: 6pt; }
+.cross .col { flex: 1; }
+.cross .col p { margin: 0 0 3pt 0; font-size: 7.5pt; color: #475569; text-align: center; }
+.cross .box {
+    display: flex;
+    gap: 3pt;
+    height: 54pt;
+    background: #f8fafc;
+    border: 0.5pt solid #e2e8f0;
+    border-radius: 3pt;
+    padding: 3pt;
+}
+.cross .box div { width: 18pt; border-radius: 2pt; }
+.h1 { height: 16pt; background: #2563eb; }
+.h2 { height: 28pt; background: #0d9488; }
+.h3 { height: 40pt; background: #7c3aed; }
+
+/* ---- wrap + gap card grid ---- */
+.grid { display: flex; flex-wrap: wrap; gap: 7pt; }
+.grid .cell {
+    flex: 0 0 31%;
+    border: 0.5pt solid #e2e8f0;
+    border-left: 2.5pt solid #0d9488;
+    border-radius: 4pt;
+    padding: 6pt 7pt;
+    background: #ffffff;
+}
+.grid .cell strong { display: block; font-size: 11pt; }
+.grid .cell span { font-size: 7pt; color: #64748b; text-transform: uppercase; letter-spacing: 0.6pt; }
+
+/* ---- order + column ---- */
+.two { display: flex; gap: 8pt; }
+.two > div { flex: 1; }
+.ordered { display: flex; gap: 4pt; }
+.ordered div {
+    flex: 1;
+    text-align: center;
+    padding: 5pt 0;
+    border-radius: 3pt;
+    background: #e2e8f0;
+    font-size: 7.5pt;
+}
+.ordered .first { order: -1; background: #16a34a; color: #ffffff; }
+.ordered .last  { order:  1; background: #e11d48; color: #ffffff; }
+
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: 4pt;
+    align-items: flex-end;
+    background: #f8fafc;
+    border: 0.5pt solid #e2e8f0;
+    border-radius: 3pt;
+    padding: 5pt;
+}
+.stack div { background: #7c3aed; color: #ffffff; padding: 2pt 8pt; border-radius: 3pt; font-size: 7.5pt; }
+
+/* ---- shrink ---- */
+.shrink { display: flex; width: 100%; gap: 4pt; }
+.shrink div {
+    flex: 0 1 60%;
+    text-align: center;
+    padding: 6pt 0;
+    border-radius: 3pt;
+    color: #ffffff;
+    font-size: 7.5pt;
+    background: #475569;
+}
+
+/* ---- progress rows ---- */
+.prog { display: flex; align-items: center; gap: 8pt; margin-bottom: 5pt; }
+.prog .name { width: 96pt; font-size: 8pt; }
+.prog .rail { flex: 1; height: 9pt; background: #e2e8f0; border-radius: 5pt; }
+.prog .rail div { height: 9pt; border-radius: 5pt; }
+.prog .val { width: 30pt; text-align: right; font-size: 8pt; color: #475569; }
+
+/* ---- toolbar ---- */
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6pt;
+    background: #f8fafc;
+    border: 0.5pt solid #e2e8f0;
+    border-radius: 5pt;
+    padding: 6pt 8pt;
+}
+.toolbar .brand { font-size: 10pt; letter-spacing: 0.4pt; }
+.toolbar .spacer { flex: 1; }
+.toolbar .btn { padding: 3pt 9pt; border-radius: 4pt; font-size: 7.5pt; background: #e2e8f0; color: #334155; }
+.toolbar .btn.primary { background: #2563eb; color: #ffffff; }
+
+/* ---- media object ---- */
+.media { display: flex; gap: 8pt; align-items: flex-start; }
+.media .avatar {
+    flex: 0 0 34pt;
+    height: 34pt;
+    border-radius: 17pt;
+    background: #0d9488;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12pt;
+}
+.media .body { flex: 1; }
+.media .body h3 { margin: 0 0 2pt 0; font-size: 9pt; }
+.media .body p { margin: 0; font-size: 8pt; color: #475569; }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+    <h1>Flexbox layout</h1>
+    <span class="tag">display: flex</span>
+</div>
+
+<p class="lead">
+    Every box below is laid out by the flex reflower, not by floats or tables.
+    The same CSS you would write for a browser drives the PDF.
+</p>
+
+<h2 class="section">Flexible lengths</h2>
+<div class="card">
+    <div class="bars">
+        <div class="bar b1" style="flex: 1;">flex: 1</div>
+        <div class="bar b2" style="flex: 1;">flex: 1</div>
+        <div class="bar b3" style="flex: 1;">flex: 1</div>
+    </div>
+    <div class="bars">
+        <div class="bar b1" style="flex: 1;">flex: 1</div>
+        <div class="bar b2" style="flex: 2;">flex: 2</div>
+        <div class="bar b3" style="flex: 3;">flex: 3</div>
+    </div>
+    <div class="bars">
+        <div class="bar b4" style="flex: 0 0 120pt;">fixed 120pt</div>
+        <div class="bar b1" style="flex: 1;">takes the rest</div>
+    </div>
+    <p class="note">Free space is shared by <code>flex-grow</code>; a <code>flex-basis</code> in points opts out of growing.</p>
+</div>
+
+<div class="card">
+    <div class="shrink">
+        <div>flex: 0 1 60%</div>
+        <div>flex: 0 1 60%</div>
+    </div>
+    <p class="note">Two items each want 60% of the line, so <code>flex-shrink</code> takes 10% off each until they fit.</p>
+</div>
+
+<h2 class="section">justify-content</h2>
+<div class="card">
+    <div class="demo-row"><span class="label">flex-start</span>
+        <div class="track" style="justify-content: flex-start;"><span class="chip a"></span><span class="chip b"></span><span class="chip c"></span></div></div>
+    <div class="demo-row"><span class="label">center</span>
+        <div class="track" style="justify-content: center;"><span class="chip a"></span><span class="chip b"></span><span class="chip c"></span></div></div>
+    <div class="demo-row"><span class="label">flex-end</span>
+        <div class="track" style="justify-content: flex-end;"><span class="chip a"></span><span class="chip b"></span><span class="chip c"></span></div></div>
+    <div class="demo-row"><span class="label">space-between</span>
+        <div class="track" style="justify-content: space-between;"><span class="chip a"></span><span class="chip b"></span><span class="chip c"></span></div></div>
+    <div class="demo-row"><span class="label">space-around</span>
+        <div class="track" style="justify-content: space-around;"><span class="chip a"></span><span class="chip b"></span><span class="chip c"></span></div></div>
+    <div class="demo-row"><span class="label">space-evenly</span>
+        <div class="track" style="justify-content: space-evenly;"><span class="chip a"></span><span class="chip b"></span><span class="chip c"></span></div></div>
+</div>
+
+<h2 class="section">align-items</h2>
+<div class="card">
+    <div class="cross">
+        <div class="col"><p>flex-start</p>
+            <div class="box" style="align-items: flex-start;"><div class="h1"></div><div class="h2"></div><div class="h3"></div></div></div>
+        <div class="col"><p>center</p>
+            <div class="box" style="align-items: center;"><div class="h1"></div><div class="h2"></div><div class="h3"></div></div></div>
+        <div class="col"><p>flex-end</p>
+            <div class="box" style="align-items: flex-end;"><div class="h1"></div><div class="h2"></div><div class="h3"></div></div></div>
+        <div class="col"><p>stretch</p>
+            <div class="box" style="align-items: stretch;"><div style="width:18pt;background:#2563eb;border-radius:2pt;"></div><div style="width:18pt;background:#0d9488;border-radius:2pt;"></div><div style="width:18pt;background:#7c3aed;border-radius:2pt;"></div></div></div>
+    </div>
+    <p class="note">Single items can opt out with <code>align-self</code>. <code>baseline</code> is accepted and behaves as <code>flex-start</code>.</p>
+</div>
+
+<h2 class="section">flex-wrap and gap</h2>
+<div class="card">
+    <div class="grid">
+        <div class="cell"><span>Resorts</span><strong>168</strong></div>
+        <div class="cell"><span>Guesthouses</span><strong>944</strong></div>
+        <div class="cell"><span>Safari vessels</span><strong>157</strong></div>
+        <div class="cell"><span>Beds</span><strong>63,412</strong></div>
+        <div class="cell"><span>Arrivals YTD</span><strong>1.42 M</strong></div>
+        <div class="cell"><span>Avg. stay</span><strong>7.6 d</strong></div>
+    </div>
+    <p class="note">Three cells at <code>flex: 0 0 31%</code> with a <code>gap: 7pt</code> wrap onto a second line by themselves.</p>
+</div>
+
+<h2 class="section">order and flex-direction</h2>
+<div class="two">
+    <div class="card">
+        <div class="ordered">
+            <div class="last">written 1st</div>
+            <div>written 2nd</div>
+            <div class="first">written 3rd</div>
+        </div>
+        <p class="note"><code>order</code> moves items without touching the markup.</p>
+    </div>
+    <div class="card">
+        <div class="stack">
+            <div>column</div>
+            <div>align-items: flex-end</div>
+            <div>gap: 4pt</div>
+        </div>
+        <p class="note"><code>flex-direction: column</code> stacks along the block axis.</p>
+    </div>
+</div>
+
+
+<h2 class="section">Everyday patterns</h2>
+<div class="card">
+    <div class="toolbar">
+        <span class="brand">Reports</span>
+        <span class="btn">Filter</span>
+        <span class="btn">Export</span>
+        <span class="spacer"></span>
+        <span class="btn">Cancel</span>
+        <span class="btn primary">Save</span>
+    </div>
+    <p class="note">A toolbar is one flex row: an empty <code>flex: 1</code> spacer pushes the last two buttons to the far edge.</p>
+</div>
+
+<div class="card">
+    <div class="prog"><span class="name">Male'</span><span class="rail"><div style="width: 86%; background: #2563eb;"></div></span><span class="val">86%</span></div>
+    <div class="prog"><span class="name">Addu City</span><span class="rail"><div style="width: 64%; background: #0d9488;"></div></span><span class="val">64%</span></div>
+    <div class="prog"><span class="name">Fuvahmulah</span><span class="rail"><div style="width: 48%; background: #7c3aed;"></div></span><span class="val">48%</span></div>
+    <div class="prog"><span class="name">Kulhudhuffushi</span><span class="rail"><div style="width: 31%; background: #f59e0b;"></div></span><span class="val">31%</span></div>
+    <p class="note">Fixed label, elastic rail, fixed value: <code>width</code> on the outer items, <code>flex: 1</code> on the middle one.</p>
+</div>
+
+<div class="card">
+    <div class="media">
+        <span class="avatar">MN</span>
+        <span class="body">
+            <h3>Media object</h3>
+            <p>A fixed-width avatar next to a paragraph that takes the remaining width.
+               <code>align-items: flex-start</code> keeps the avatar pinned to the top while the text wraps
+               over as many lines as it needs.</p>
+        </span>
+    </div>
+</div>
+
+</body>
+</html>

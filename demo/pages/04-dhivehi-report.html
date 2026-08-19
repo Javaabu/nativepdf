@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="dv" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Dhivehi report: flexbox, SVG and RTL together</title>
+<link rel="stylesheet" href="../assets/demo.css">
+<style>
+@font-face { font-family: "Faruma"; font-style: normal; font-weight: 400; src: url("../fonts/Faruma.ttf") format("truetype"); }
+@font-face { font-family: "Faruma"; font-style: normal; font-weight: 700; src: url("../fonts/Faruma.ttf") format("truetype"); }
+
+body { font-family: "Faruma"; font-size: 10.5pt; line-height: 2.0; }
+.num { font-family: "DejaVu Sans"; }
+
+.band {
+    background-image: url("../assets/report-band.svg");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    border-radius: 6pt;
+    color: #ffffff;
+    padding: 12pt 14pt;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.band .title { font-size: 16.5pt; line-height: 1.65; }
+.band .sub { font-size: 9pt; color: #cffafe; line-height: 1.9; }
+.band .stamp {
+    font-family: "DejaVu Sans";
+    font-size: 7.5pt;
+    letter-spacing: 1pt;
+    border: 0.5pt solid #67e8f9;
+    border-radius: 20pt;
+    padding: 3pt 9pt;
+    color: #cffafe;
+}
+
+.kpis { display: flex; gap: 7pt; margin-top: 8pt; }
+.kpi {
+    flex: 1;
+    border: 0.5pt solid #e2e8f0;
+    border-radius: 5pt;
+    padding: 8pt 9pt;
+}
+.kpi .top { display: flex; align-items: center; gap: 6pt; }
+.kpi .top svg { width: 17pt; height: 17pt; }
+.kpi .top .label { flex: 1; font-size: 9pt; color: #475569; line-height: 1.7; }
+.kpi .value { font-family: "DejaVu Sans"; font-size: 15pt; font-weight: bold; margin-top: 3pt; }
+.kpi .delta { font-family: "DejaVu Sans"; font-size: 7pt; }
+.up { color: #b91c1c; }
+.flat { color: #64748b; }
+
+.panels { display: flex; gap: 8pt; margin-top: 8pt; align-items: stretch; }
+.panel { border: 0.5pt solid #e2e8f0; border-radius: 5pt; padding: 9pt 10pt; }
+.panel h2 { font-size: 11pt; font-weight: normal; margin: 0 0 6pt 0; line-height: 1.8; }
+.panel .hint { font-family: "DejaVu Sans"; font-size: 6.5pt; color: #94a3b8; letter-spacing: 0.5pt; text-transform: uppercase; }
+.panel.wide { flex: 1.55; }
+.panel.narrow { flex: 1; }
+.panel svg { width: 100%; }
+
+.legend .row { display: flex; align-items: center; gap: 6pt; margin-top: 4pt; }
+.legend .dot { width: 8pt; height: 8pt; border-radius: 4pt; }
+.legend .who { flex: 1; font-size: 9pt; }
+.legend .val { font-family: "DejaVu Sans"; font-size: 8.5pt; color: #334155; }
+
+.prog { display: flex; align-items: center; gap: 8pt; margin-top: 5pt; }
+.prog .name { width: 104pt; font-size: 9.5pt; }
+.prog .rail { flex: 1; height: 9pt; background: #e2e8f0; border-radius: 5pt; }
+.prog .rail div { height: 9pt; border-radius: 5pt; }
+.prog .val { width: 42pt; text-align: left; font-family: "DejaVu Sans"; font-size: 8pt; color: #475569; }
+
+.callout {
+    display: flex;
+    gap: 9pt;
+    align-items: center;
+    background: #f0fdfa;
+    border: 0.5pt solid #99f6e4;
+    border-radius: 5pt;
+    padding: 9pt 11pt;
+    margin-top: 8pt;
+}
+.callout svg { flex: 0 0 22pt; height: 22pt; }
+.callout .txt { flex: 1; font-size: 10pt; }
+.callout .big { font-family: "DejaVu Sans"; font-size: 13pt; font-weight: bold; color: #0f766e; }
+
+.foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 7pt;
+    padding-top: 6pt;
+    border-top: 0.5pt solid #e2e8f0;
+    font-family: "DejaVu Sans";
+    font-size: 7pt;
+    color: #94a3b8;
+}
+</style>
+</head>
+<body>
+
+<div class="band">
+    <div>
+        <div class="title">މުވައްޒަފުންގެ ތަފާސްހިސާބު</div>
+        <div class="sub">ސަރުކާރުގެ ކުންފުނިތައް &middot; <span class="num" dir="ltr">2018 - 2026</span></div>
+    </div>
+    <div class="stamp">RTL + FLEX + SVG</div>
+</div>
+
+<div class="kpis">
+    <div class="kpi">
+        <div class="top">
+            <svg viewBox="0 0 24 24" fill="#1d4ed8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg>
+            <span class="label">މިހާރު</span>
+        </div>
+        <div class="value">41،667</div>
+        <div class="delta up"><span dir="ltr">+123% since 2018</span></div>
+    </div>
+    <div class="kpi">
+        <div class="top">
+            <svg viewBox="0 0 24 24" fill="#0d9488"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="15" rx="1"/><rect x="17" y="9" width="4" height="12" rx="1"/></svg>
+            <span class="label">މި ސަރުކާރުގައި</span>
+        </div>
+        <div class="value">4،938</div>
+        <div class="delta flat"><span dir="ltr">2024 - 2026</span></div>
+    </div>
+    <div class="kpi">
+        <div class="top">
+            <svg viewBox="0 0 24 24" color="#b45309" fill="currentColor"><path d="M4 19h16v2H4z"/><path d="M6 6h12l-1.5 11h-9z"/><circle cx="12" cy="4" r="2"/></svg>
+            <span class="label">2023 ގައި</span>
+        </div>
+        <div class="value">36،729</div>
+        <div class="delta up"><span dir="ltr">+97% since 2018</span></div>
+    </div>
+    <div class="kpi">
+        <div class="top">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.4l3.4 2"/></svg>
+            <span class="label">2018 ގައި</span>
+        </div>
+        <div class="value">18،676</div>
+        <div class="delta flat"><span dir="ltr">baseline</span></div>
+    </div>
+</div>
+
+<div class="panels">
+    <div class="panel wide">
+        <h2>އަދަދު ބޮޑުވި ގޮތް</h2>
+        <svg viewBox="0 0 260 132" style="height:98pt;">
+            <defs>
+                <linearGradient id="gb" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#5eead4"/><stop offset="1" stop-color="#0f766e"/></linearGradient>
+                <linearGradient id="gr" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#93c5fd"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient>
+            </defs>
+            <line x1="10" y1="108" x2="252" y2="108" stroke="#cbd5e1" stroke-width="1"/>
+            <line x1="10" y1="72"  x2="252" y2="72"  stroke="#eef2f6" stroke-width="1"/>
+            <line x1="10" y1="36"  x2="252" y2="36"  stroke="#eef2f6" stroke-width="1"/>
+
+            <rect x="176" y="67.7" width="56" height="40.3" rx="3" fill="url(#gb)"/>
+            <rect x="98"  y="28.7" width="56" height="79.3" rx="3" fill="url(#gb)"/>
+            <rect x="20"  y="18"   width="56" height="90"   rx="3" fill="url(#gr)"/>
+
+            <text x="204" y="62"  text-anchor="middle" font-size="11" fill="#0f172a">18,676</text>
+            <text x="126" y="23"  text-anchor="middle" font-size="11" fill="#0f172a">36,729</text>
+            <text x="48"  y="12"  text-anchor="middle" font-size="11" fill="#1d4ed8" font-weight="bold">41,667</text>
+
+            <text x="204" y="122" text-anchor="middle" font-size="9" fill="#64748b">2018</text>
+            <text x="126" y="122" text-anchor="middle" font-size="9" fill="#64748b">2023</text>
+            <text x="48"  y="122" text-anchor="middle" font-size="9" fill="#64748b">2026</text>
+        </svg>
+        <span class="hint" dir="ltr">inline svg &middot; gradient fills</span>
+    </div>
+
+    <div class="panel narrow">
+        <h2>ބައިކުޅަ ބައި</h2>
+        <svg viewBox="0 0 120 120" style="height:86pt;">
+            <g transform="rotate(-90 60 60)" fill="none" stroke-width="15">
+                <circle cx="60" cy="60" r="32" stroke="#1d4ed8" stroke-dasharray="90.13 110.93" stroke-dashoffset="0"/>
+                <circle cx="60" cy="60" r="32" stroke="#0d9488" stroke-dasharray="87.10 113.96" stroke-dashoffset="-90.13"/>
+                <circle cx="60" cy="60" r="32" stroke="#b45309" stroke-dasharray="23.83 177.23" stroke-dashoffset="-177.23"/>
+            </g>
+            <text x="60" y="58" text-anchor="middle" font-size="13" font-weight="bold" fill="#0f172a">41,667</text>
+            <text x="60" y="71" text-anchor="middle" font-size="7" fill="#64748b">total</text>
+        </svg>
+        <div class="legend">
+            <div class="row"><span class="dot" style="background:#1d4ed8"></span><span class="who">2018 ގައި</span><span class="val">18،676</span></div>
+            <div class="row"><span class="dot" style="background:#0d9488"></span><span class="who" dir="ltr" style="text-align:right;">2019 - 2023</span><span class="val">18،053</span></div>
+            <div class="row"><span class="dot" style="background:#b45309"></span><span class="who">މި ސަރުކާރުގައި</span><span class="val">4،938</span></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel" style="margin-top:7pt;">
+    <h2>ކުންފުނިތަކުގެ ހިއްސާ</h2>
+    <div class="prog"><span class="name">2018 ގައި</span><span class="rail"><div style="width:45%; background:#1d4ed8;"></div></span><span class="val">18،676</span></div>
+    <div class="prog"><span class="name">2023 ގައި</span><span class="rail"><div style="width:88%; background:#0d9488;"></div></span><span class="val">36،729</span></div>
+    <div class="prog"><span class="name">މިހާރު</span><span class="rail"><div style="width:100%; background:#b45309;"></div></span><span class="val">41،667</span></div>
+    <span class="hint" dir="ltr">flexbox &middot; fixed label, elastic rail, fixed value</span>
+</div>
+
+<div class="callout">
+    <svg viewBox="0 0 24 24" fill="#0f766e"><path d="M12 2 2 7l10 5 10-5z"/><path d="M4 10.5V16c0 2.2 3.6 4 8 4s8-1.8 8-4v-5.5l-8 4z"/></svg>
+    <span class="txt"><span class="big">600</span> މިލިއަން ރުފިޔާގެ އެސްއެމްއީ ޑިޖިޓަލް ފަންޑެއް ތައާރަފުކުރަން ވަނީ ނިންމައިފަ އެވެ.</span>
+</div>
+
+<div class="foot">
+    <span dir="ltr">Figures: mihaaru.com, 18 August 2026 &middot; rendered by j_dom_pdf</span>
+    <span dir="ltr">Faruma &middot; DejaVu Sans</span>
+</div>
+
+</body>
+</html>

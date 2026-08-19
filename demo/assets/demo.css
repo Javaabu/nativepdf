@@ -1,0 +1,79 @@
+/* Shared styling for the dompdf CSS3 demo pages. */
+
+:root {
+    --ink:    #0f172a;
+    --muted:  #64748b;
+    --line:   #e2e8f0;
+    --soft:   #f1f5f9;
+    --blue:   #2563eb;
+    --teal:   #0d9488;
+    --violet: #7c3aed;
+    --amber:  #f59e0b;
+    --rose:   #e11d48;
+    --green:  #16a34a;
+}
+
+@page { size: A4; margin: 14mm 14mm 18mm 14mm; }
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: "DejaVu Sans";
+    font-size: 9pt;
+    line-height: 1.45;
+    color: var(--ink);
+}
+
+/* ---- page furniture -------------------------------------------------- */
+
+.masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--ink);
+    color: #ffffff;
+    border-radius: 6pt;
+    padding: 9pt 12pt;
+}
+.masthead h1 { margin: 0; font-size: 14pt; letter-spacing: 0.3pt; }
+.masthead .tag {
+    font-size: 7.5pt;
+    letter-spacing: 1pt;
+    text-transform: uppercase;
+    color: #cbd5e1;
+    border: 0.5pt solid #475569;
+    border-radius: 20pt;
+    padding: 2pt 8pt;
+}
+
+.lead { color: var(--muted); margin: 8pt 0 2pt 0; }
+
+h2.section {
+    font-size: 9.5pt;
+    letter-spacing: 1.2pt;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-left: 3pt solid var(--teal);
+    padding-left: 6pt;
+    margin: 14pt 0 7pt 0;
+}
+
+.card {
+    border: 0.5pt solid var(--line);
+    border-radius: 5pt;
+    padding: 9pt;
+    margin-bottom: 8pt;
+    page-break-inside: avoid;
+}
+
+code {
+    font-family: "DejaVu Sans Mono";
+    font-size: 7pt;
+    background: var(--soft);
+    color: #334155;
+    border-radius: 3pt;
+    padding: 1pt 3pt;
+}
+
+.note { font-size: 7.5pt; color: var(--muted); margin-top: 5pt; }

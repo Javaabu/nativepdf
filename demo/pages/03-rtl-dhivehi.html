@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="dv" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Right-to-left Dhivehi in dompdf</title>
+<link rel="stylesheet" href="../assets/demo.css">
+<style>
+@font-face {
+    font-family: "Faruma";
+    font-style: normal;
+    font-weight: 400;
+    src: url("../fonts/Faruma.ttf") format("truetype");
+}
+/* Faruma ships a single weight. Registering it for bold as well keeps headings
+   and <strong> on Thaana glyphs instead of falling back to a Latin-only face. */
+@font-face {
+    font-family: "Faruma";
+    font-style: normal;
+    font-weight: 700;
+    src: url("../fonts/Faruma.ttf") format("truetype");
+}
+
+body { font-family: "Faruma"; font-size: 11.5pt; line-height: 2.1; }
+
+.paper-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2pt solid #b91c1c;
+    padding-bottom: 6pt;
+}
+.paper-top .brand { display: flex; align-items: center; gap: 7pt; }
+.paper-top .brand svg { width: 21pt; height: 21pt; }
+.paper-top .brand span { font-size: 17pt; color: #b91c1c; }
+.paper-top .meta { font-family: "DejaVu Sans"; font-size: 7.5pt; color: #64748b; line-height: 1.4; text-align: left; }
+
+h1.headline { font-weight: normal; font-size: 19pt; line-height: 1.95; margin: 13pt 0 7pt 0; }
+
+.byline {
+    display: flex;
+    align-items: center;
+    gap: 9pt;
+    border-bottom: 0.5pt solid #e2e8f0;
+    padding-bottom: 7pt;
+    margin-bottom: 9pt;
+}
+.byline .who { font-size: 10pt; }
+.byline .when { font-size: 9pt; color: #64748b; }
+.byline .spacer { flex: 1; }
+.byline .src {
+    font-family: "DejaVu Sans";
+    font-size: 6.5pt;
+    letter-spacing: 0.5pt;
+    text-transform: uppercase;
+    color: #b91c1c;
+    border: 0.5pt solid #fecaca;
+    background: #fef2f2;
+    border-radius: 10pt;
+    padding: 2pt 7pt;
+}
+
+p.lede {
+    font-size: 12.5pt;
+    border-right: 3pt solid #b91c1c;
+    padding-right: 9pt;
+    margin: 0 0 11pt 0;
+}
+p.body { margin: 0 0 9pt 0; text-align: justify; }
+
+blockquote {
+    margin: 11pt 0;
+    padding: 9pt 13pt 9pt 11pt;
+    background: #f8fafc;
+    border-right: 3pt solid #0f172a;
+    font-size: 11.5pt;
+    line-height: 2.0;
+    text-align: justify;
+}
+blockquote .attrib { display: block; font-size: 9pt; color: #64748b; margin-top: 5pt; }
+
+.figures { display: flex; gap: 7pt; margin: 11pt 0; }
+.figures .fig {
+    flex: 1;
+    border: 0.5pt solid #e2e8f0;
+    border-top: 2.5pt solid #b91c1c;
+    border-radius: 4pt;
+    padding: 7pt 6pt;
+    text-align: center;
+}
+.figures .num { font-size: 14pt; line-height: 1.5; }
+.figures .cap { font-size: 8.5pt; color: #475569; line-height: 1.9; }
+
+ul.dv { margin: 4pt 0 10pt 0; padding-right: 16pt; }
+ul.dv li { padding-right: 3pt; }
+
+.related {
+    display: flex;
+    gap: 9pt;
+    align-items: flex-start;
+    background: #f8fafc;
+    border-radius: 5pt;
+    padding: 10pt 11pt;
+    margin-top: 6pt;
+}
+.related .rule { flex: 0 0 3pt; height: 30pt; background: #b91c1c; border-radius: 2pt; }
+.related .txt { flex: 1; }
+.related .kicker { font-family: "DejaVu Sans"; font-size: 6.5pt; letter-spacing: 1pt; text-transform: uppercase; color: #b91c1c; }
+.related h3 { font-weight: normal; font-size: 12.5pt; line-height: 1.95; margin: 3pt 0 0 0; }
+
+/* the explanation box is written for a left-to-right reader */
+.explain {
+    direction: ltr;
+    text-align: left;
+    font-family: "DejaVu Sans";
+    font-size: 8pt;
+    line-height: 1.5;
+    border: 0.5pt solid #e2e8f0;
+    border-radius: 5pt;
+    padding: 10pt 11pt;
+    margin-top: 13pt;
+    page-break-inside: avoid;
+}
+.explain h2 { margin: 0 0 6pt 0; font-size: 9pt; letter-spacing: 0.8pt; text-transform: uppercase; color: #334155; }
+.explain .case { display: flex; gap: 8pt; align-items: center; border-top: 0.5pt solid #f1f5f9; padding: 3.5pt 0; }
+.explain .case .tag { flex: 0 0 122pt; font-family: "DejaVu Sans Mono"; font-size: 7pt; color: #475569; }
+.explain .case .sample { flex: 1; font-family: "Faruma"; font-size: 11pt; line-height: 1.9; }
+.explain .why { font-size: 7.5pt; color: #64748b; margin: 7pt 0 0 0; }
+</style>
+</head>
+<body>
+
+<div class="paper-top">
+    <div class="brand">
+        <svg viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#b91c1c"/>
+            <rect x="6" y="7" width="12" height="2.2" rx="1.1" fill="#ffffff"/>
+            <rect x="6" y="11" width="12" height="2.2" rx="1.1" fill="#ffffff" opacity="0.75"/>
+            <rect x="6" y="15" width="7" height="2.2" rx="1.1" fill="#ffffff" opacity="0.5"/></svg>
+        <span>މިއަދު</span>
+    </div>
+    <div class="meta">
+        Right-to-left demo page<br>
+        Dhivehi (Thaana) &middot; Faruma &middot; UAX&nbsp;#9 bidi
+    </div>
+</div>
+
+<h1 class="headline">މުވައްޒަފުން މަދުކުރާނީ ކުލައަކަށް، ފިކުރަކަށް ބެލުމެއް ނެތި: ޒަރީރު</h1>
+
+<div class="byline">
+    <span class="who">މާއިދާ މުހައްމަދު ރަޝާދު</span>
+    <span class="when">18 އޯގަސްޓު 2026 ، 10:27</span>
+    <span class="spacer"></span>
+    <span class="src">text: mihaaru.com</span>
+</div>
+
+<p class="lede">ސަރުކާރުގެ ކުންފުނިތަކުގެ ހަރަދުތައް ކުޑަކުރަން އަޅާ ފިޔަވަޅުތަކުގެ ތެރެއިން މުވައްޒަފުން މަދުކުރާނީ އެ މުވައްޒަފަކު ނިސްބަތްވާ ޕާޓީއަކާއި އެ މީހެއްގެ ފިކުރަށް ބެލުމެއް ނެތި ކަމަށް ފިނޭންސް މިނިސްޓަރު ހަސަން ޒަރީރު މިއަދު ވިދާޅުވެއްޖެ އެވެ.</p>
+
+<blockquote>
+    "ކުރިން އަޅުގަނޑުމެން ދެންނެވިހެން އެ ބޭފުޅެއްގެ ކުލައަކަށް އެ ބޭފުޅެއްގެ ފިކުރަކަށް އެ ބޭފުޅަކު ކުރާ ކަންތައްތަކަކަށް ބެލުމެއް ނެތި އަޅުގަނޑުމެން ރައިޓް ސައިޒުކުރާނީ. އަދި ރައިޓް ސައިޒުކުރާއިރު އަޅުގަނޑުމެން ވިސްނަންޖެހޭ މިއިން ކޮންމެ ބޭފުޅަކީ ވެސް ދިވެހި ރައްޔިތެއްކަން،"
+    <span class="attrib">ރައްޔިތުންގެ މަޖިލީހުގައި ޒަރީރު ވިދާޅުވި އެވެ.</span>
+</blockquote>
+
+<p class="body">ޒަރީރު ވިދާޅުވީ ކުންފުނިތަކުން މުވައްޒަފުން ވަކިކުރާއިރު އެކަން ކުރާނެ ގޮތުގެ އިންތިޒާމުތަކެއް ވެސް ރާވާފައިވާ ކަމަށެވެ. އޭގެ ތެރެއިން އެއް ކަމެއްގެ ގޮތުގައި ޒަރީރު ފާހަގަކުރެއްވީ އެ ތަނެއްގައި މުވައްޒަފުން ވަޒީފާ އަދާކުރި މުއްދަތަށް ބަލައި ރިޑަންޑަންސީ ޕެކޭޖުތަކެއް ތައާރަފްކޮށްފައި ވުމެވެ.</p>
+
+<p class="body">އޭނާ ވިދާޅުވީ "ކުމެވި" ގެ ނަމުގައި 600 މިލިއަން ރުފިޔާގެ އެސްއެމްއީ ޑިޖިޓަލް ފަންޑެއް ތައާރަފުކުރަން ނިންމާފައިވާ ކަމަށެވެ. އެއީ ކުދި ވިޔަފާރިތައް ފެށުމަށް އެހީވުމަށް ދޫކުރާ ފައިސާކަމަށާއި ޕްރޮޕޯސަލް ހުށަހެޅުމުން އެ ފަންޑުން ފައިސާ ލިބޭނެ ކަމަށް ޒަރީރު ވިދާޅުވި އެވެ.</p>
+
+<div class="figures">
+    <div class="fig"><div class="num">18،676</div><div class="cap">2018 ގައި</div></div>
+    <div class="fig"><div class="num">36،729</div><div class="cap">2023 ގައި</div></div>
+    <div class="fig"><div class="num">4،938</div><div class="cap">މި ސަރުކާރުގައި</div></div>
+    <div class="fig"><div class="num">41،667</div><div class="cap">މިހާރު</div></div>
+</div>
+
+<p class="body">އޭނާ ވިދާޅުވީ 2024 އިން ފެށިގެން މިހާތަނަށް މި ސަރުކާރުގައި ވައްދާފައިވާ 4،938 މުވައްޒަފުންނާ އެކު މިހާރު ތިބި މުވައްޒަފުންގެ އަދަދަކީ 41،667 ކަމަށެވެ.</p>
+
+<p class="body">ކުރިއަރާފައިވާ ގައުމުތަކުގައި އަމަލުކުރާ ގޮތަށް ރާއްޖޭގެ އިގްތިސާދު ހަރުދަނާކުރަން ބޭނުން ނަމަ، މުވައްޒަފުންގެ އަދަދު މަދުކުރަންޖެހޭ ކަމަށް ވެސް ފިނޭންސް މިނިސްޓަރު ވިދާޅުވި އެވެ.</p>
+
+<div class="related">
+    <span class="rule"></span>
+    <span class="txt">
+        <span class="kicker">related</span>
+        <h3>ޓޫރިސްޓުންނަށް ވިއްކާ މޯލްޑިވިއަންގެ ޓިކެޓްގެ އަގުހެޔޮކުރަން ނިންމައިފި</h3>
+    </span>
+</div>
+
+<div class="explain">
+    <h2>What the bidi engine is doing</h2>
+
+    <div class="case">
+        <span class="tag">dir="rtl"</span>
+        <span class="sample" dir="rtl">މުވައްޒަފުން Finance Ministry ރިޕޯޓް</span>
+    </div>
+    <div class="case">
+        <span class="tag">dir="ltr"</span>
+        <span class="sample" dir="ltr">މުވައްޒަފުން Finance Ministry ރިޕޯޓް</span>
+    </div>
+    <div class="case">
+        <span class="tag">bdo dir="ltr"</span>
+        <span class="sample" dir="rtl"><bdo dir="ltr">މުވައްޒަފުން Finance Ministry ރިޕޯޓް</bdo></span>
+    </div>
+    <div class="case">
+        <span class="tag">digits in an rtl line</span>
+        <span class="sample" dir="rtl">މިހާރު ތިބި މުވައްޒަފުންގެ އަދަދަކީ 41،667</span>
+    </div>
+    <div class="case">
+        <span class="tag">rtl list</span>
+        <div class="sample"><ul class="dv" dir="rtl" style="margin:0; text-align:right;"><li>މާލެ</li><li>މާލެ - އައްޑޫ</li></ul></div>
+    </div>
+
+    <p class="why">
+        The first three rows hold exactly the same characters in the same stored order. Only the
+        paragraph direction changes, and the Dhivehi words swap sides around the Latin run, because
+        dompdf resolves every paragraph with the Unicode bidirectional algorithm (UAX&nbsp;#9).
+        <code>&lt;bdo&gt;</code> turns the algorithm off and forces a visual order, which is why row
+        three reads backwards. Row four shows a number keeping its own left-to-right order inside a
+        right-to-left sentence, and row five shows list bullets moving to the right edge.
+    </p>
+</div>
+
+</body>
+</html>
