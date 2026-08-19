@@ -157,11 +157,13 @@ HTML
         }
 
         // The text has been replaced with presentation forms, including the
-        // mandatory lam-alef ligature
-        $this->assertMatchesRegularExpression('/[\x{FE70}-\x{FEFF}]/u', $joined);
+        // mandatory lam-alef ligature. preg_match keeps this working on the
+        // older PHPUnit versions used for PHP 7.1 and 7.2, which have neither
+        // assertMatchesRegularExpression nor the removed assertRegExp.
+        $this->assertSame(1, preg_match('/[\x{FE70}-\x{FEFF}]/u', $joined));
         $this->assertStringContainsString("\u{FEFC}", $joined); // lam-alef final
         // No unshaped Arabic base letters remain
-        $this->assertDoesNotMatchRegularExpression('/[\x{0621}-\x{064A}]/u', $joined);
+        $this->assertSame(0, preg_match('/[\x{0621}-\x{064A}]/u', $joined));
     }
 
     public function testCombiningMarksPrecedeTheirBase(): void
