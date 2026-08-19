@@ -1,10 +1,10 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf;
+namespace NativePdf;
 
 class Helpers
 {
@@ -595,10 +595,16 @@ class Helpers
      * @param string $type The type of debug messages to print
      * @param string $msg The message to show
      */
-    public static function dompdf_debug($type, $msg)
+    public static function nativepdf_debug($type, $msg)
     {
+        global $_NATIVEPDF_DEBUG_TYPES, $_nativepdf_show_warnings, $_nativepdf_debug;
         global $_DOMPDF_DEBUG_TYPES, $_dompdf_show_warnings, $_dompdf_debug;
-        if (isset($_DOMPDF_DEBUG_TYPES[$type]) && ($_dompdf_show_warnings || $_dompdf_debug)) {
+
+        $types = isset($_NATIVEPDF_DEBUG_TYPES) ? $_NATIVEPDF_DEBUG_TYPES : $_DOMPDF_DEBUG_TYPES;
+        $show = $_nativepdf_show_warnings || $_nativepdf_debug
+            || $_dompdf_show_warnings || $_dompdf_debug;
+
+        if (isset($types[$type]) && $show) {
             $arr = debug_backtrace();
 
             echo basename($arr[0]["file"]) . " (" . $arr[0]["line"] . "): " . $arr[1]["function"] . ": ";
@@ -628,13 +634,14 @@ class Helpers
             throw new Exception($errstr . " $errno");
         }
 
-        global $_dompdf_warnings;
-        global $_dompdf_show_warnings;
+        global $_nativepdf_warnings, $_dompdf_warnings;
+        global $_nativepdf_show_warnings, $_dompdf_show_warnings;
 
-        if ($_dompdf_show_warnings) {
+        if ($_nativepdf_show_warnings || $_dompdf_show_warnings) {
             echo $errstr . "\n";
         }
 
+        $_nativepdf_warnings[] = $errstr;
         $_dompdf_warnings[] = $errstr;
     }
 
@@ -807,7 +814,7 @@ class Helpers
      *               - `int|null` bits
      *               - `int|null` estimated memory size in bytes
      */
-    public static function dompdf_getimagesize($filename, $context = null)
+    public static function nativepdf_getimagesize($filename, $context = null)
     {
         static $cache = [];
 

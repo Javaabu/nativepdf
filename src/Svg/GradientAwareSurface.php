@@ -1,12 +1,12 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Svg;
+namespace NativePdf\Svg;
 
-use Dompdf\Cpdf;
+use NativePdf\Cpdf;
 use Svg\Document;
 use Svg\Style;
 use Svg\Surface\SurfaceCpdf;
@@ -22,7 +22,7 @@ use Svg\Tag\RadialGradient;
  * This subclass re-resolves the reference from the raw attributes of the
  * tag being rendered, arms the gradient, substitutes the first stop as a
  * flat fallback fill (so the Shape issues a fill call at all), and replaces
- * the fill operation with clip + `sh` using the shading API in Dompdf\Cpdf.
+ * the fill operation with clip + `sh` using the shading API in NativePdf\Cpdf.
  *
  * Supported: linear and radial gradients (radialGradient elements are
  * parsed into LinearGradient objects by php-svg-lib; the element name is
@@ -32,7 +32,7 @@ use Svg\Tag\RadialGradient;
  * Fallbacks: gradient strokes and text fills use the first stop color;
  * spreadMethod reflect/repeat behave as pad; stop-opacity is ignored.
  *
- * @package dompdf
+ * @package nativepdf
  */
 class GradientAwareSurface extends SurfaceCpdf
 {

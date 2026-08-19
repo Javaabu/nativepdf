@@ -1,8 +1,8 @@
 /**
- * dompdf default stylesheet.
+ * nativepdf default stylesheet.
  *
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  *
  * Portions from Mozilla
@@ -19,7 +19,7 @@
 }
 
 html {
-  display: -dompdf-page !important;
+  display: -nativepdf-page !important;
   counter-reset: page;
 }
 
@@ -308,8 +308,8 @@ li {
 }
 
 /*li::before {
-  display: -dompdf-list-bullet !important;
-  content: counter(-dompdf-default-counter) ". ";
+  display: -nativepdf-list-bullet !important;
+  content: counter(-nativepdf-default-counter) ". ";
   padding-right: 0.5em;
 }*/
 
@@ -507,14 +507,14 @@ noframes {
 }
 
 br {
-  display: -dompdf-br;
+  display: -nativepdf-br;
 }
 
 img, img_generated {
-  display: -dompdf-image !important;
+  display: -nativepdf-image !important;
 }
 
-dompdf_generated {
+nativepdf_generated {
   display: inline;
 }
 
@@ -554,5 +554,5 @@ bdo[dir="rtl"] {
 area, base, basefont, head, meta, script, style, title,
 noembed, param {
   display: none;
-  -dompdf-keep: yes;
+  -nativepdf-keep: yes;
 }

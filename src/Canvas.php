@@ -1,15 +1,15 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf;
+namespace NativePdf;
 
 /**
  * Main rendering interface
  *
- * Currently {@link Dompdf\Adapter\CPDF}, {@link Dompdf\Adapter\PDFLib}, and {@link Dompdf\Adapter\GD}
+ * Currently {@link NativePdf\Adapter\CPDF}, {@link NativePdf\Adapter\PDFLib}, and {@link NativePdf\Adapter\GD}
  * implement this interface.
  *
  * Implementations should measure x and y increasing to the left and down,
@@ -17,22 +17,22 @@ namespace Dompdf;
  * are free to use a unit other than points for length, but I can't
  * guarantee that the results will look any good.
  *
- * @package dompdf
+ * @package nativepdf
  */
 interface Canvas
 {
     /**
-     * @param string|float[] $paper       The paper size to use as either a standard paper size (see {@link Dompdf\Adapter\CPDF::$PAPER_SIZES})
+     * @param string|float[] $paper       The paper size to use as either a standard paper size (see {@link NativePdf\Adapter\CPDF::$PAPER_SIZES})
      *                                    or an array of the form `[x1, y1, x2, y2]` (typically `[0, 0, width, height]`).
      * @param string         $orientation The paper orientation, either `portrait` or `landscape`.
-     * @param Dompdf|null    $dompdf      The Dompdf instance.
+     * @param NativePdf|null    $nativepdf      The NativePdf instance.
      */
-    public function __construct($paper = "letter", string $orientation = "portrait", ?Dompdf $dompdf = null);
+    public function __construct($paper = "letter", string $orientation = "portrait", ?NativePdf $nativepdf = null);
 
     /**
-     * @return Dompdf
+     * @return NativePdf
      */
-    function get_dompdf();
+    function get_nativepdf();
 
     /**
      * Returns the current page number

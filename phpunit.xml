@@ -13,7 +13,7 @@
          stopOnFailure="false"
          failOnSkipped="true">
   <testsuites>
-    <testsuite name="Dompdf Test Suite">
+    <testsuite name="NativePdf Test Suite">
       <directory>tests</directory>
     </testsuite>
   </testsuites>

@@ -1,19 +1,19 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameDecorator;
+namespace NativePdf\FrameDecorator;
 
-use Dompdf\Dompdf;
-use Dompdf\Frame;
-use Dompdf\Exception;
+use NativePdf\NativePdf;
+use NativePdf\Frame;
+use NativePdf\Exception;
 
 /**
  * Decorates frames for inline layout
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Inline extends AbstractFrameDecorator
 {
@@ -21,11 +21,11 @@ class Inline extends AbstractFrameDecorator
     /**
      * Inline constructor.
      * @param Frame $frame
-     * @param Dompdf $dompdf
+     * @param NativePdf $nativepdf
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    function __construct(Frame $frame, NativePdf $nativepdf)
     {
-        parent::__construct($frame, $dompdf);
+        parent::__construct($frame, $nativepdf);
     }
 
     /**
@@ -46,7 +46,7 @@ class Inline extends AbstractFrameDecorator
         $style = $this->get_style();
         $font = $style->font_family;
         $size = $style->font_size;
-        $fontHeight = $this->_dompdf->getFontMetrics()->getFontHeight($font, $size);
+        $fontHeight = $this->_nativepdf->getFontMetrics()->getFontHeight($font, $size);
 
         return ($style->line_height / ($size > 0 ? $size : 1)) * $fontHeight;
     }
@@ -85,7 +85,7 @@ class Inline extends AbstractFrameDecorator
         $split_style->border_bottom_left_radius = 0.0;
 
         // If this is a generated node don't propagate the content style
-        if ($split->get_node()->nodeName == "dompdf_generated") {
+        if ($split->get_node()->nodeName == "nativepdf_generated") {
             $split_style->content = "normal";
         }
 

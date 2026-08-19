@@ -1,8 +1,8 @@
 <?php
-namespace Dompdf\Tests;
+namespace NativePdf\Tests;
 
-use Dompdf\Helpers;
-use Dompdf\Tests\TestCase;
+use NativePdf\Helpers;
+use NativePdf\Tests\TestCase;
 
 class HelpersTest extends TestCase
 {
@@ -22,7 +22,7 @@ class HelpersTest extends TestCase
     public function testUrlResolution(string $url, array $expected): void
     {
         // Some systems will return image/x-bmp or image/x-ms-bmp for BMP files, so we need to normalize the actual value
-        $imginfo = Helpers::dompdf_getimagesize($url);
+        $imginfo = Helpers::nativepdf_getimagesize($url);
         if ($imginfo[3] === IMAGETYPE_BMP) {
             $imginfo[4] = 'image/bmp';
         }

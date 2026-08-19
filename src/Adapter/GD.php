@@ -1,15 +1,15 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Adapter;
+namespace NativePdf\Adapter;
 
-use Dompdf\Canvas;
-use Dompdf\Dompdf;
-use Dompdf\Helpers;
-use Dompdf\Image\Cache;
+use NativePdf\Canvas;
+use NativePdf\NativePdf;
+use NativePdf\Helpers;
+use NativePdf\Image\Cache;
 
 /**
  * Image rendering interface
@@ -17,14 +17,14 @@ use Dompdf\Image\Cache;
  * Renders to an image format supported by GD (jpeg, gif, png, xpm).
  * Not super-useful day-to-day but handy nonetheless
  *
- * @package dompdf
+ * @package nativepdf
  */
 class GD implements Canvas
 {
     /**
-     * @var Dompdf
+     * @var NativePdf
      */
-    protected $_dompdf;
+    protected $_nativepdf;
 
     /**
      * Resource handle for the image
@@ -131,11 +131,11 @@ class GD implements Canvas
      * @param string|float[] $paper       The paper size to use as either a standard paper size (see {@link CPDF::$PAPER_SIZES}) or
      *                                    an array of the form `[x1, y1, x2, y2]` (typically `[0, 0, width, height]`).
      * @param string         $orientation The paper orientation, either `portrait` or `landscape`.
-     * @param Dompdf|null    $dompdf      The Dompdf instance.
+     * @param NativePdf|null    $nativepdf      The NativePdf instance.
      * @param float          $aa_factor   Anti-aliasing factor, 1 for no AA
      * @param array          $bg_color    Image background color: array(r,g,b,a), 0 <= r,g,b,a <= 1
      */
-    public function __construct($paper = "letter", string $orientation = "portrait", ?Dompdf $dompdf = null, float $aa_factor = 1.0, array $bg_color = [1, 1, 1, 0])
+    public function __construct($paper = "letter", string $orientation = "portrait", ?NativePdf $nativepdf = null, float $aa_factor = 1.0, array $bg_color = [1, 1, 1, 0])
     {
         if (is_array($paper)) {
             $size = array_map("floatval", $paper);
@@ -148,13 +148,13 @@ class GD implements Canvas
             [$size[2], $size[3]] = [$size[3], $size[2]];
         }
 
-        if ($dompdf === null) {
-            $this->_dompdf = new Dompdf();
+        if ($nativepdf === null) {
+            $this->_nativepdf = new NativePdf();
         } else {
-            $this->_dompdf = $dompdf;
+            $this->_nativepdf = $nativepdf;
         }
 
-        $this->dpi = $this->get_dompdf()->getOptions()->getDpi();
+        $this->dpi = $this->get_nativepdf()->getOptions()->getDpi();
 
         if ($aa_factor < 1) {
             $aa_factor = 1;
@@ -183,9 +183,9 @@ class GD implements Canvas
         $this->new_page();
     }
 
-    public function get_dompdf()
+    public function get_nativepdf()
     {
-        return $this->_dompdf;
+        return $this->_nativepdf;
     }
 
     /**
@@ -518,12 +518,12 @@ class GD implements Canvas
 
     public function save()
     {
-        $this->get_dompdf()->getOptions()->setDpi(72);
+        $this->get_nativepdf()->getOptions()->setDpi(72);
     }
 
     public function restore()
     {
-        $this->get_dompdf()->getOptions()->setDpi($this->dpi);
+        $this->get_nativepdf()->getOptions()->setDpi($this->dpi);
     }
 
     public function rotate($angle, $x, $y)
@@ -623,7 +623,7 @@ class GD implements Canvas
      */
     public function image($img, $x, $y, $w, $h, $resolution = "normal")
     {
-        $img_type = Cache::detect_type($img, $this->get_dompdf()->getHttpContext());
+        $img_type = Cache::detect_type($img, $this->get_nativepdf()->getHttpContext());
 
         if (!$img_type) {
             return;
@@ -638,7 +638,7 @@ class GD implements Canvas
         $src = @call_user_func($func_name, $img);
 
         if (!$src) {
-            return; // Probably should add to $_dompdf_errors or whatever here
+            return; // Probably should add to $_nativepdf_errors or whatever here
         }
 
         // Scale by the AA factor and DPI
@@ -859,8 +859,8 @@ class GD implements Canvas
         }
 
         if (!file_exists($font)) {
-            $font_metrics = $this->_dompdf->getFontMetrics();
-            $font = $font_metrics->getFont($this->_dompdf->getOptions()->getDefaultFont()) . ".ttf";
+            $font_metrics = $this->_nativepdf->getFontMetrics();
+            $font = $font_metrics->getFont($this->_nativepdf->getOptions()->getDefaultFont()) . ".ttf";
             if (!file_exists($font)) {
                 if (strpos($font, "mono")) {
                     $font = $font_metrics->getFont("DejaVu Mono") . ".ttf";
@@ -895,7 +895,7 @@ class GD implements Canvas
     protected function get_font_height_actual($font, $size)
     {
         $font = $this->get_ttf_file($font);
-        $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
+        $ratio = $this->_nativepdf->getOptions()->getFontHeightRatio();
 
         // FIXME: word spacing
         list(, $y2, , , , $y1) = imagettfbbox($size, 0, $font, "MXjpqytfhl"); // Test string with ascenders, descenders and caps
@@ -904,7 +904,7 @@ class GD implements Canvas
 
     public function get_font_baseline($font, $size)
     {
-        $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
+        $ratio = $this->_nativepdf->getOptions()->getFontHeightRatio();
         return $this->get_font_height($font, $size) / $ratio;
     }
 

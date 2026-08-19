@@ -1,15 +1,15 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf;
+namespace NativePdf;
 
 /**
  * Executes inline PHP code during the rendering process
  *
- * @package dompdf
+ * @package nativepdf
  */
 class PhpEvaluator
 {
@@ -34,13 +34,13 @@ class PhpEvaluator
      */
     public function evaluate($code, $vars = [])
     {
-        if (!$this->_canvas->get_dompdf()->getOptions()->getIsPhpEnabled()) {
+        if (!$this->_canvas->get_nativepdf()->getOptions()->getIsPhpEnabled()) {
             return;
         }
 
         // Set up some variables for the inline code
         $pdf = $this->_canvas;
-        $fontMetrics = $pdf->get_dompdf()->getFontMetrics();
+        $fontMetrics = $pdf->get_nativepdf()->getFontMetrics();
         $PAGE_NUM = $pdf->get_page_number();
         $PAGE_COUNT = $pdf->get_page_count();
 

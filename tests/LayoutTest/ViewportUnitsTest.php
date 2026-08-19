@@ -1,13 +1,13 @@
 <?php
-namespace Dompdf\Tests\LayoutTest;
+namespace NativePdf\Tests\LayoutTest;
 
 use DOMElement;
-use Dompdf\Canvas;
-use Dompdf\Dompdf;
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\Helpers;
-use Dompdf\Options;
-use Dompdf\Tests\TestCase;
+use NativePdf\Canvas;
+use NativePdf\NativePdf;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\Helpers;
+use NativePdf\Options;
+use NativePdf\Tests\TestCase;
 
 class ViewportUnitsTest extends TestCase
 {
@@ -15,9 +15,9 @@ class ViewportUnitsTest extends TestCase
     {
         $geo = [];
 
-        $dompdf = new Dompdf(new Options());
-        $dompdf->setPaper([0, 0, 500, 400]);
-        $dompdf->setCallbacks([
+        $nativepdf = new NativePdf(new Options());
+        $nativepdf->setPaper([0, 0, 500, 400]);
+        $nativepdf->setCallbacks([
             [
                 "event" => "begin_frame",
                 "f" => function (AbstractFrameDecorator $frame, Canvas $canvas) use (&$geo) {
@@ -33,7 +33,7 @@ class ViewportUnitsTest extends TestCase
             ]
         ]);
 
-        $dompdf->loadHtml(<<<HTML
+        $nativepdf->loadHtml(<<<HTML
 <!DOCTYPE html>
 <html>
 <head>
@@ -54,7 +54,7 @@ class ViewportUnitsTest extends TestCase
 </html>
 HTML
         );
-        $dompdf->render();
+        $nativepdf->render();
 
         // Page is 500x400pt
         $this->assertTrue(Helpers::lengthEqual(250.0, $geo["a"][0]), "50vw: {$geo['a'][0]}");
@@ -63,9 +63,9 @@ HTML
         $this->assertTrue(Helpers::lengthEqual(50.0, $geo["b"][1]), "10vmax: {$geo['b'][1]}");
 
         // 20ch = 20 x the advance width of "0" in DejaVu Sans at 12pt
-        $zero = $dompdf->getFontMetrics()->getTextWidth(
+        $zero = $nativepdf->getFontMetrics()->getTextWidth(
             "0",
-            $dompdf->getFontMetrics()->getFont("DejaVu Sans"),
+            $nativepdf->getFontMetrics()->getFont("DejaVu Sans"),
             12.0
         );
         $this->assertTrue(

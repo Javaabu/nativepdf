@@ -1,10 +1,10 @@
 <?php
-namespace Dompdf\Tests\Css;
+namespace NativePdf\Tests\Css;
 
-use Dompdf\Css\Style;
-use Dompdf\Dompdf;
-use Dompdf\Css\Stylesheet;
-use Dompdf\Tests\TestCase;
+use NativePdf\Css\Style;
+use NativePdf\NativePdf;
+use NativePdf\Css\Stylesheet;
+use NativePdf\Tests\TestCase;
 
 class StylesheetTest extends TestCase
 {
@@ -65,8 +65,8 @@ CSS
     #[\PHPUnit\Framework\Attributes\DataProvider('parseCssProvider')]
     public function testParseCss(string $css, array $expected): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $sheet->load_css($css);
 
         $styles = $sheet->get_styles();
@@ -101,8 +101,8 @@ CSS
         $dataUri = "data:image/jpeg;base64," . $imageEncoded;
         $css = "div { background-color: #000; background-image: url(\"$dataUri\"); }";
 
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $sheet->load_css($css);
 
         $styles = $sheet->get_styles();

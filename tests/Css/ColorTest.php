@@ -1,8 +1,8 @@
 <?php
-namespace Dompdf\Tests\Css;
+namespace NativePdf\Tests\Css;
 
-use Dompdf\Css\Color;
-use Dompdf\Tests\TestCase;
+use NativePdf\Css\Color;
+use NativePdf\Tests\TestCase;
 
 class ColorTest extends TestCase
 {

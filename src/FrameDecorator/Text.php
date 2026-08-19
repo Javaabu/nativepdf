@@ -1,19 +1,19 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameDecorator;
+namespace NativePdf\FrameDecorator;
 
-use Dompdf\Dompdf;
-use Dompdf\Frame;
-use Dompdf\Exception;
+use NativePdf\NativePdf;
+use NativePdf\Frame;
+use NativePdf\Exception;
 
 /**
  * Decorates Frame objects for text layout
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Text extends AbstractFrameDecorator
 {
@@ -38,16 +38,16 @@ class Text extends AbstractFrameDecorator
     /**
      * Text constructor.
      * @param Frame $frame
-     * @param Dompdf $dompdf
+     * @param NativePdf $nativepdf
      * @throws Exception
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    function __construct(Frame $frame, NativePdf $nativepdf)
     {
         if (!$frame->is_text_node()) {
             throw new Exception("Text_Decorator can only be applied to #text nodes.");
         }
 
-        parent::__construct($frame, $dompdf);
+        parent::__construct($frame, $nativepdf);
         $this->text_spacing = 0.0;
     }
 
@@ -127,11 +127,11 @@ class Text extends AbstractFrameDecorator
             $cluster = self::marksBeforeBase($cluster);
             // Mirror single-character clusters (brackets etc.)
             if ($rtl && strlen($cluster) <= 4) {
-                $cps = \Dompdf\Text\BidiAnalyzer::toCodePoints($cluster);
+                $cps = \NativePdf\Text\BidiAnalyzer::toCodePoints($cluster);
                 if (count($cps) === 1) {
-                    $mirror = \Dompdf\Text\UnicodeData::mirror($cps[0]);
+                    $mirror = \NativePdf\Text\UnicodeData::mirror($cps[0]);
                     if ($mirror !== null) {
-                        $cluster = \Dompdf\Text\ArabicShaper::encode($mirror);
+                        $cluster = \NativePdf\Text\ArabicShaper::encode($mirror);
                     }
                 }
             }
@@ -229,7 +229,7 @@ class Text extends AbstractFrameDecorator
             return false;
         }
 
-        $cps = \Dompdf\Text\BidiAnalyzer::toCodePoints($char);
+        $cps = \NativePdf\Text\BidiAnalyzer::toCodePoints($char);
 
         if (count($cps) !== 1) {
             return false;
@@ -263,7 +263,7 @@ class Text extends AbstractFrameDecorator
 //      var_dump($asc = utf8_decode($text));
 //      for ($i = 0; $i < strlen($asc); $i++)
 //        Helpers::pre_r("$i: " . $asc[$i] . " - " . ord($asc[$i]));
-//      Helpers::pre_r("width: " . $this->_dompdf->getFontMetrics()->getTextWidth($text, $style->font_family, $style->font_size));
+//      Helpers::pre_r("width: " . $this->_nativepdf->getFontMetrics()->getTextWidth($text, $style->font_family, $style->font_size));
 
         return $this->_frame->get_node()->data;
     }
@@ -290,7 +290,7 @@ class Text extends AbstractFrameDecorator
         $style = $this->get_style();
         $font = $style->font_family;
         $size = $style->font_size;
-        $fontHeight = $this->_dompdf->getFontMetrics()->getFontHeight($font, $size);
+        $fontHeight = $this->_nativepdf->getFontMetrics()->getFontHeight($font, $size);
 
         return ($style->line_height / ($size > 0 ? $size : 1)) * $fontHeight;
     }
@@ -319,7 +319,7 @@ class Text extends AbstractFrameDecorator
      */
     public function recalculate_width(): float
     {
-        $fontMetrics = $this->_dompdf->getFontMetrics();
+        $fontMetrics = $this->_nativepdf->getFontMetrics();
         $style = $this->get_style();
         $text = $this->get_text();
         $font = $style->font_family;
@@ -414,7 +414,7 @@ class Text extends AbstractFrameDecorator
             return;
         }
 
-        $fontMetrics = $this->_dompdf->getFontMetrics();
+        $fontMetrics = $this->_nativepdf->getFontMetrics();
         $style = $this->get_style();
         $families = $style->get_font_family_computed();
         $subtype = $fontMetrics->getType($style->font_weight . ' ' . $style->font_style);

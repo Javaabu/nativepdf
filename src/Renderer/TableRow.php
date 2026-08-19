@@ -1,15 +1,15 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Renderer;
+namespace NativePdf\Renderer;
 
-use Dompdf\Frame;
+use NativePdf\Frame;
 
 /**
- * @package dompdf
+ * @package nativepdf
  */
 class TableRow extends Block
 {

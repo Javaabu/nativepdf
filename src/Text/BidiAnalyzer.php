@@ -1,10 +1,10 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Text;
+namespace NativePdf\Text;
 
 /**
  * Implementation of the Unicode Bidirectional Algorithm (UAX #9),
@@ -15,7 +15,7 @@ namespace Dompdf\Text;
  *
  * https://www.unicode.org/reports/tr9/
  *
- * @package dompdf
+ * @package nativepdf
  */
 final class BidiAnalyzer
 {

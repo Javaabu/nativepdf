@@ -1,13 +1,13 @@
 <?php
-namespace Dompdf\Tests\LayoutTest;
+namespace NativePdf\Tests\LayoutTest;
 
 use DOMElement;
-use Dompdf\Canvas;
-use Dompdf\Dompdf;
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\Helpers;
-use Dompdf\Options;
-use Dompdf\Tests\TestCase;
+use NativePdf\Canvas;
+use NativePdf\NativePdf;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\Helpers;
+use NativePdf\Options;
+use NativePdf\Tests\TestCase;
 
 class FlexTest extends TestCase
 {
@@ -217,9 +217,9 @@ class FlexTest extends TestCase
         $geo = [];
 
         $options = new Options();
-        $dompdf = new Dompdf($options);
-        $dompdf->setBasePath(__DIR__);
-        $dompdf->setCallbacks([
+        $nativepdf = new NativePdf($options);
+        $nativepdf->setBasePath(__DIR__);
+        $nativepdf->setCallbacks([
             [
                 "event" => "begin_frame",
                 "f" => function (AbstractFrameDecorator $frame, Canvas $canvas) use (&$geo) {
@@ -238,7 +238,7 @@ class FlexTest extends TestCase
             ]
         ]);
 
-        $dompdf->loadHtml(<<<HTML
+        $nativepdf->loadHtml(<<<HTML
 <!DOCTYPE html>
 <html>
 <head>
@@ -258,7 +258,7 @@ class FlexTest extends TestCase
 </html>
 HTML
         );
-        $dompdf->render();
+        $nativepdf->render();
 
         $labels = ["x", "y", "width", "height"];
 
@@ -282,8 +282,8 @@ HTML
     {
         $pages = [];
 
-        $dompdf = new Dompdf(new Options());
-        $dompdf->setCallbacks([
+        $nativepdf = new NativePdf(new Options());
+        $nativepdf->setCallbacks([
             [
                 "event" => "begin_frame",
                 "f" => function (AbstractFrameDecorator $frame, Canvas $canvas) use (&$pages) {
@@ -296,7 +296,7 @@ HTML
             ]
         ]);
 
-        $dompdf->loadHtml(<<<HTML
+        $nativepdf->loadHtml(<<<HTML
 <!DOCTYPE html>
 <html>
 <head>
@@ -322,9 +322,9 @@ HTML
 </html>
 HTML
         );
-        $dompdf->render();
+        $nativepdf->render();
 
-        $this->assertSame(2, $dompdf->getCanvas()->get_page_count());
+        $this->assertSame(2, $nativepdf->getCanvas()->get_page_count());
         $this->assertSame(1, $pages["tall"]);
         $this->assertSame(2, $pages["flex"]);
         $this->assertSame(2, $pages["a"]);
@@ -333,8 +333,8 @@ HTML
 
     public function testOversizedFlexContainerTerminates(): void
     {
-        $dompdf = new Dompdf(new Options());
-        $dompdf->loadHtml(<<<HTML
+        $nativepdf = new NativePdf(new Options());
+        $nativepdf->loadHtml(<<<HTML
 <!DOCTYPE html>
 <html>
 <head>
@@ -355,11 +355,11 @@ HTML
 </html>
 HTML
         );
-        $dompdf->render();
+        $nativepdf->render();
 
         // The container overflows the page; rendering must terminate and
         // the following content must appear
-        $this->assertGreaterThanOrEqual(2, $dompdf->getCanvas()->get_page_count());
-        $this->assertNotSame("", $dompdf->output());
+        $this->assertGreaterThanOrEqual(2, $nativepdf->getCanvas()->get_page_count());
+        $this->assertNotSame("", $nativepdf->output());
     }
 }

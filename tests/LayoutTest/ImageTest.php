@@ -1,11 +1,11 @@
 <?php
-namespace Dompdf\Tests\LayoutTest;
+namespace NativePdf\Tests\LayoutTest;
 
-use Dompdf\Dompdf;
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\Helpers;
-use Dompdf\Options;
-use Dompdf\Tests\TestCase;
+use NativePdf\NativePdf;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\Helpers;
+use NativePdf\Options;
+use NativePdf\Tests\TestCase;
 
 class ImageTest extends TestCase
 {
@@ -183,9 +183,9 @@ HTML
         $options = new Options();
 
         // Use callback to inspect frame tree
-        $dompdf = new Dompdf($options);
-        $dompdf->setBasePath(__DIR__);
-        $dompdf->setCallbacks([
+        $nativepdf = new NativePdf($options);
+        $nativepdf->setBasePath(__DIR__);
+        $nativepdf->setCallbacks([
             [
                 "event" => "begin_frame",
                 "f" => function (AbstractFrameDecorator $frame) use (&$width, &$height) {
@@ -196,7 +196,7 @@ HTML
             ]
         ]);
 
-        $dompdf->loadHtml(<<<HTML
+        $nativepdf->loadHtml(<<<HTML
     <!DOCTYPE html>
     <head>
     <meta charset="UTF-8">
@@ -212,7 +212,7 @@ HTML
     </html>
 HTML
         );
-        $dompdf->render();
+        $nativepdf->render();
 
         $this->assertTrue(
             Helpers::lengthEqual($expectedWidth, $width),

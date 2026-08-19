@@ -1,12 +1,12 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf;
+namespace NativePdf;
 
-use Dompdf\Css\Style;
+use NativePdf\Css\Style;
 use FontLib\Font;
 
 /**
@@ -17,7 +17,7 @@ use FontLib\Font;
  * size of text in a particular font and size.
  *
  * @static
- * @package dompdf
+ * @package nativepdf
  */
 class FontMetrics
 {
@@ -224,7 +224,7 @@ class FontMetrics
             return false;
         }
 
-        $localTempFile = @tempnam($this->options->get("tempDir"), "dompdf-font-");
+        $localTempFile = @tempnam($this->options->get("tempDir"), "nativepdf-font-");
         file_put_contents($localTempFile, $remoteFileContent);
 
         $font = Font::load($localTempFile);

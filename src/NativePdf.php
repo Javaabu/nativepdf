@@ -1,28 +1,28 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf;
+namespace NativePdf;
 
 use DOMDocument;
 use DOMNode;
-use Dompdf\Adapter\CPDF;
+use NativePdf\Adapter\CPDF;
 use DOMXPath;
-use Dompdf\Frame\Factory;
-use Dompdf\Frame\FrameTree;
-use Dompdf\Image\Cache;
-use Dompdf\Css\Stylesheet;
-use Dompdf\Helpers;
+use NativePdf\Frame\Factory;
+use NativePdf\Frame\FrameTree;
+use NativePdf\Image\Cache;
+use NativePdf\Css\Stylesheet;
+use NativePdf\Helpers;
 use Masterminds\HTML5;
 
 /**
- * Dompdf - PHP5 HTML to PDF renderer
+ * NativePdf - PHP5 HTML to PDF renderer
  *
- * Dompdf loads HTML and does its best to render it as a PDF.  It gets its
+ * NativePdf loads HTML and does its best to render it as a PDF.  It gets its
  * name from the new DomDocument PHP5 extension.  Source HTML is first
- * parsed by a DomDocument object.  Dompdf takes the resulting DOM tree and
+ * parsed by a DomDocument object.  NativePdf takes the resulting DOM tree and
  * attaches a {@link Frame} object to each node.  {@link Frame} objects store
  * positioning and layout information and each has a reference to a {@link
  * Style} object.
@@ -57,21 +57,21 @@ use Masterminds\HTML5;
  * Frame}s are rendered using an adapted {@link Cpdf} class, originally
  * written by Wayne Munro, http://www.ros.co.nz/pdf/.  (Some performance
  * related changes have been made to the original {@link Cpdf} class, and
- * the {@link Dompdf\Adapter\CPDF} class provides a simple, stateless interface to
+ * the {@link NativePdf\Adapter\CPDF} class provides a simple, stateless interface to
  * PDF generation.)  PDFLib support has now also been added, via the {@link
- * Dompdf\Adapter\PDFLib}.
+ * NativePdf\Adapter\PDFLib}.
  *
  *
- * @package dompdf
+ * @package nativepdf
  */
-class Dompdf
+class NativePdf
 {
     /**
-     * Version string for dompdf
+     * Version string for nativepdf
      *
      * @var string
      */
-    private $version = 'dompdf';
+    private $version = 'nativepdf';
 
     /**
      * DomDocument representing the HTML document
@@ -197,7 +197,7 @@ class Dompdf
     /**
     * Local file extension whitelist
     *
-    * File extensions supported by dompdf for local files.
+    * File extensions supported by nativepdf for local files.
     *
     * @var array
     */
@@ -262,7 +262,7 @@ class Dompdf
         if (file_exists($versionFile) && ($version = file_get_contents($versionFile)) !== false) {
             $version = trim($version);
             if ($version !== '$Format:<%h>$') {
-                $this->version = sprintf('dompdf %s', $version);
+                $this->version = sprintf('nativepdf %s', $version);
             }
         }
 
@@ -280,7 +280,7 @@ class Dompdf
 
     /**
      * Save the system's existing locale, PCRE JIT, and MBString encoding
-     * configuration and configure the system for Dompdf processing
+     * configuration and configure the system for NativePdf processing
      */
     private function setPhpConfig()
     {
@@ -337,7 +337,7 @@ class Dompdf
      * encoding specified via `<meta>` tag is used. An existing Unicode BOM
      * always takes precedence.
      *
-     * Parse errors are stored in the global array `$_dompdf_warnings`.
+     * Parse errors are stored in the global array `$_nativepdf_warnings`.
      *
      * @param string      $file     A filename or URL to load.
      * @param string|null $encoding Encoding of the file.
@@ -432,7 +432,7 @@ class Dompdf
      * If no encoding is given, the document encoding specified via `<meta>`
      * tag is used. An existing Unicode BOM always takes precedence.
      *
-     * Parse errors are stored in the global array `$_dompdf_warnings`.
+     * Parse errors are stored in the global array `$_nativepdf_warnings`.
      *
      * @param string      $str      The HTML to load.
      * @param string|null $encoding Encoding of the string.
@@ -772,8 +772,8 @@ class Dompdf
         $size = $this->getPaperSize();
 
         if (
-            \Dompdf\Helpers::lengthEqual($canvasWidth, $size[2]) === false ||
-            \Dompdf\Helpers::lengthEqual($canvasHeight, $size[3]) === false
+            \NativePdf\Helpers::lengthEqual($canvasWidth, $size[2]) === false ||
+            \NativePdf\Helpers::lengthEqual($canvasHeight, $size[3]) === false
         ) {
             $this->canvas = CanvasFactory::get_instance($this, $this->paperSize, $this->paperOrientation);
             $this->fontMetrics->setCanvas($this->canvas);
@@ -814,7 +814,9 @@ class Dompdf
                 continue;
             }
 
-            if ($name === "dompdf.view" && $this->parseDefaultView($value)) {
+            if (($name === "nativepdf.view" || $name === "dompdf.view")
+                && $this->parseDefaultView($value)
+            ) {
                 $canvas->set_default_view($this->defaultView, $this->defaultViewOptions);
             }
         }
@@ -838,10 +840,10 @@ class Dompdf
             Cache::clear($this->options->getDebugPng());
         }
 
-        global $_dompdf_warnings, $_dompdf_show_warnings;
-        if ($_dompdf_show_warnings && isset($_dompdf_warnings)) {
-            echo '<b>Dompdf Warnings</b><br><pre>';
-            foreach ($_dompdf_warnings as $msg) {
+        global $_nativepdf_warnings, $_nativepdf_show_warnings, $_dompdf_show_warnings;
+        if (($_nativepdf_show_warnings || $_dompdf_show_warnings) && isset($_nativepdf_warnings)) {
+            echo '<b>NativePdf Warnings</b><br><pre>';
+            foreach ($_nativepdf_warnings as $msg) {
                 echo $msg . "\n";
             }
 
@@ -975,7 +977,7 @@ class Dompdf
     }
 
     /**
-     * Get the dompdf option value
+     * Get the nativepdf option value
      *
      * @param string $key
      * @return mixed
@@ -1026,7 +1028,7 @@ class Dompdf
     /**
      * Sets the paper size & orientation
      *
-     * @param string|float[] $size 'letter', 'legal', 'A4', etc. {@link Dompdf\Adapter\CPDF::$PAPER_SIZES}
+     * @param string|float[] $size 'letter', 'legal', 'A4', etc. {@link NativePdf\Adapter\CPDF::$PAPER_SIZES}
      * @param string $orientation 'portrait' or 'landscape'
      * @return $this
      */
@@ -1037,8 +1039,8 @@ class Dompdf
         $this->paperOrientation = $orientation;
         $new_size = $this->getPaperSize();
         if (
-            \Dompdf\Helpers::lengthEqual($current_size[2], $new_size[2]) === false ||
-            \Dompdf\Helpers::lengthEqual($current_size[3], $new_size[3]) === false
+            \NativePdf\Helpers::lengthEqual($current_size[2], $new_size[2]) === false ||
+            \NativePdf\Helpers::lengthEqual($current_size[3], $new_size[3]) === false
         ) {
             $this->canvas = CanvasFactory::get_instance($this, $this->paperSize, $this->paperOrientation);
         }
@@ -1327,7 +1329,7 @@ class Dompdf
     }
 
     /**
-     * Return the underlying Canvas instance (e.g. Dompdf\Adapter\CPDF, Dompdf\Adapter\GD)
+     * Return the underlying Canvas instance (e.g. NativePdf\Adapter\CPDF, NativePdf\Adapter\GD)
      *
      * @return Canvas
      */
@@ -1535,7 +1537,7 @@ class Dompdf
 
     /**
      * PHP5 overloaded getter
-     * Along with {@link Dompdf::__set()} __get() provides access to all
+     * Along with {@link NativePdf::__set()} __get() provides access to all
      * properties directly.  Typically __get() is not called directly outside
      * of this class.
      *

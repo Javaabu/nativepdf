@@ -1,12 +1,12 @@
 <?php
-namespace Dompdf\Tests\LayoutTest;
+namespace NativePdf\Tests\LayoutTest;
 
 use DOMElement;
-use Dompdf\Canvas;
-use Dompdf\Dompdf;
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\Options;
-use Dompdf\Tests\TestCase;
+use NativePdf\Canvas;
+use NativePdf\NativePdf;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\Options;
+use NativePdf\Tests\TestCase;
 
 class PageTest extends TestCase
 {
@@ -93,8 +93,8 @@ HTML
         $options = new Options();
 
         // Use callback to inspect frame tree
-        $dompdf = new Dompdf($options);
-        $dompdf->setCallbacks([
+        $nativepdf = new NativePdf($options);
+        $nativepdf->setCallbacks([
             [
                 "event" => "begin_frame",
                 "f" => function (AbstractFrameDecorator $frame, Canvas $canvas) use ($expectedPages, &$elementPages) {
@@ -113,10 +113,10 @@ HTML
             ]
         ]);
 
-        $dompdf->loadHtml($html);
-        $dompdf->render();
+        $nativepdf->loadHtml($html);
+        $nativepdf->render();
 
-        $this->assertSame($pageCount, $dompdf->getCanvas()->get_page_count());
+        $this->assertSame($pageCount, $nativepdf->getCanvas()->get_page_count());
 
         foreach ($expectedPages as $class => $pageNumber) {
             $this->assertSame($pageNumber, $elementPages[$class] ?? 0);

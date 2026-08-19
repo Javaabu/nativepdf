@@ -1,18 +1,18 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Frame;
+namespace NativePdf\Frame;
 
-use Dompdf\Dompdf;
-use Dompdf\Exception;
-use Dompdf\Frame;
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameDecorator\Page as PageFrameDecorator;
-use Dompdf\FrameReflower\Page as PageFrameReflower;
-use Dompdf\Positioner\AbstractPositioner;
+use NativePdf\NativePdf;
+use NativePdf\Exception;
+use NativePdf\Frame;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\FrameDecorator\Page as PageFrameDecorator;
+use NativePdf\FrameReflower\Page as PageFrameReflower;
+use NativePdf\Positioner\AbstractPositioner;
 use DOMXPath;
 
 /**
@@ -23,7 +23,7 @@ use DOMXPath;
  * objects.  This is determined primarily by the Frame's display type, but
  * also by the Frame's node's type (e.g. DomElement vs. #text)
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Factory
 {
@@ -39,13 +39,13 @@ class Factory
      * Decorate the root Frame
      *
      * @param Frame  $root   The frame to decorate
-     * @param Dompdf $dompdf The dompdf instance
+     * @param NativePdf $nativepdf The nativepdf instance
      *
      * @return PageFrameDecorator
      */
-    public static function decorate_root(Frame $root, Dompdf $dompdf): PageFrameDecorator
+    public static function decorate_root(Frame $root, NativePdf $nativepdf): PageFrameDecorator
     {
-        $frame = new PageFrameDecorator($root, $dompdf);
+        $frame = new PageFrameDecorator($root, $nativepdf);
         $frame->set_reflower(new PageFrameReflower($frame));
         $root->set_decorator($frame);
 
@@ -56,14 +56,14 @@ class Factory
      * Decorate a Frame
      *
      * @param Frame      $frame  The frame to decorate
-     * @param Dompdf     $dompdf The dompdf instance
+     * @param NativePdf     $nativepdf The nativepdf instance
      * @param Frame|null $root   The root of the frame
      *
      * @throws Exception
      * @return AbstractFrameDecorator|null
      * FIXME: this is admittedly a little smelly...
      */
-    public static function decorate_frame(Frame $frame, Dompdf $dompdf, ?Frame $root = null): ?AbstractFrameDecorator
+    public static function decorate_frame(Frame $frame, NativePdf $nativepdf, ?Frame $root = null): ?AbstractFrameDecorator
     {
         $style = $frame->get_style();
         $display = $style->display;
@@ -181,7 +181,7 @@ class Factory
                 $reflower = "Flex";
                 break;
 
-            case "-dompdf-list-bullet":
+            case "-nativepdf-list-bullet":
                 if ($style->list_style_position === "inside") {
                     $positioner = "Inline";
                 } else {
@@ -197,13 +197,13 @@ class Factory
                 $reflower = "ListBullet";
                 break;
 
-            case "-dompdf-image":
+            case "-nativepdf-image":
                 $positioner = "Inline";
                 $decorator = "Image";
                 $reflower = "Image";
                 break;
 
-            case "-dompdf-br":
+            case "-nativepdf-br":
                 $positioner = "Inline";
                 $decorator = "Inline";
                 $reflower = "Inline";
@@ -211,7 +211,7 @@ class Factory
 
             default:
             case "none":
-                if ($style->_dompdf_keep !== "yes") {
+                if ($style->_nativepdf_keep !== "yes") {
                     // Remove the node and the frame
                     $frame->get_parent()->remove_child($frame);
                     return null;
@@ -236,7 +236,7 @@ class Factory
 
         // Handle nodeName
         if ($node->nodeName === "img") {
-            $style->set_prop("display", "-dompdf-image");
+            $style->set_prop("display", "-nativepdf-image");
             $decorator = "Image";
             $reflower = "Image";
         }
@@ -246,14 +246,14 @@ class Factory
             $positioner = "FlexItem";
         }
 
-        $decorator  = "Dompdf\\FrameDecorator\\$decorator";
-        $reflower   = "Dompdf\\FrameReflower\\$reflower";
+        $decorator  = "NativePdf\\FrameDecorator\\$decorator";
+        $reflower   = "NativePdf\\FrameReflower\\$reflower";
 
         /** @var AbstractFrameDecorator $deco */
-        $deco = new $decorator($frame, $dompdf);
+        $deco = new $decorator($frame, $nativepdf);
 
         $deco->set_positioner(self::getPositionerInstance($positioner));
-        $deco->set_reflower(new $reflower($deco, $dompdf->getFontMetrics()));
+        $deco->set_reflower(new $reflower($deco, $nativepdf->getFontMetrics()));
 
         if ($root) {
             $deco->set_root($root);
@@ -261,39 +261,39 @@ class Factory
 
         if ($display === "list-item") {
             // Insert a list-bullet frame
-            $xml = $dompdf->getDom();
+            $xml = $nativepdf->getDom();
             $bullet_node = $xml->createElement("bullet"); // arbitrary choice
             $b_f = new Frame($bullet_node);
 
             $node = $frame->get_node();
             $parent_node = $node->parentNode;
             if ($parent_node && $parent_node instanceof \DOMElement) {
-                if (!$parent_node->hasAttribute("dompdf-children-count")) {
+                if (!$parent_node->hasAttribute("nativepdf-children-count")) {
                     $xpath = new DOMXPath($xml);
                     $count = $xpath->query("li", $parent_node)->length;
-                    $parent_node->setAttribute("dompdf-children-count", $count);
+                    $parent_node->setAttribute("nativepdf-children-count", $count);
                 }
 
                 if (is_numeric($node->getAttribute("value"))) {
                     $index = intval($node->getAttribute("value"));
                 } else {
-                    if (!$parent_node->hasAttribute("dompdf-counter")) {
+                    if (!$parent_node->hasAttribute("nativepdf-counter")) {
                         $index = ($parent_node->hasAttribute("start") ? $parent_node->getAttribute("start") : 1);
                     } else {
-                        $index = (int)$parent_node->getAttribute("dompdf-counter") + 1;
+                        $index = (int)$parent_node->getAttribute("nativepdf-counter") + 1;
                     }
                 }
 
-                $parent_node->setAttribute("dompdf-counter", $index);
-                $bullet_node->setAttribute("dompdf-counter", $index);
+                $parent_node->setAttribute("nativepdf-counter", $index);
+                $bullet_node->setAttribute("nativepdf-counter", $index);
             }
 
-            $new_style = $dompdf->getCss()->create_style();
-            $new_style->set_prop("display", "-dompdf-list-bullet");
+            $new_style = $nativepdf->getCss()->create_style();
+            $new_style->set_prop("display", "-nativepdf-list-bullet");
             $new_style->inherit($style);
             $b_f->set_style($new_style);
 
-            $deco->prepend_child(Factory::decorate_frame($b_f, $dompdf, $root));
+            $deco->prepend_child(Factory::decorate_frame($b_f, $nativepdf, $root));
         }
 
         return $deco;
@@ -309,7 +309,7 @@ class Factory
     public static function getPositionerInstance(string $type): AbstractPositioner
     {
         if (!isset(self::$_positioners[$type])) {
-            $class = '\\Dompdf\\Positioner\\'.$type;
+            $class = '\\NativePdf\\Positioner\\'.$type;
             self::$_positioners[$type] = new $class();
         }
         return self::$_positioners[$type];

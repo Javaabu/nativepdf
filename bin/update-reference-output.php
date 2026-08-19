@@ -1,6 +1,6 @@
 <?php
-use Dompdf\Tests\OutputTest\Dataset;
-use Dompdf\Tests\OutputTest\OutputTest;
+use NativePdf\Tests\OutputTest\Dataset;
+use NativePdf\Tests\OutputTest\OutputTest;
 
 /**
  * Usage:

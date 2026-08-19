@@ -1,18 +1,20 @@
-Dompdf was designed and developed by Benj Carson.
+NativePdf is a fork of [Dompdf](https://github.com/dompdf/dompdf), which was
+designed and developed by Benj Carson and the Dompdf community. All of the
+work below is theirs; NativePdf builds on it.
 
-### Current Team
+### Dompdf Team
 
 * **Brian Sweeney** (maintainer)
 * **Till Berger**
 
-### Alumni
+### Dompdf Alumni
 
 * **Benj Carson** (creator)
 * **Fabien Ménager**
 * **Simon Berger**
 * **Orion Richardson**
 
-### Contributors
+### Dompdf Contributors
 * **Gabriel Bull**
 * **Barry vd. Heuvel**
 * **Ryan H. Masten**
@@ -21,4 +23,4 @@ Dompdf was designed and developed by Benj Carson.
 
 ### Thanks
 
-Dompdf would not have been possible without strong community support.
+NativePdf would not exist without Dompdf and its strong community support.

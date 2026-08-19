@@ -1,13 +1,13 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Positioner;
+namespace NativePdf\Positioner;
 
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameDecorator\Flex as FlexFrameDecorator;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\FrameDecorator\Flex as FlexFrameDecorator;
 
 /**
  * Positions flex items
@@ -15,7 +15,7 @@ use Dompdf\FrameDecorator\Flex as FlexFrameDecorator;
  * Flex items are positioned at the coordinates computed by the parent flex
  * container's layout algorithm (push model, cf. Positioner\TableCell).
  *
- * @package dompdf
+ * @package nativepdf
  */
 class FlexItem extends AbstractPositioner
 {

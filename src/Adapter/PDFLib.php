@@ -1,22 +1,22 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Adapter;
+namespace NativePdf\Adapter;
 
-use Dompdf\Canvas;
-use Dompdf\Dompdf;
-use Dompdf\Exception;
-use Dompdf\FontMetrics;
-use Dompdf\Helpers;
-use Dompdf\Image\Cache;
+use NativePdf\Canvas;
+use NativePdf\NativePdf;
+use NativePdf\Exception;
+use NativePdf\FontMetrics;
+use NativePdf\Helpers;
+use NativePdf\Image\Cache;
 
 /**
  * PDF rendering interface
  *
- * Dompdf\Adapter\PDFLib provides a simple, stateless interface to the one
+ * NativePdf\Adapter\PDFLib provides a simple, stateless interface to the one
  * provided by PDFLib.
  *
  * Unless otherwise mentioned, all dimensions are in points (1/72 in).
@@ -26,7 +26,7 @@ use Dompdf\Image\Cache;
  * See {@link http://www.pdflib.com/} for more complete documentation
  * on the underlying PDFlib functions.
  *
- * @package dompdf
+ * @package nativepdf
  */
 class PDFLib implements Canvas
 {
@@ -36,7 +36,7 @@ class PDFLib implements Canvas
      *
      * @var array
      */
-    public static $PAPER_SIZES = []; // Set to Dompdf\Adapter\CPDF::$PAPER_SIZES below.
+    public static $PAPER_SIZES = []; // Set to NativePdf\Adapter\CPDF::$PAPER_SIZES below.
 
     /**
      * Whether to create PDFs in memory or on disk
@@ -78,9 +78,9 @@ class PDFLib implements Canvas
     ];
 
     /**
-     * @var \Dompdf\Dompdf
+     * @var \NativePdf\NativePdf
      */
-    protected $_dompdf;
+    protected $_nativepdf;
 
     /**
      * Instance of PDFLib class
@@ -187,7 +187,7 @@ class PDFLib implements Canvas
      */
     protected $_pages;
 
-    public function __construct($paper = "letter", string $orientation = "portrait", ?Dompdf $dompdf = null)
+    public function __construct($paper = "letter", string $orientation = "portrait", ?NativePdf $nativepdf = null)
     {
         if (is_array($paper)) {
             $size = array_map("floatval", $paper);
@@ -203,12 +203,12 @@ class PDFLib implements Canvas
         $this->_width = $size[2] - $size[0];
         $this->_height = $size[3] - $size[1];
 
-        if ($dompdf === null) {
-            $this->_dompdf = new Dompdf();
+        if ($nativepdf === null) {
+            $this->_nativepdf = new NativePdf();
         } else {
-            $this->_dompdf = $dompdf;
+            $this->_nativepdf = $nativepdf;
         }
-        $options = $dompdf->getOptions();
+        $options = $this->_nativepdf->getOptions();
 
         $this->_pdf = new \PDFLib();
 
@@ -234,7 +234,7 @@ class PDFLib implements Canvas
         }
 
         // fetch PDFLib version information for the producer field
-        $this->_pdf->set_info("Producer Addendum", sprintf("%s + PDFLib %s", $dompdf->version, $this->getPDFLibMajorVersion()));
+        $this->_pdf->set_info("Producer Addendum", sprintf("%s + PDFLib %s", $this->_nativepdf->version, $this->getPDFLibMajorVersion()));
 
         // Silence pedantic warnings about missing TZ settings
         $tz = @date_default_timezone_get();
@@ -252,7 +252,7 @@ class PDFLib implements Canvas
             $this->_pdf->begin_document("", $doc_options);
         } else {
             $tmp_dir = $options->getTempDir();
-            $tmp_name = @tempnam($tmp_dir, "libdompdf_pdf_");
+            $tmp_name = @tempnam($tmp_dir, "libnativepdf_pdf_");
             @unlink($tmp_name);
             $this->_file = "$tmp_name.pdf";
             $this->_pdf->begin_document($this->_file, $doc_options);
@@ -272,9 +272,9 @@ class PDFLib implements Canvas
         $this->_objs = [];
     }
 
-    function get_dompdf()
+    function get_nativepdf()
     {
-        return $this->_dompdf;
+        return $this->_nativepdf;
     }
 
     /**
@@ -748,12 +748,12 @@ class PDFLib implements Canvas
             $options .= " embedding=true";
         }
 
-        $options .= " autosubsetting=" . ($this->_dompdf->getOptions()->getIsFontSubsettingEnabled() === false ? "false" : "true");
+        $options .= " autosubsetting=" . ($this->_nativepdf->getOptions()->getIsFontSubsettingEnabled() === false ? "false" : "true");
 
         if (is_null($encoding)) {
             // Unicode encoding is only available for the commerical
             // version of PDFlib and not PDFlib-Lite
-            if (strlen($this->_dompdf->getOptions()->getPdflibLicense()) > 0) {
+            if (strlen($this->_nativepdf->getOptions()->getPdflibLicense()) > 0) {
                 $encoding = "unicode";
             } else {
                 $encoding = "auto";
@@ -773,7 +773,7 @@ class PDFLib implements Canvas
 
         $fontOutline = $this->getPDFLibParameter("FontOutline", 1);
         if ($fontOutline === "" || $fontOutline < 0) {
-            $families = $this->_dompdf->getFontMetrics()->getFontFamilies();
+            $families = $this->_nativepdf->getFontMetrics()->getFontFamilies();
             foreach ($families as $files) {
                 foreach ($files as $file) {
                     $face = basename($file);
@@ -1093,8 +1093,8 @@ class PDFLib implements Canvas
             if ($im) {
                 imageinterlace($im, false);
 
-                $tmp_dir = $this->_dompdf->getOptions()->getTempDir();
-                $tmp_name = @tempnam($tmp_dir, "{$type}_dompdf_img_");
+                $tmp_dir = $this->_nativepdf->getOptions()->getTempDir();
+                $tmp_name = @tempnam($tmp_dir, "{$type}_nativepdf_img_");
                 @unlink($tmp_name);
                 $filename = "$tmp_name.png";
 
@@ -1121,7 +1121,7 @@ class PDFLib implements Canvas
         $w = (int)$w;
         $h = (int)$h;
 
-        $img_type = Cache::detect_type($img, $this->get_dompdf()->getHttpContext());
+        $img_type = Cache::detect_type($img, $this->get_nativepdf()->getHttpContext());
 
         // Strip file:// prefix
         if (substr($img, 0, 7) === "file://") {
@@ -1203,7 +1203,7 @@ class PDFLib implements Canvas
 
     public function javascript($code)
     {
-        if (strlen($this->_dompdf->getOptions()->getPdflibLicense()) > 0) {
+        if (strlen($this->_nativepdf->getOptions()->getPdflibLicense()) > 0) {
             $this->_pdf->create_action("JavaScript", $code);
         }
     }
@@ -1289,14 +1289,14 @@ class PDFLib implements Canvas
         $desc = $this->_pdf->info_font($fh, "descender", "fontsize=$size");
 
         // $desc is usually < 0,
-        $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
+        $ratio = $this->_nativepdf->getOptions()->getFontHeightRatio();
 
         return (abs($asc) + abs($desc)) * $ratio;
     }
 
     public function get_font_baseline($font, $size)
     {
-        $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
+        $ratio = $this->_nativepdf->getOptions()->getFontHeightRatio();
 
         return $this->get_font_height($font, $size) / $ratio * 1.1;
     }
@@ -1368,7 +1368,7 @@ class PDFLib implements Canvas
         for ($p = 1; $p <= $this->_page_count; $p++) {
             $this->_pdf->resume_page("pagenumber=$p");
 
-            $fontMetrics = $this->_dompdf->getFontMetrics();
+            $fontMetrics = $this->_nativepdf->getFontMetrics();
             $callback($p, $this->_page_count, $this, $fontMetrics);
 
             $this->_pdf->suspend_page("");
@@ -1433,10 +1433,10 @@ class PDFLib implements Canvas
             fclose($fh);
 
             //debugpng
-            if ($this->_dompdf->getOptions()->getDebugPng()) {
+            if ($this->_nativepdf->getOptions()->getDebugPng()) {
                 print '[pdflib stream unlink ' . $this->_file . ']';
             }
-            if (!$this->_dompdf->getOptions()->getDebugKeepTemp()) {
+            if (!$this->_nativepdf->getOptions()->getDebugKeepTemp()) {
                 unlink($this->_file);
             }
             $this->_file = null;
@@ -1466,10 +1466,10 @@ class PDFLib implements Canvas
             $data = file_get_contents($this->_file);
 
             //debugpng
-            if ($this->_dompdf->getOptions()->getDebugPng()) {
+            if ($this->_nativepdf->getOptions()->getDebugPng()) {
                 print '[pdflib output unlink ' . $this->_file . ']';
             }
-            if (!$this->_dompdf->getOptions()->getDebugKeepTemp()) {
+            if (!$this->_nativepdf->getOptions()->getDebugKeepTemp()) {
                 unlink($this->_file);
             }
             $this->_file = null;

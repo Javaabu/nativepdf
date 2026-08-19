@@ -1,11 +1,11 @@
 <?php
-namespace Dompdf\Tests\Canvas;
+namespace NativePdf\Tests\Canvas;
 
-use Dompdf\Adapter\CPDF;
-use Dompdf\Canvas;
-use Dompdf\Dompdf;
-use Dompdf\FontMetrics;
-use Dompdf\Tests\TestCase;
+use NativePdf\Adapter\CPDF;
+use NativePdf\Canvas;
+use NativePdf\NativePdf;
+use NativePdf\FontMetrics;
+use NativePdf\Tests\TestCase;
 use DateTime;
 
 class CPDFTest extends TestCase
@@ -15,8 +15,8 @@ class CPDFTest extends TestCase
         $basePath = realpath(__DIR__ . "/..");
         $imagePath = "$basePath/_files/red-dot.png";
 
-        $dompdf = new Dompdf();
-        $canvas = new CPDF([0, 0, 200, 200], "portrait", $dompdf);
+        $nativepdf = new NativePdf();
+        $canvas = new CPDF([0, 0, 200, 200], "portrait", $nativepdf);
         $canvas->new_page();
         $canvas->image($imagePath, 0, 0, 5, 5);
         $output = $canvas->output();
@@ -28,8 +28,8 @@ class CPDFTest extends TestCase
         global $called;
         $called = 0;
 
-        $dompdf = new Dompdf();
-        $canvas = new CPDF([0, 0, 200, 200], "portrait", $dompdf);
+        $nativepdf = new NativePdf();
+        $canvas = new CPDF([0, 0, 200, 200], "portrait", $nativepdf);
         $canvas->new_page();
 
         $canvas->page_script(function (
@@ -58,11 +58,11 @@ class CPDFTest extends TestCase
 
     public function testPageText(): void
     {
-        $dompdf = new Dompdf();
-        $canvas = new CPDF([0, 0, 200, 200], "portrait", $dompdf);
+        $nativepdf = new NativePdf();
+        $canvas = new CPDF([0, 0, 200, 200], "portrait", $nativepdf);
         $canvas->new_page();
 
-        $font = $dompdf->getFontMetrics()->getFont("Helvetica");
+        $font = $nativepdf->getFontMetrics()->getFont("Helvetica");
         $canvas->page_text(60, 40, "Page {PAGE_NUM} of {PAGE_COUNT}", $font, 12);
 
         $output = $canvas->output();
@@ -71,8 +71,8 @@ class CPDFTest extends TestCase
 
     public function testPageLine(): void
     {
-        $dompdf = new Dompdf();
-        $canvas = new CPDF([0, 0, 200, 200], "portrait", $dompdf);
+        $nativepdf = new NativePdf();
+        $canvas = new CPDF([0, 0, 200, 200], "portrait", $nativepdf);
         $canvas->new_page();
 
         $canvas->page_line(0, 0, 200, 200, [0, 0, 0], 1);
@@ -146,21 +146,21 @@ class CPDFTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('fontSupportsCharProvider')]
     public function testFontSupportsChar(string $font, string $char, bool $expected): void
     {
-        $dompdf = new Dompdf();
-        $canvas = new CPDF("letter", "portrait", $dompdf);
-        $fontFile = $dompdf->getFontMetrics()->getFont($font);
+        $nativepdf = new NativePdf();
+        $canvas = new CPDF("letter", "portrait", $nativepdf);
+        $fontFile = $nativepdf->getFontMetrics()->getFont($font);
 
         $this->assertSame($expected, $canvas->font_supports_char($fontFile, $char));
     }
 
     public function testGetXmpMetadata(): void
     {
-        $dompdf = new Dompdf();
-        $canvas = new CPDF([0, 0, 200, 200], "portrait", $dompdf);
+        $nativepdf = new NativePdf();
+        $canvas = new CPDF([0, 0, 200, 200], "portrait", $nativepdf);
 
         $canvas->get_cpdf()->addInfo('CreationDate', 'aa20250208195048');
         $canvas->get_cpdf()->addInfo('ModDate', 'aa20250208195048Z');
-        $canvas->get_cpdf()->addInfo('Producer', 'Dompdf Tests');
+        $canvas->get_cpdf()->addInfo('Producer', 'NativePdf Tests');
 
         $data = implode("\n", [
             '<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>',
@@ -175,7 +175,7 @@ class CPDFTest extends TestCase
             '<rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">',
             '</rdf:Description>',
             '<rdf:Description xmlns:pdf="http://ns.adobe.com/pdf/1.3/" rdf:about="">',
-            '<pdf:Producer>Dompdf Tests</pdf:Producer>',
+            '<pdf:Producer>NativePdf Tests</pdf:Producer>',
             '</rdf:Description>',
             '<rdf:Description xmlns:xmp="http://ns.adobe.com/xap/1.0/" rdf:about="">',
             '<xmp:CreateDate>2025-02-08T19:50:48+00:00</xmp:CreateDate>',
@@ -191,12 +191,12 @@ class CPDFTest extends TestCase
 
     public function testSetAdditionalXmpRdf(): void
     {
-        $dompdf = new Dompdf();
-        $canvas = new CPDF([0, 0, 200, 200], "portrait", $dompdf);
+        $nativepdf = new NativePdf();
+        $canvas = new CPDF([0, 0, 200, 200], "portrait", $nativepdf);
 
         $canvas->get_cpdf()->addInfo('CreationDate', 'aa20250208195048');
         $canvas->get_cpdf()->addInfo('ModDate', 'aa20250208195048Z');
-        $canvas->get_cpdf()->addInfo('Producer', 'Dompdf Tests');
+        $canvas->get_cpdf()->addInfo('Producer', 'NativePdf Tests');
         $additionalXmpRdf = implode("\n", [
             '',
             '<rdf:Description rdf:about="" xmlns:zf="urn:ferd:pdfa:CrossIndustryDocument:invoice:1p0#">',
@@ -222,7 +222,7 @@ class CPDFTest extends TestCase
             '<rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/" rdf:about="">',
             '</rdf:Description>',
             '<rdf:Description xmlns:pdf="http://ns.adobe.com/pdf/1.3/" rdf:about="">',
-            '<pdf:Producer>Dompdf Tests</pdf:Producer>',
+            '<pdf:Producer>NativePdf Tests</pdf:Producer>',
             '</rdf:Description>',
             '<rdf:Description xmlns:xmp="http://ns.adobe.com/xap/1.0/" rdf:about="">',
             '<xmp:CreateDate>2025-02-08T19:50:48+00:00</xmp:CreateDate>',

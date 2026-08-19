@@ -1,11 +1,11 @@
 <?php
-namespace Dompdf\Tests\LayoutTest;
+namespace NativePdf\Tests\LayoutTest;
 
-use Dompdf\Canvas;
-use Dompdf\Dompdf;
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\Options;
-use Dompdf\Tests\TestCase;
+use NativePdf\Canvas;
+use NativePdf\NativePdf;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\Options;
+use NativePdf\Tests\TestCase;
 
 class BidiTest extends TestCase
 {
@@ -17,8 +17,8 @@ class BidiTest extends TestCase
     {
         $frames = [];
 
-        $dompdf = new Dompdf($options ?? new Options());
-        $dompdf->setCallbacks([
+        $nativepdf = new NativePdf($options ?? new Options());
+        $nativepdf->setCallbacks([
             [
                 "event" => "begin_frame",
                 "f" => function (AbstractFrameDecorator $frame, Canvas $canvas) use (&$frames) {
@@ -44,7 +44,7 @@ class BidiTest extends TestCase
             ]
         ]);
 
-        $dompdf->loadHtml(<<<HTML
+        $nativepdf->loadHtml(<<<HTML
 <!DOCTYPE html>
 <html>
 <head>
@@ -66,7 +66,7 @@ class BidiTest extends TestCase
 </html>
 HTML
         );
-        $dompdf->render();
+        $nativepdf->render();
 
         usort($frames, function ($a, $b) {
             return $a["page"] <=> $b["page"] ?: $a["y"] <=> $b["y"] ?: $a["x"] <=> $b["x"];

@@ -1,18 +1,18 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Frame;
+namespace NativePdf\Frame;
 
 use DOMDocument;
 use DOMNode;
 use DOMElement;
 use DOMXPath;
 
-use Dompdf\Exception;
-use Dompdf\Frame;
+use NativePdf\Exception;
+use NativePdf\Frame;
 use IteratorAggregate;
 
 /**
@@ -23,7 +23,7 @@ use IteratorAggregate;
  * structure as the DomDocument, but adds additional capabilities for
  * styling and layout.
  *
- * @package dompdf
+ * @package nativepdf
  */
 class FrameTree implements IteratorAggregate
 {

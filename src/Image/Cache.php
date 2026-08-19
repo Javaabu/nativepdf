@@ -1,20 +1,20 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Image;
+namespace NativePdf\Image;
 
-use Dompdf\Options;
-use Dompdf\Helpers;
-use Dompdf\Exception\ImageException;
+use NativePdf\Options;
+use NativePdf\Helpers;
+use NativePdf\Exception\ImageException;
 
 /**
  * Static class that resolves image urls and downloads and caches
  * remote images if required.
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Cache
 {
@@ -55,7 +55,7 @@ class Cache
      * @param string $protocol  Default protocol if none specified in $url
      * @param string $host      Default host if none specified in $url
      * @param string $base_path Default path if none specified in $url
-     * @param Options $options  An instance of Dompdf\Options
+     * @param Options $options  An instance of NativePdf\Options
      *
      * @return array            An array with three elements: The local path to the image, the image
      *                          extension, and an error message if the image could not be cached
@@ -96,7 +96,7 @@ class Cache
                 $resolved_url = self::$_cache[$full_url];
             } else {
                 $tmp_dir = $options->getTempDir();
-                if (($resolved_url = @tempnam($tmp_dir, "ca_dompdf_img_")) === false) {
+                if (($resolved_url = @tempnam($tmp_dir, "ca_nativepdf_img_")) === false) {
                     throw new ImageException("Unable to create temporary image in " . $tmp_dir, E_WARNING);
                 }
                 $tempfile = $resolved_url;
@@ -128,7 +128,7 @@ class Cache
                 throw new ImageException("Image not readable or empty", E_WARNING);
             }
 
-            list($width, $height, $type, , , , , $imageBytes) = Helpers::dompdf_getimagesize($resolved_url, $options->getHttpContext());
+            list($width, $height, $type, , , , , $imageBytes) = Helpers::nativepdf_getimagesize($resolved_url, $options->getHttpContext());
 
             if (($width && $height && in_array($type, ["gif", "png", "jpeg", "bmp", "svg","webp"], true)) === false) {
                 throw new ImageException("Image type unknown", E_WARNING);
@@ -191,7 +191,7 @@ class Cache
                 unlink($tempfile);
             }
             $resolved_url = self::$broken_image;
-            list($width, $height, $type) = Helpers::dompdf_getimagesize($resolved_url, $options->getHttpContext());
+            list($width, $height, $type) = Helpers::nativepdf_getimagesize($resolved_url, $options->getHttpContext());
             $message = self::$error_message;
             Helpers::record_warnings($e->getCode(), $e->getMessage() . " \n $url", $e->getFile(), $e->getLine());
             if ($full_url !== null) {
@@ -281,7 +281,7 @@ class Cache
 
     static function detect_type($file, $context = null)
     {
-        list(, , $type) = Helpers::dompdf_getimagesize($file, $context);
+        list(, , $type) = Helpers::nativepdf_getimagesize($file, $context);
 
         return $type;
     }

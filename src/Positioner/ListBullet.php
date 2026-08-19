@@ -1,18 +1,18 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Positioner;
+namespace NativePdf\Positioner;
 
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameDecorator\ListBullet as ListBulletFrameDecorator;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\FrameDecorator\ListBullet as ListBulletFrameDecorator;
 
 /**
  * Positions list bullets
  *
- * @package dompdf
+ * @package nativepdf
  */
 class ListBullet extends AbstractPositioner
 {

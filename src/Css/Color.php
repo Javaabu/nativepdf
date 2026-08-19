@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Css;
+namespace NativePdf\Css;
 
-use Dompdf\Helpers;
+use NativePdf\Helpers;
 
 class Color
 {

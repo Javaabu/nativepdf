@@ -1,19 +1,19 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Renderer;
+namespace NativePdf\Renderer;
 
-use Dompdf\Exception;
-use Dompdf\Frame;
-use Dompdf\FrameDecorator\Table;
+use NativePdf\Exception;
+use NativePdf\Frame;
+use NativePdf\FrameDecorator\Table;
 
 /**
  * Renders table cells
  *
- * @package dompdf
+ * @package nativepdf
  */
 class TableCell extends Block
 {

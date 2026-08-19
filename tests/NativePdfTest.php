@@ -1,60 +1,60 @@
 <?php
-namespace Dompdf\Tests;
+namespace NativePdf\Tests;
 
 use DOMDocument;
-use Dompdf\Adapter\CPDF;
-use Dompdf\Canvas;
-use Dompdf\Css\Stylesheet;
-use Dompdf\Dompdf;
-use Dompdf\FontMetrics;
-use Dompdf\Frame;
-use Dompdf\Frame\FrameTree;
-use Dompdf\Options;
-use Dompdf\Tests\TestCase;
+use NativePdf\Adapter\CPDF;
+use NativePdf\Canvas;
+use NativePdf\Css\Stylesheet;
+use NativePdf\NativePdf;
+use NativePdf\FontMetrics;
+use NativePdf\Frame;
+use NativePdf\Frame\FrameTree;
+use NativePdf\Options;
+use NativePdf\Tests\TestCase;
 
-class DompdfTest extends TestCase
+class NativePdfTest extends TestCase
 {
     public function testConstructor()
     {
-        $dompdf = new Dompdf();
-        $this->assertInstanceOf(CPDF::class, $dompdf->getCanvas());
-        $this->assertSame("", $dompdf->getProtocol());
-        $this->assertSame("", $dompdf->getBaseHost());
-        $this->assertSame("", $dompdf->getBasePath());
-        $this->assertIsArray($dompdf->getCallbacks());
-        $this->assertInstanceOf(Stylesheet::class, $dompdf->getCss());
-        $this->assertNull($dompdf->getDom());
-        $this->assertInstanceOf(Options::class, $dompdf->getOptions());
-        $this->assertFalse($dompdf->getQuirksmode());
-        $this->assertNull($dompdf->getTree());
+        $nativepdf = new NativePdf();
+        $this->assertInstanceOf(CPDF::class, $nativepdf->getCanvas());
+        $this->assertSame("", $nativepdf->getProtocol());
+        $this->assertSame("", $nativepdf->getBaseHost());
+        $this->assertSame("", $nativepdf->getBasePath());
+        $this->assertIsArray($nativepdf->getCallbacks());
+        $this->assertInstanceOf(Stylesheet::class, $nativepdf->getCss());
+        $this->assertNull($nativepdf->getDom());
+        $this->assertInstanceOf(Options::class, $nativepdf->getOptions());
+        $this->assertFalse($nativepdf->getQuirksmode());
+        $this->assertNull($nativepdf->getTree());
     }
 
     public function testSetters()
     {
-        $dompdf = new Dompdf();
-        $dompdf->setBaseHost('test1');
-        $dompdf->setBasePath('test2');
-        $dompdf->setCallbacks(['test' => ['event' => 'test', 'f' => function () {}]]);
-        $dompdf->setCss(new Stylesheet($dompdf));
-        $dompdf->setDom(new DOMDocument());
-        $dompdf->setHttpContext(fopen(__DIR__ . "/_files/jamaica.jpg", 'r'));
-        $dompdf->setOptions(new Options());
-        $dompdf->setProtocol('test3');
-        $dompdf->setTree(new FrameTree($dompdf->getDom()));
+        $nativepdf = new NativePdf();
+        $nativepdf->setBaseHost('test1');
+        $nativepdf->setBasePath('test2');
+        $nativepdf->setCallbacks(['test' => ['event' => 'test', 'f' => function () {}]]);
+        $nativepdf->setCss(new Stylesheet($nativepdf));
+        $nativepdf->setDom(new DOMDocument());
+        $nativepdf->setHttpContext(fopen(__DIR__ . "/_files/jamaica.jpg", 'r'));
+        $nativepdf->setOptions(new Options());
+        $nativepdf->setProtocol('test3');
+        $nativepdf->setTree(new FrameTree($nativepdf->getDom()));
 
-        $this->assertEquals('test1', $dompdf->getBaseHost());
-        $this->assertEquals('test2', $dompdf->getBasePath());
-        $this->assertCount(1, $dompdf->getCallbacks());
-        $this->assertInstanceOf(Stylesheet::class, $dompdf->getCss());
-        $this->assertInstanceOf(DOMDocument::class, $dompdf->getDom());
-        $this->assertIsResource($dompdf->getHttpContext());
-        $this->assertInstanceOf(Options::class, $dompdf->getOptions());
-        $this->assertEquals('test3', $dompdf->getProtocol());
-        $this->assertInstanceOf(FrameTree::class, $dompdf->getTree());
+        $this->assertEquals('test1', $nativepdf->getBaseHost());
+        $this->assertEquals('test2', $nativepdf->getBasePath());
+        $this->assertCount(1, $nativepdf->getCallbacks());
+        $this->assertInstanceOf(Stylesheet::class, $nativepdf->getCss());
+        $this->assertInstanceOf(DOMDocument::class, $nativepdf->getDom());
+        $this->assertIsResource($nativepdf->getHttpContext());
+        $this->assertInstanceOf(Options::class, $nativepdf->getOptions());
+        $this->assertEquals('test3', $nativepdf->getProtocol());
+        $this->assertInstanceOf(FrameTree::class, $nativepdf->getTree());
 
-        $dompdf = new Dompdf();
-        $dompdf->setHttpContext(['ssl' => ['verify_peer' => false]]);
-        $this->assertIsResource($dompdf->getHttpContext());
+        $nativepdf = new NativePdf();
+        $nativepdf->setHttpContext(['ssl' => ['verify_peer' => false]]);
+        $this->assertIsResource($nativepdf->getHttpContext());
     }
 
     public static function loadHtmlProvider(): array
@@ -166,19 +166,19 @@ class DompdfTest extends TestCase
         ?string $encoding,
         string $expectedText
     ): void {
-        $dompdf = new Dompdf();
-        $dompdf->loadHtml($html, $encoding);
+        $nativepdf = new NativePdf();
+        $nativepdf->loadHtml($html, $encoding);
 
-        $this->assertSame($expectedText, $dompdf->getDom()->textContent);
+        $this->assertSame($expectedText, $nativepdf->getDom()->textContent);
     }
 
     public function testRender()
     {
-        $dompdf = new Dompdf();
-        $dompdf->loadHtml('<html><body><strong>Hello</strong></body></html>');
-        $dompdf->render();
+        $nativepdf = new NativePdf();
+        $nativepdf->loadHtml('<html><body><strong>Hello</strong></body></html>');
+        $nativepdf->render();
 
-        $this->assertEquals('', $dompdf->getDom()->textContent);
+        $this->assertEquals('', $nativepdf->getDom()->textContent);
     }
 
     public static function callbacksProvider(): array
@@ -200,8 +200,8 @@ class DompdfTest extends TestCase
     {
         $called = 0;
 
-        $dompdf = new Dompdf();
-        $dompdf->setCallbacks([
+        $nativepdf = new NativePdf();
+        $nativepdf->setCallbacks([
             [
                 "event" => $event,
                 "f" => function ($frame, $canvas, $fontMetrics) use (&$called) {
@@ -213,8 +213,8 @@ class DompdfTest extends TestCase
             ]
         ]);
 
-        $dompdf->loadHtml("<html><body><p>Some text</p></body></html>");
-        $dompdf->render();
+        $nativepdf->loadHtml("<html><body><p>Some text</p></body></html>");
+        $nativepdf->render();
 
         $this->assertSame($numCalls, $called);
     }
@@ -223,8 +223,8 @@ class DompdfTest extends TestCase
     {
         $called = 0;
 
-        $dompdf = new Dompdf();
-        $dompdf->setCallbacks([
+        $nativepdf = new NativePdf();
+        $nativepdf->setCallbacks([
             [
                 "event" => "end_document",
                 "f" => function ($pageNumber, $pageCount, $canvas, $fontMetrics) use (&$called) {
@@ -237,8 +237,8 @@ class DompdfTest extends TestCase
             ]
         ]);
 
-        $dompdf->loadHtml("<html><body><p>Page 1</p><p style='page-break-before: always;'>Page 2</p></body></html>");
-        $dompdf->render();
+        $nativepdf->loadHtml("<html><body><p>Page 1</p><p style='page-break-before: always;'>Page 2</p></body></html>");
+        $nativepdf->render();
 
         $this->assertSame(2, $called);
     }
@@ -269,17 +269,17 @@ class DompdfTest extends TestCase
         $options = new Options();
         $options->setDefaultPaperSize("Letter");
 
-        $dompdf = new Dompdf($options);
+        $nativepdf = new NativePdf($options);
 
         if ($setPaper) {
-            $dompdf->setPaper($size, $orientation);
+            $nativepdf->setPaper($size, $orientation);
         }
 
-        $c1 = new CPDF($size, $orientation, $dompdf);
-        $dompdf->setCanvas($c1);
-        $dompdf->loadHtml("<html><head><style>@page { size: $cssSize; }</style></head><body></body></html>");
-        $dompdf->render();
-        $c2 = $dompdf->getCanvas();
+        $c1 = new CPDF($size, $orientation, $nativepdf);
+        $nativepdf->setCanvas($c1);
+        $nativepdf->loadHtml("<html><head><style>@page { size: $cssSize; }</style></head><body></body></html>");
+        $nativepdf->render();
+        $c2 = $nativepdf->getCanvas();
 
         $this->assertSame($c1, $c2);
     }
@@ -288,11 +288,11 @@ class DompdfTest extends TestCase
     {
         $text_frame_contents = [];
 
-        $dompdf = new Dompdf();
+        $nativepdf = new NativePdf();
 
         // Use a callback to inspect the frame tree; otherwise FrameReflower\Page::reflow()
-        // will dispose of it before dompdf->render finishes
-        $dompdf->setCallbacks(['test' => [
+        // will dispose of it before nativepdf->render finishes
+        $nativepdf->setCallbacks(['test' => [
             'event' => 'end_page_render',
             'f' => function (Frame $frame) use (&$text_frame_contents) {
                 foreach ($frame->get_children() as $child) {
@@ -303,8 +303,8 @@ class DompdfTest extends TestCase
             }
         ]]);
 
-        $dompdf->loadHtml('<html><body><span>one</span><span> - two</span></body></html>');
-        $dompdf->render();
+        $nativepdf->loadHtml('<html><body><span>one</span><span> - two</span></body></html>');
+        $nativepdf->render();
 
         $this->assertEquals("one", $text_frame_contents[0]);
         $this->assertEquals(" - two", $text_frame_contents[1]);

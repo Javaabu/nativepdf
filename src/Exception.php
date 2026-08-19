@@ -1,15 +1,15 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf;
+namespace NativePdf;
 
 /**
- * Standard exception thrown by DOMPDF classes
+ * Standard exception thrown by NativePdf classes
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Exception extends \Exception
 {

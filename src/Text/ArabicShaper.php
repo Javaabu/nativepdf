@@ -1,10 +1,10 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Text;
+namespace NativePdf\Text;
 
 /**
  * Contextual Arabic shaping using the Unicode presentation forms
@@ -13,12 +13,12 @@ namespace Dompdf\Text;
  * ligatures.
  *
  * The replacement approach is limited to glyphs that exist as Unicode code
- * points (dompdf's PDF text layer addresses glyphs by code point); fonts
+ * points (nativepdf's PDF text layer addresses glyphs by code point); fonts
  * providing shaping only through OpenType GSUB tables are not supported.
  * Transparent characters (diacritics, ZWJ/ZWNJ) are preserved; shaping is
  * idempotent, as presentation forms themselves have no further forms.
  *
- * @package dompdf
+ * @package nativepdf
  */
 final class ArabicShaper
 {

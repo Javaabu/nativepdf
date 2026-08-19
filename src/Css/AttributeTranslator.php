@@ -1,18 +1,18 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Css;
+namespace NativePdf\Css;
 
-use Dompdf\Frame;
-use Dompdf\Helpers;
+use NativePdf\Frame;
+use NativePdf\Helpers;
 
 /**
  * Translates HTML 4.0 attributes into CSS rules
  *
- * @package dompdf
+ * @package nativepdf
  */
 class AttributeTranslator
 {
@@ -166,7 +166,7 @@ class AttributeTranslator
         ],
         'ol' => [
             'compact' => 'margin: 0.5em 0;',
-            'start' => 'counter-reset: -dompdf-default-counter %d;',
+            'start' => 'counter-reset: -nativepdf-default-counter %d;',
             'type' => '_set_list_style_type',
         ],
         'ul' => [
@@ -175,7 +175,7 @@ class AttributeTranslator
         ],
         'li' => [
             'type' => '_set_list_style_type',
-            'value' => 'counter-reset: -dompdf-default-counter %d;',
+            'value' => 'counter-reset: -nativepdf-default-counter %d;',
         ],
         'pre' => [
             'width' => 'width: %s;',

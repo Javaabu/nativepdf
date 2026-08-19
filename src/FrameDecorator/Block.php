@@ -1,19 +1,19 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameDecorator;
+namespace NativePdf\FrameDecorator;
 
-use Dompdf\Dompdf;
-use Dompdf\Frame;
-use Dompdf\LineBox;
+use NativePdf\NativePdf;
+use NativePdf\Frame;
+use NativePdf\LineBox;
 
 /**
  * Decorates frames for block layout
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Block extends AbstractFrameDecorator
 {
@@ -60,11 +60,11 @@ class Block extends AbstractFrameDecorator
     /**
      * Block constructor.
      * @param Frame $frame
-     * @param Dompdf $dompdf
+     * @param NativePdf $nativepdf
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    function __construct(Frame $frame, NativePdf $nativepdf)
     {
-        parent::__construct($frame, $dompdf);
+        parent::__construct($frame, $nativepdf);
 
         $this->_line_boxes = [new LineBox($this)];
         $this->_cl = 0;

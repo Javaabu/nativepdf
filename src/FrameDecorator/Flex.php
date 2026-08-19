@@ -1,13 +1,13 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameDecorator;
+namespace NativePdf\FrameDecorator;
 
-use Dompdf\Frame;
-use Dompdf\Frame\Factory;
+use NativePdf\Frame;
+use NativePdf\Frame\Factory;
 
 /**
  * Decorates frames for flex container layout
@@ -15,7 +15,7 @@ use Dompdf\Frame\Factory;
  * The flex container computes item geometry centrally (cf. Cellmap for
  * tables); items read their positions back via Positioner\FlexItem.
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Flex extends Block
 {
@@ -161,7 +161,7 @@ class Flex extends Block
         $isItemLevelOrNull = function ($f) {
             return $f === null
                 || (!$f->is_text_node()
-                    && !in_array($f->get_style()->display, ["inline", "-dompdf-br"], true));
+                    && !in_array($f->get_style()->display, ["inline", "-nativepdf-br"], true));
         };
 
         $children = iterator_to_array($this->get_children());
@@ -172,7 +172,7 @@ class Flex extends Block
                 return;
             }
 
-            $wrapper = $this->create_anonymous_child("dompdf-flex-item", "block");
+            $wrapper = $this->create_anonymous_child("nativepdf-flex-item", "block");
             $this->insert_child_before($wrapper, $run[0]);
             $wrapper->set_positioner(Factory::getPositionerInstance("FlexItem"));
 
@@ -186,7 +186,7 @@ class Flex extends Block
         foreach ($children as $child) {
             $display = $child->get_style()->display;
             $isInline = $child->is_text_node()
-                || in_array($display, ["inline", "-dompdf-br"], true);
+                || in_array($display, ["inline", "-nativepdf-br"], true);
 
             if (!$isInline || !$child->is_in_flow()) {
                 $flush();

@@ -1,19 +1,19 @@
 <?php
-namespace Dompdf\Tests\Css;
+namespace NativePdf\Tests\Css;
 
 use DOMDocument;
 use DOMElement;
 use DOMXPath;
-use Dompdf\Css\Stylesheet;
-use Dompdf\Dompdf;
-use Dompdf\Frame\FrameTree;
-use Dompdf\Tests\TestCase;
+use NativePdf\Css\Stylesheet;
+use NativePdf\NativePdf;
+use NativePdf\Frame\FrameTree;
+use NativePdf\Tests\TestCase;
 
 class SelectorTest extends TestCase
 {
     private function stylesheet()
     {
-        return new class(new Dompdf()) extends Stylesheet {
+        return new class(new NativePdf()) extends Stylesheet {
             public function specificity(string $selector, int $origin = self::ORIG_AUTHOR): int
             {
                 return parent::specificity($selector, $origin);

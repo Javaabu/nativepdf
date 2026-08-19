@@ -1,8 +1,8 @@
 <?php
-namespace Dompdf\Tests\Text;
+namespace NativePdf\Tests\Text;
 
-use Dompdf\Tests\TestCase;
-use Dompdf\Text\BidiAnalyzer;
+use NativePdf\Tests\TestCase;
+use NativePdf\Text\BidiAnalyzer;
 
 /**
  * Runs the complete official UAX #9 conformance suites (BidiTest.txt and

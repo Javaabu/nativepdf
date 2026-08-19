@@ -1,24 +1,24 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Renderer;
+namespace NativePdf\Renderer;
 
 use DOMElement;
-use Dompdf\Adapter\CPDF;
-use Dompdf\Css\Color;
-use Dompdf\Css\Style;
-use Dompdf\Dompdf;
-use Dompdf\Frame;
-use Dompdf\Helpers;
-use Dompdf\Image\Cache;
+use NativePdf\Adapter\CPDF;
+use NativePdf\Css\Color;
+use NativePdf\Css\Style;
+use NativePdf\NativePdf;
+use NativePdf\Frame;
+use NativePdf\Helpers;
+use NativePdf\Image\Cache;
 
 /**
  * Base renderer class
  *
- * @package dompdf
+ * @package nativepdf
  */
 abstract class AbstractRenderer
 {
@@ -26,26 +26,26 @@ abstract class AbstractRenderer
     /**
      * Rendering backend
      *
-     * @var \Dompdf\Canvas
+     * @var \NativePdf\Canvas
      */
     protected $_canvas;
 
     /**
-     * Current dompdf instance
+     * Current nativepdf instance
      *
-     * @var Dompdf
+     * @var NativePdf
      */
-    protected $_dompdf;
+    protected $_nativepdf;
 
     /**
      * Class constructor
      *
-     * @param Dompdf $dompdf The current dompdf instance
+     * @param NativePdf $nativepdf The current nativepdf instance
      */
-    function __construct(Dompdf $dompdf)
+    function __construct(NativePdf $nativepdf)
     {
-        $this->_dompdf = $dompdf;
-        $this->_canvas = $dompdf->getCanvas();
+        $this->_nativepdf = $nativepdf;
+        $this->_canvas = $nativepdf->getCanvas();
     }
 
     /**
@@ -301,7 +301,7 @@ abstract class AbstractRenderer
         float $intrinsic_h,
         Style $style
     ): void {
-        $dpi = $this->_dompdf->getOptions()->getDpi();
+        $dpi = $this->_nativepdf->getOptions()->getDpi();
 
         // Intrinsic tile size in pt
         $tile_w = $intrinsic_w * 72 / $dpi;
@@ -431,7 +431,7 @@ abstract class AbstractRenderer
         $box_height = $height;
 
         //debugpng
-        if ($this->_dompdf->getOptions()->getDebugPng()) {
+        if ($this->_nativepdf->getOptions()->getDebugPng()) {
             print '[_background_image ' . $url . ']';
         }
 
@@ -440,7 +440,7 @@ abstract class AbstractRenderer
             $sheet->get_protocol(),
             $sheet->get_host(),
             $sheet->get_base_path(),
-            $this->_dompdf->getOptions()
+            $this->_nativepdf->getOptions()
         );
 
         // Bail if the image is no good
@@ -454,7 +454,7 @@ abstract class AbstractRenderer
         //Therefore read dimension directly from file, instead of creating gd object first.
         //$img_w = imagesx($src); $img_h = imagesy($src);
 
-        list($img_w, $img_h, $img_type) = Helpers::dompdf_getimagesize($img, $this->_dompdf->getHttpContext());
+        list($img_w, $img_h, $img_type) = Helpers::nativepdf_getimagesize($img, $this->_nativepdf->getHttpContext());
         if ($img_w == 0 || $img_h == 0) {
             return;
         }
@@ -462,7 +462,7 @@ abstract class AbstractRenderer
         // SVG backgrounds are drawn as vectors on the PDF canvas; the
         // GD-based compositing below only handles raster types
         if ($img_type === "svg") {
-            if ($this->_canvas instanceof \Dompdf\Adapter\CPDF) {
+            if ($this->_canvas instanceof \NativePdf\Adapter\CPDF) {
                 $this->_render_svg_background($img, $x, $y, $width, $height, (float)$img_w, (float)$img_h, $style);
             }
             return;
@@ -477,7 +477,7 @@ abstract class AbstractRenderer
         $org_img_h = $img_h;
 
         $repeat = $style->background_repeat;
-        $dpi = $this->_dompdf->getOptions()->getDpi();
+        $dpi = $this->_nativepdf->getOptions()->getDpi();
 
         //Increase background resolution and dependent box size according to image resolution to be placed in
         //Then image can be copied in without resize
@@ -616,7 +616,7 @@ abstract class AbstractRenderer
 
         if (!$cached) {
             // determmine if image is too big to be rendered
-            $maxImageBytes = $this->_dompdf->getOptions()->getImageByteSizeLimit();
+            $maxImageBytes = $this->_nativepdf->getOptions()->getImageByteSizeLimit();
             $bgBytes = $bg_width * $bg_height * 4 * 4; // 4 channels with 4 bytes per channel (e.g. truecolor with alpha)
             if ($maxImageBytes > 0 && ($bgBytes === null || $bgBytes > $maxImageBytes)) {
                 Helpers::record_warnings(E_USER_WARNING, "Background image dimensions are too large to be rendered (calculated size: " . round($bgBytes / 1048576, 2) . " MB).", __FILE__, __LINE__);
@@ -807,8 +807,8 @@ abstract class AbstractRenderer
             if ($cpdfFromGd && $this->_canvas instanceof CPDF) {
                 // Skip writing temp file as the GD object is added directly
             } else {
-                $tmpDir = $this->_dompdf->getOptions()->getTempDir();
-                $tmpName = @tempnam($tmpDir, "bg_dompdf_img_");
+                $tmpDir = $this->_nativepdf->getOptions()->getTempDir();
+                $tmpName = @tempnam($tmpDir, "bg_nativepdf_img_");
                 @unlink($tmpName);
                 $tmpFile = "$tmpName.png";
 
@@ -824,7 +824,7 @@ abstract class AbstractRenderer
             $cpdfFromGd = $tmpFile === null;
         }
 
-        if ($this->_dompdf->getOptions()->getDebugPng()) {
+        if ($this->_nativepdf->getOptions()->getDebugPng()) {
             print '[_background_image ' . $tmpFile . ']';
         }
 
@@ -1447,13 +1447,13 @@ abstract class AbstractRenderer
     {
         if ($node->nodeName === "a" && ($href = $node->getAttribute("href")) !== "") {
             [$x, $y, $w, $h] = $borderBox;
-            $dompdf = $this->_dompdf;
+            $nativepdf = $this->_nativepdf;
             $href = Helpers::build_url(
-                $dompdf->getProtocol(),
-                $dompdf->getBaseHost(),
-                $dompdf->getBasePath(),
+                $nativepdf->getProtocol(),
+                $nativepdf->getBaseHost(),
+                $nativepdf->getBasePath(),
                 $href,
-                $dompdf->getOptions()->getChroot()
+                $nativepdf->getOptions()->getChroot()
             ) ?? $href;
             $this->_canvas->add_link($href, $x, $y, $w, $h);
         }

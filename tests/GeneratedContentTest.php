@@ -1,9 +1,9 @@
 <?php
-namespace Dompdf\Tests;
+namespace NativePdf\Tests;
 
-use Dompdf\Dompdf;
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\Tests\TestCase;
+use NativePdf\NativePdf;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\Tests\TestCase;
 
 final class GeneratedContentTest extends TestCase
 {
@@ -140,7 +140,7 @@ HTML
             ],
             // Note: There have been spec changes in regards to how `counter-reset`
             // is supposed to work in cases like the following. Firefox 82+
-            // behaves differently here, dompdf is consistent with other browsers
+            // behaves differently here, nativepdf is consistent with other browsers
             // and older Firefox versions:
             // * https://github.com/mdn/content/issues/13293
             // * https://github.com/w3c/csswg-drafts/issues/5477
@@ -602,8 +602,8 @@ HTML
         $content = array_fill_keys(array_keys($expectedContent), []);
 
         // Use callback to inspect frame tree
-        $dompdf = new Dompdf();
-        $dompdf->setCallbacks([
+        $nativepdf = new NativePdf();
+        $nativepdf->setCallbacks([
             [
                 "event" => "begin_frame",
                 "f" => function (AbstractFrameDecorator $frame) use ($expectedContent, &$content) {
@@ -617,8 +617,8 @@ HTML
             ]
         ]);
 
-        $dompdf->loadHtml($html);
-        $dompdf->render();
+        $nativepdf->loadHtml($html);
+        $nativepdf->render();
 
         $this->assertSame($expectedContent, $content);
     }

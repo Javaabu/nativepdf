@@ -1,17 +1,17 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf;
+namespace NativePdf;
 
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameDecorator\Block;
-use Dompdf\FrameDecorator\ListBullet;
-use Dompdf\FrameDecorator\Page;
-use Dompdf\FrameReflower\Text as TextFrameReflower;
-use Dompdf\Positioner\Inline as InlinePositioner;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\FrameDecorator\Block;
+use NativePdf\FrameDecorator\ListBullet;
+use NativePdf\FrameDecorator\Page;
+use NativePdf\FrameReflower\Text as TextFrameReflower;
+use NativePdf\Positioner\Inline as InlinePositioner;
 use Iterator;
 
 /**
@@ -20,7 +20,7 @@ use Iterator;
  * This class represents a line box
  * http://www.w3.org/TR/CSS2/visuren.html#line-box
  *
- * @package dompdf
+ * @package nativepdf
  */
 class LineBox
 {

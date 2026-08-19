@@ -1,20 +1,20 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameReflower;
+namespace NativePdf\FrameReflower;
 
-use Dompdf\Exception;
-use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
-use Dompdf\FrameDecorator\Table as TableFrameDecorator;
-use Dompdf\FrameDecorator\TableRowGroup as TableRowGroupFrameDecorator;
+use NativePdf\Exception;
+use NativePdf\FrameDecorator\Block as BlockFrameDecorator;
+use NativePdf\FrameDecorator\Table as TableFrameDecorator;
+use NativePdf\FrameDecorator\TableRowGroup as TableRowGroupFrameDecorator;
 
 /**
  * Reflows table row groups (e.g. tbody tags)
  *
- * @package dompdf
+ * @package nativepdf
  */
 class TableRowGroup extends AbstractFrameReflower
 {
@@ -37,7 +37,7 @@ class TableRowGroup extends AbstractFrameReflower
         $frame = $this->_frame;
         $page = $frame->get_root();
         $parent = $frame->get_parent();
-        $dompdf_generated = $parent->get_frame()->get_node()->nodeName === "dompdf_generated";
+        $nativepdf_generated = $parent->get_frame()->get_node()->nodeName === "nativepdf_generated";
 
         // Counters and generated content
         $this->_set_content();
@@ -57,7 +57,7 @@ class TableRowGroup extends AbstractFrameReflower
             }
         }
 
-        if ($page->is_full() && $dompdf_generated && $frame->get_parent() === null) {
+        if ($page->is_full() && $nativepdf_generated && $frame->get_parent() === null) {
             return;
         }
 

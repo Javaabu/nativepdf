@@ -1,10 +1,10 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf;
+namespace NativePdf;
 
 /**
  * Create canvas instances
@@ -12,7 +12,7 @@ namespace Dompdf;
  * The canvas factory creates canvas instances based on the
  * availability of rendering backends and config options.
  *
- * @package dompdf
+ * @package nativepdf
  */
 class CanvasFactory
 {
@@ -24,16 +24,16 @@ class CanvasFactory
     }
 
     /**
-     * @param Dompdf         $dompdf
+     * @param NativePdf         $nativepdf
      * @param string|float[] $paper
      * @param string         $orientation
      * @param string|null    $class
      *
      * @return Canvas
      */
-    static function get_instance(Dompdf $dompdf, $paper, string $orientation, ?string $class = null)
+    static function get_instance(NativePdf $nativepdf, $paper, string $orientation, ?string $class = null)
     {
-        $backend = strtolower($dompdf->getOptions()->getPdfBackend());
+        $backend = strtolower($nativepdf->getOptions()->getPdfBackend());
 
         if (isset($class) && class_exists($class, false)) {
             $class .= "_Adapter";
@@ -41,26 +41,26 @@ class CanvasFactory
             if (($backend === "auto" || $backend === "pdflib") &&
                 class_exists("PDFLib", false)
             ) {
-                $class = "Dompdf\\Adapter\\PDFLib";
+                $class = "NativePdf\\Adapter\\PDFLib";
             }
 
             else {
                 if (class_exists($backend, false)) {
                     $class = $backend;
                 } elseif ($backend === "gd" && extension_loaded('gd')) {
-                    $class = "Dompdf\\Adapter\\GD";
+                    $class = "NativePdf\\Adapter\\GD";
                 } else {
-                    $class = "Dompdf\\Adapter\\CPDF";
+                    $class = "NativePdf\\Adapter\\CPDF";
                 }
             }
         }
 
-        $instance = new $class($paper, $orientation, $dompdf);
+        $instance = new $class($paper, $orientation, $nativepdf);
 
         $class_interfaces = class_implements($class, false);
-        if (!$class_interfaces || !in_array("Dompdf\\Canvas", $class_interfaces)) {
-            $class = "Dompdf\\Adapter\\CPDF";
-            $instance = new $class($paper, $orientation, $dompdf);
+        if (!$class_interfaces || !in_array("NativePdf\\Canvas", $class_interfaces)) {
+            $class = "NativePdf\\Adapter\\CPDF";
+            $instance = new $class($paper, $orientation, $nativepdf);
         }
 
         return $instance;

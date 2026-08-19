@@ -1,21 +1,21 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Renderer;
+namespace NativePdf\Renderer;
 
-use Dompdf\Helpers;
-use Dompdf\Frame;
-use Dompdf\FrameDecorator\ListBullet as ListBulletFrameDecorator;
-use Dompdf\FrameDecorator\ListBulletImage;
-use Dompdf\Image\Cache;
+use NativePdf\Helpers;
+use NativePdf\Frame;
+use NativePdf\FrameDecorator\ListBullet as ListBulletFrameDecorator;
+use NativePdf\FrameDecorator\ListBulletImage;
+use NativePdf\Image\Cache;
 
 /**
  * Renders list bullets
  *
- * @package dompdf
+ * @package nativepdf
  */
 class ListBullet extends AbstractRenderer
 {
@@ -180,21 +180,21 @@ class ListBullet extends AbstractRenderer
                 case "upper-roman":
                     $pad = null;
                     if ($bullet_style === "decimal-leading-zero") {
-                        $pad = strlen($li->get_parent()->get_node()->getAttribute("dompdf-children-count"));
+                        $pad = strlen($li->get_parent()->get_node()->getAttribute("nativepdf-children-count"));
                     }
 
                     $node = $frame->get_node();
 
-                    if (!$node->hasAttribute("dompdf-counter")) {
+                    if (!$node->hasAttribute("nativepdf-counter")) {
                         return;
                     }
 
-                    $index = (int) $node->getAttribute("dompdf-counter");
+                    $index = (int) $node->getAttribute("nativepdf-counter");
                     $text = $this->make_counter($index, $bullet_style, $pad);
 
                     $word_spacing = $style->word_spacing;
                     $letter_spacing = $style->letter_spacing;
-                    $text_width = $this->_dompdf->getFontMetrics()->getTextWidth($text, $font_family, $font_size, $word_spacing, $letter_spacing);
+                    $text_width = $this->_nativepdf->getFontMetrics()->getTextWidth($text, $font_family, $font_size, $word_spacing, $letter_spacing);
 
                     [$x, $y] = $frame->get_position();
 
@@ -228,13 +228,13 @@ class ListBullet extends AbstractRenderer
      */
     protected function bidi_marker_text(string $text): string
     {
-        $cps = \Dompdf\Text\BidiAnalyzer::toCodePoints($text);
-        $result = \Dompdf\Text\BidiAnalyzer::computeLevels($cps, 1);
-        $order = \Dompdf\Text\BidiAnalyzer::visualOrder($result["levels"], $result["removed"]);
+        $cps = \NativePdf\Text\BidiAnalyzer::toCodePoints($text);
+        $result = \NativePdf\Text\BidiAnalyzer::computeLevels($cps, 1);
+        $order = \NativePdf\Text\BidiAnalyzer::visualOrder($result["levels"], $result["removed"]);
 
         $out = "";
         foreach ($order as $i) {
-            $out .= \Dompdf\Text\ArabicShaper::encode($cps[$i]);
+            $out .= \NativePdf\Text\ArabicShaper::encode($cps[$i]);
         }
 
         return $out;

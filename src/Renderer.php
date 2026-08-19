@@ -1,27 +1,27 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf;
+namespace NativePdf;
 
-use Dompdf\Renderer\AbstractRenderer;
-use Dompdf\Renderer\Block;
-use Dompdf\Renderer\Image;
-use Dompdf\Renderer\Inline;
-use Dompdf\Renderer\ListBullet;
-use Dompdf\Renderer\TableCell;
-use Dompdf\Renderer\TableRow;
-use Dompdf\Renderer\TableRowGroup;
-use Dompdf\Renderer\Text;
+use NativePdf\Renderer\AbstractRenderer;
+use NativePdf\Renderer\Block;
+use NativePdf\Renderer\Image;
+use NativePdf\Renderer\Inline;
+use NativePdf\Renderer\ListBullet;
+use NativePdf\Renderer\TableCell;
+use NativePdf\Renderer\TableRow;
+use NativePdf\Renderer\TableRowGroup;
+use NativePdf\Renderer\Text;
 
 /**
  * Concrete renderer
  *
  * Instantiates several specific renderers in order to render any given frame.
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Renderer extends AbstractRenderer
 {
@@ -55,11 +55,11 @@ class Renderer extends AbstractRenderer
      */
     public function render(Frame $frame)
     {
-        global $_dompdf_debug;
+        global $_nativepdf_debug, $_dompdf_debug;
 
         $this->_check_callbacks("begin_frame", $frame);
 
-        if ($_dompdf_debug) {
+        if ($_nativepdf_debug || $_dompdf_debug) {
             echo $frame;
             flush();
         }
@@ -134,11 +134,11 @@ class Renderer extends AbstractRenderer
                 $this->_render_frame("table-row-group", $frame);
                 break;
 
-            case "-dompdf-list-bullet":
+            case "-nativepdf-list-bullet":
                 $this->_render_frame("list-bullet", $frame);
                 break;
 
-            case "-dompdf-image":
+            case "-nativepdf-image":
                 $this->_render_frame("image", $frame);
                 break;
 
@@ -233,13 +233,13 @@ class Renderer extends AbstractRenderer
     protected function _check_callbacks(string $event, Frame $frame): void
     {
         if (!isset($this->_callbacks)) {
-            $this->_callbacks = $this->_dompdf->getCallbacks();
+            $this->_callbacks = $this->_nativepdf->getCallbacks();
         }
 
         if (isset($this->_callbacks[$event])) {
             $fs = $this->_callbacks[$event];
             $canvas = $this->_canvas;
-            $fontMetrics = $this->_dompdf->getFontMetrics();
+            $fontMetrics = $this->_nativepdf->getFontMetrics();
 
             foreach ($fs as $f) {
                 $f($frame, $canvas, $fontMetrics);
@@ -262,35 +262,35 @@ class Renderer extends AbstractRenderer
 
             switch ($type) {
                 case "block":
-                    $this->_renderers[$type] = new Block($this->_dompdf);
+                    $this->_renderers[$type] = new Block($this->_nativepdf);
                     break;
 
                 case "inline":
-                    $this->_renderers[$type] = new Inline($this->_dompdf);
+                    $this->_renderers[$type] = new Inline($this->_nativepdf);
                     break;
 
                 case "text":
-                    $this->_renderers[$type] = new Text($this->_dompdf);
+                    $this->_renderers[$type] = new Text($this->_nativepdf);
                     break;
 
                 case "image":
-                    $this->_renderers[$type] = new Image($this->_dompdf);
+                    $this->_renderers[$type] = new Image($this->_nativepdf);
                     break;
 
                 case "table-cell":
-                    $this->_renderers[$type] = new TableCell($this->_dompdf);
+                    $this->_renderers[$type] = new TableCell($this->_nativepdf);
                     break;
 
                 case "table-row":
-                    $this->_renderers[$type] = new TableRow($this->_dompdf);
+                    $this->_renderers[$type] = new TableRow($this->_nativepdf);
                     break;
 
                 case "table-row-group":
-                    $this->_renderers[$type] = new TableRowGroup($this->_dompdf);
+                    $this->_renderers[$type] = new TableRowGroup($this->_nativepdf);
                     break;
 
                 case "list-bullet":
-                    $this->_renderers[$type] = new ListBullet($this->_dompdf);
+                    $this->_renderers[$type] = new ListBullet($this->_nativepdf);
                     break;
 
                 case "php":
@@ -298,7 +298,7 @@ class Renderer extends AbstractRenderer
                     break;
 
                 case "javascript":
-                    $this->_renderers[$type] = new JavascriptEmbedder($this->_dompdf);
+                    $this->_renderers[$type] = new JavascriptEmbedder($this->_nativepdf);
                     break;
 
             }

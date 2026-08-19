@@ -1,8 +1,8 @@
 <?php
-namespace Dompdf\Tests\OutputTest;
+namespace NativePdf\Tests\OutputTest;
 
-use Dompdf\Options;
-use Dompdf\Dompdf;
+use NativePdf\Options;
+use NativePdf\NativePdf;
 use SplFileInfo;
 
 final class Dataset
@@ -34,7 +34,7 @@ final class Dataset
         return new SplFileInfo("$path/$name.pdf");
     }
 
-    public function render(string $backend = "cpdf"): Dompdf
+    public function render(string $backend = "cpdf"): NativePdf
     {
         $options = new Options([
             'chroot' => realpath(__DIR__ . '/../_files'),
@@ -43,7 +43,7 @@ final class Dataset
         ]);
         $options->setPdfBackend($backend);
 
-        $pdf = new Dompdf($options);
+        $pdf = new NativePdf($options);
         $pdf->loadHtmlFile($this->file->getPathname());
         $pdf->setBasePath($this->file->getPath());
         $pdf->render();

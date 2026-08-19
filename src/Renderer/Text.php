@@ -1,18 +1,18 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Renderer;
+namespace NativePdf\Renderer;
 
-use Dompdf\Adapter\CPDF;
-use Dompdf\Frame;
+use NativePdf\Adapter\CPDF;
+use NativePdf\Frame;
 
 /**
  * Renders text frames
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Text extends AbstractRenderer
 {
@@ -44,7 +44,7 @@ class Text extends AbstractRenderer
     const DECO_EXTENSION = 0.0;
 
     /**
-     * @param \Dompdf\FrameDecorator\Text $frame
+     * @param \NativePdf\FrameDecorator\Text $frame
      */
     function render(Frame $frame)
     {
@@ -67,7 +67,7 @@ class Text extends AbstractRenderer
 
         $font = $style->font_family;
         $size = $style->font_size;
-        $frame_font_size = $frame->get_dompdf()->getFontMetrics()->getFontHeight($font, $size);
+        $frame_font_size = $frame->get_nativepdf()->getFontMetrics()->getFontHeight($font, $size);
         $word_spacing = $frame->get_text_spacing() + $style->word_spacing;
         $letter_spacing = $style->letter_spacing;
         $width = (float) $style->width;
@@ -136,7 +136,7 @@ class Text extends AbstractRenderer
             if ($deco_color === "currentcolor" || $deco_color === "") {
                 $deco_color = $deco_style->color;
             } else {
-                $deco_color = \Dompdf\Css\Color::parse($deco_color);
+                $deco_color = \NativePdf\Css\Color::parse($deco_color);
             }
 
             $deco_line_style = $deco_style->text_decoration_style;
@@ -168,10 +168,10 @@ class Text extends AbstractRenderer
             }
         }
 
-        $options = $this->_dompdf->getOptions();
+        $options = $this->_nativepdf->getOptions();
 
         if ($options->getDebugLayout() && $options->getDebugLayoutLines()) {
-            $fontMetrics = $this->_dompdf->getFontMetrics();
+            $fontMetrics = $this->_nativepdf->getFontMetrics();
             $textWidth = $fontMetrics->getTextWidth($text, $font, $size, $word_spacing, $letter_spacing);
             $this->debugLayout([$x, $y, $textWidth, $frame_font_size], "orange", [0.5, 0.5]);
         }

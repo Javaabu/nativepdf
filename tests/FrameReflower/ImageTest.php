@@ -1,11 +1,11 @@
 <?php
-namespace Dompdf\Tests\FrameReflower;
+namespace NativePdf\Tests\FrameReflower;
 
-use Dompdf\Css\Style;
-use Dompdf\Css\Stylesheet;
-use Dompdf\Dompdf;
-use Dompdf\FrameDecorator\Image as ImageFrameDecorator;
-use Dompdf\Tests\TestCase;
+use NativePdf\Css\Style;
+use NativePdf\Css\Stylesheet;
+use NativePdf\NativePdf;
+use NativePdf\FrameDecorator\Image as ImageFrameDecorator;
+use NativePdf\Tests\TestCase;
 use Mockery;
 
 class ImageTest extends TestCase
@@ -128,7 +128,7 @@ class ImageTest extends TestCase
         ?ImageFrameDecorator $parentFrame = null,
         array $containingBlock = [0, 0, 400, 400]
     ): ImageFrameDecorator {
-        $style = new Style(new Stylesheet(new Dompdf()));
+        $style = new Style(new Stylesheet(new NativePdf()));
 
         foreach ($styleProperties as $prop => $val) {
             $style->set_prop($prop, $val);
@@ -137,12 +137,12 @@ class ImageTest extends TestCase
         $frame = Mockery::mock(
             ImageFrameDecorator::class,
             [
-                'get_dompdf->getOptions->getDebugPng' => false,
+                'get_nativepdf->getOptions->getDebugPng' => false,
                 'get_style' => $style,
                 'get_parent' => $parentFrame,
-                'get_dompdf->getOptions->getDpi' => 75,
+                'get_nativepdf->getOptions->getDpi' => 75,
                 'get_image_url' => dirname(__DIR__) . '/_files/jamaica.jpg',
-                'get_dompdf->getHttpContext' => null
+                'get_nativepdf->getHttpContext' => null
             ]
         );
 

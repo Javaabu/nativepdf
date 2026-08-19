@@ -1,20 +1,20 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameDecorator;
+namespace NativePdf\FrameDecorator;
 
-use Dompdf\Dompdf;
-use Dompdf\Frame;
-use Dompdf\Helpers;
-use Dompdf\Image\Cache;
+use NativePdf\NativePdf;
+use NativePdf\Frame;
+use NativePdf\Helpers;
+use NativePdf\Image\Cache;
 
 /**
  * Decorates frames for image layout and rendering
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Image extends AbstractFrameDecorator
 {
@@ -38,30 +38,30 @@ class Image extends AbstractFrameDecorator
      * Class constructor
      *
      * @param Frame $frame the frame to decorate
-     * @param DOMPDF $dompdf the document's dompdf object (required to resolve relative & remote urls)
+     * @param NativePdf $nativepdf the document's nativepdf object (required to resolve relative & remote urls)
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    function __construct(Frame $frame, NativePdf $nativepdf)
     {
-        parent::__construct($frame, $dompdf);
+        parent::__construct($frame, $nativepdf);
 
         $node = $frame->get_node();
         $url = $node->getAttribute("src");
 
-        $debug_png = $dompdf->getOptions()->getDebugPng();
+        $debug_png = $nativepdf->getOptions()->getDebugPng();
         if ($debug_png) {
             print '[__construct ' . $url . ']';
         }
 
         list($this->_image_url, /*$type*/, $this->_image_msg) = Cache::resolve_url(
             $url,
-            $dompdf->getProtocol(),
-            $dompdf->getBaseHost(),
-            $dompdf->getBasePath(),
-            $dompdf->getOptions()
+            $nativepdf->getProtocol(),
+            $nativepdf->getBaseHost(),
+            $nativepdf->getBasePath(),
+            $nativepdf->getOptions()
         );
 
         if (Cache::is_broken($this->_image_url) && ($alt = $node->getAttribute("alt")) !== "") {
-            $fontMetrics = $dompdf->getFontMetrics();
+            $fontMetrics = $nativepdf->getFontMetrics();
             $style = $frame->get_style();
             $font = $style->font_family;
             $size = $style->font_size;
@@ -80,7 +80,7 @@ class Image extends AbstractFrameDecorator
      */
     public function get_intrinsic_dimensions(): array
     {
-        [$width, $height] = Helpers::dompdf_getimagesize($this->_image_url, $this->_dompdf->getHttpContext());
+        [$width, $height] = Helpers::nativepdf_getimagesize($this->_image_url, $this->_nativepdf->getHttpContext());
 
         return [$width, $height];
     }
@@ -93,7 +93,7 @@ class Image extends AbstractFrameDecorator
      */
     public function resample($length): float
     {
-        $dpi = $this->_dompdf->getOptions()->getDpi();
+        $dpi = $this->_nativepdf->getOptions()->getDpi();
         return ($length * 72) / $dpi;
     }
 

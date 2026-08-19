@@ -1,22 +1,22 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameReflower;
+namespace NativePdf\FrameReflower;
 
-use Dompdf\Exception;
-use Dompdf\FontMetrics;
-use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
-use Dompdf\FrameDecorator\Inline as InlineFrameDecorator;
-use Dompdf\FrameDecorator\Text as TextFrameDecorator;
-use Dompdf\Helpers;
+use NativePdf\Exception;
+use NativePdf\FontMetrics;
+use NativePdf\FrameDecorator\Block as BlockFrameDecorator;
+use NativePdf\FrameDecorator\Inline as InlineFrameDecorator;
+use NativePdf\FrameDecorator\Text as TextFrameDecorator;
+use NativePdf\Helpers;
 
 /**
  * Reflows text frames.
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Text extends AbstractFrameReflower
 {

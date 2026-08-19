@@ -1,28 +1,28 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameDecorator;
+namespace NativePdf\FrameDecorator;
 
-use Dompdf\Dompdf;
-use Dompdf\Frame;
+use NativePdf\NativePdf;
+use NativePdf\Frame;
 
 /**
  * Decorates Frames for table row layout
  *
- * @package dompdf
+ * @package nativepdf
  */
 class TableRow extends AbstractFrameDecorator
 {
     /**
      * TableRow constructor.
      * @param Frame $frame
-     * @param Dompdf $dompdf
+     * @param NativePdf $nativepdf
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    function __construct(Frame $frame, NativePdf $nativepdf)
     {
-        parent::__construct($frame, $dompdf);
+        parent::__construct($frame, $nativepdf);
     }
 }

@@ -7,7 +7,7 @@
  * @license http://creativecommons.org/licenses/publicdomain/ Public Domain
  * @package Cpdf
  */
-namespace Dompdf;
+namespace NativePdf;
 
 use FontLib\Exception\FontNotFoundException;
 use FontLib\Font;
@@ -1850,7 +1850,7 @@ EOT;
                 $this->objects[$id] = [
                     't'    => 'info',
                     'info' => [
-                        'Producer'     => 'CPDF (dompdf)',
+                        'Producer'     => 'CPDF (nativepdf)',
                         'CreationDate' => $date
                     ]
                 ];
@@ -2993,7 +2993,7 @@ EOT;
                 }
 
                 $res .= "/M ($date)\n";
-                $res .= "/Prop_Build << /App << /Name /DomPDF >> /Filter << /Name /Adobe.PPKLite >> >>\n";
+                $res .= "/Prop_Build << /App << /Name /NativePdf >> /Filter << /Name /Adobe.PPKLite >> >>\n";
 
                 $o = &$this->objects[$id];
                 foreach ($o['info'] as $k => $v) {
@@ -3628,7 +3628,7 @@ EOT;
 
         if ($this->fileIdentifier === '') {
             $tmp = implode('', $this->objects[$this->infoObject]['info']);
-            $this->fileIdentifier = md5('DOMPDF' . __FILE__ . $tmp . microtime() . mt_rand());
+            $this->fileIdentifier = md5('NATIVEPDF' . __FILE__ . $tmp . microtime() . mt_rand());
         }
 
         if ($this->arc4_objnum) {
@@ -4788,10 +4788,10 @@ EOT;
      * $fieldSigId = $cpdf->addFormField(Cpdf::ACROFORM_FIELD_SIG, 'Signature1', 0, 0, 0, 0, 0);
      *
      * $signatureId = $cpdf->addSignature([
-     *   'signcert' => file_get_contents('dompdf.crt'),
-     *   'privkey' => file_get_contents('dompdf.key'),
+     *   'signcert' => file_get_contents('nativepdf.crt'),
+     *   'privkey' => file_get_contents('nativepdf.key'),
      *   'password' => 'password',
-     *   'name' => 'DomPDF DEMO',
+     *   'name' => 'NativePdf DEMO',
      *   'location' => 'Home',
      *   'reason' => 'First Form',
      *   'contactinfo' => 'info'
@@ -6617,7 +6617,7 @@ EOT;
         $this->transform([$sx, 0, 0, $sy, $x + $tx, $y + $h - $ty - $sy * $dh]);
 
         $doc = $this->createSvgDocument($file);
-        $surface = new \Dompdf\Svg\GradientAwareSurface($doc, $this, $file);
+        $surface = new \NativePdf\Svg\GradientAwareSurface($doc, $this, $file);
         $doc->render($surface);
 
         $this->clippingEnd();

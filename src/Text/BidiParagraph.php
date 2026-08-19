@@ -1,14 +1,14 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Text;
+namespace NativePdf\Text;
 
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
-use Dompdf\FrameDecorator\Text as TextFrameDecorator;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\FrameDecorator\Block as BlockFrameDecorator;
+use NativePdf\FrameDecorator\Text as TextFrameDecorator;
 
 /**
  * Paragraph-level bidirectional analysis for a block container's inline
@@ -28,7 +28,7 @@ use Dompdf\FrameDecorator\Text as TextFrameDecorator;
  * valid across page re-reflows (all later mutations are level-preserving),
  * so none of this state is cleared by reset().
  *
- * @package dompdf
+ * @package nativepdf
  */
 final class BidiParagraph
 {
@@ -47,7 +47,7 @@ final class BidiParagraph
             return;
         }
 
-        if (!$block->get_dompdf()->getOptions()->isBidiEnabled()) {
+        if (!$block->get_nativepdf()->getOptions()->isBidiEnabled()) {
             $block->bidi_analyzed = true;
             return;
         }
@@ -237,8 +237,8 @@ final class BidiParagraph
                 // outside list marker is anchored to the border edge and
                 // stays put; an inside one is inline content and reorders
                 // with the rest of the line.
-                if (($f instanceof \Dompdf\FrameDecorator\ListBullet
-                        || $f instanceof \Dompdf\FrameDecorator\ListBulletImage)
+                if (($f instanceof \NativePdf\FrameDecorator\ListBullet
+                        || $f instanceof \NativePdf\FrameDecorator\ListBulletImage)
                     && $f->get_parent()->get_style()->list_style_position === "outside"
                 ) {
                     continue;
@@ -324,7 +324,7 @@ final class BidiParagraph
 
             $display = $child->get_style()->display;
 
-            if ($display === "-dompdf-br") {
+            if ($display === "-nativepdf-br") {
                 $entries[] = ["sep"];
                 continue;
             }
@@ -348,7 +348,7 @@ final class BidiParagraph
                 continue;
             }
 
-            if (in_array($display, ["inline-block", "inline-table", "inline-flex", "-dompdf-image"], true)) {
+            if (in_array($display, ["inline-block", "inline-table", "inline-flex", "-nativepdf-image"], true)) {
                 $entries[] = ["atomic", $child];
                 continue;
             }

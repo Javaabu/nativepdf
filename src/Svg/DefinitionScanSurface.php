@@ -1,10 +1,10 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Svg;
+namespace NativePdf\Svg;
 
 use Svg\Style;
 use Svg\Surface\SurfaceInterface;
@@ -18,7 +18,7 @@ use Svg\Surface\SurfaceInterface;
  * what makes a reference to a gradient declared later in the file
  * resolvable.
  *
- * @package dompdf
+ * @package nativepdf
  */
 class DefinitionScanSurface implements SurfaceInterface
 {

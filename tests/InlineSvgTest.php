@@ -1,12 +1,12 @@
 <?php
-namespace Dompdf\Tests;
+namespace NativePdf\Tests;
 
 use DOMDocument;
-use Dompdf\Canvas;
-use Dompdf\Dompdf;
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\InlineSvg;
-use Dompdf\Options;
+use NativePdf\Canvas;
+use NativePdf\NativePdf;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\InlineSvg;
+use NativePdf\Options;
 use Masterminds\HTML5;
 
 class InlineSvgTest extends TestCase
@@ -136,8 +136,8 @@ class InlineSvgTest extends TestCase
         $textFrames = [];
         $imageFrames = 0;
 
-        $dompdf = new Dompdf(new Options());
-        $dompdf->setCallbacks([
+        $nativepdf = new NativePdf(new Options());
+        $nativepdf->setCallbacks([
             [
                 "event" => "begin_frame",
                 "f" => function (AbstractFrameDecorator $frame, Canvas $canvas) use (&$textFrames, &$imageFrames) {
@@ -154,7 +154,7 @@ class InlineSvgTest extends TestCase
             ]
         ]);
 
-        $dompdf->loadHtml(
+        $nativepdf->loadHtml(
             '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>'
             . '<p>before</p>'
             . '<svg width="100" height="50" viewBox="0 0 100 50">'
@@ -165,13 +165,13 @@ class InlineSvgTest extends TestCase
             . '<p>after</p>'
             . '</body></html>'
         );
-        $dompdf->render();
+        $nativepdf->render();
 
         $this->assertSame(1, $imageFrames);
         $this->assertContains("before", $textFrames);
         $this->assertContains("after", $textFrames);
         $this->assertNotContains("LEAKED", $textFrames);
         $this->assertNotContains("rect { stroke: black; }", $textFrames);
-        $this->assertNotSame("", $dompdf->output());
+        $this->assertNotSame("", $nativepdf->output());
     }
 }

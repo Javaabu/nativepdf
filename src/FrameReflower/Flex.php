@@ -1,21 +1,21 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameReflower;
+namespace NativePdf\FrameReflower;
 
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
-use Dompdf\FrameDecorator\Flex as FlexFrameDecorator;
-use Dompdf\Helpers;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\FrameDecorator\Block as BlockFrameDecorator;
+use NativePdf\FrameDecorator\Flex as FlexFrameDecorator;
+use NativePdf\Helpers;
 
 /**
  * Reflows flex containers
  *
  * Implements the CSS Flexible Box Layout Module Level 1 layout algorithm
- * (https://www.w3.org/TR/css-flexbox-1/#layout-algorithm) within dompdf's
+ * (https://www.w3.org/TR/css-flexbox-1/#layout-algorithm) within nativepdf's
  * architecture: the container computes all item geometry centrally and
  * pushes positions to items (cf. Cellmap for tables), imposing resolved
  * sizes through used style values before reflowing each item.
@@ -24,7 +24,7 @@ use Dompdf\Helpers;
  * supported for row directions (column containers are laid out as a single
  * line); `wrap-reverse` mirrors the line stacking order.
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Flex extends Block
 {

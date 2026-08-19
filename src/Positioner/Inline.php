@@ -1,20 +1,20 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Positioner;
+namespace NativePdf\Positioner;
 
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameDecorator\Inline as InlineFrameDecorator;
-use Dompdf\Exception;
-use Dompdf\Helpers;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\FrameDecorator\Inline as InlineFrameDecorator;
+use NativePdf\Exception;
+use NativePdf\Helpers;
 
 /**
  * Positions inline frames
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Inline extends AbstractPositioner
 {

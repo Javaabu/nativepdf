@@ -1,32 +1,32 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf;
+namespace NativePdf;
 
 /**
  * Embeds Javascript into the PDF document
  *
- * @package dompdf
+ * @package nativepdf
  */
 class JavascriptEmbedder
 {
 
     /**
-     * @var Dompdf
+     * @var NativePdf
      */
-    protected $_dompdf;
+    protected $_nativepdf;
 
     /**
      * JavascriptEmbedder constructor.
      *
-     * @param Dompdf $dompdf
+     * @param NativePdf $nativepdf
      */
-    public function __construct(Dompdf $dompdf)
+    public function __construct(NativePdf $nativepdf)
     {
-        $this->_dompdf = $dompdf;
+        $this->_nativepdf = $nativepdf;
     }
 
     /**
@@ -34,7 +34,7 @@ class JavascriptEmbedder
      */
     public function insert($script)
     {
-        $this->_dompdf->getCanvas()->javascript($script);
+        $this->_nativepdf->getCanvas()->javascript($script);
     }
 
     /**
@@ -42,7 +42,7 @@ class JavascriptEmbedder
      */
     public function render(Frame $frame)
     {
-        if (!$this->_dompdf->getOptions()->getIsJavascriptEnabled()) {
+        if (!$this->_nativepdf->getOptions()->getIsJavascriptEnabled()) {
             return;
         }
 

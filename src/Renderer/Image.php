@@ -1,19 +1,19 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Renderer;
+namespace NativePdf\Renderer;
 
-use Dompdf\Frame;
-use Dompdf\FrameDecorator\Image as ImageFrameDecorator;
-use Dompdf\Image\Cache;
+use NativePdf\Frame;
+use NativePdf\FrameDecorator\Image as ImageFrameDecorator;
+use NativePdf\Image\Cache;
 
 /**
  * Image renderer
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Image extends Block
 {

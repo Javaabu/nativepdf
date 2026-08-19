@@ -1,4 +1,4 @@
-# j_dom_pdf demo pack
+# NativePdf demo pack
 
 Four sample PDFs that show what the CSS3 work in this fork can do:
 flexbox layout, inline SVG (including recolouring), and right-to-left
@@ -24,7 +24,7 @@ php demo/build.php        # renders every page in demo/pages into demo/out
 php demo/build.php 01-flexbox   # or just one
 ```
 
-`demo/.cache/` holds the font metrics dompdf generates; it is safe to delete.
+`demo/.cache/` holds the font metrics nativepdf generates; it is safe to delete.
 
 ## Things worth knowing (checked while building these pages)
 

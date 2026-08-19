@@ -1,18 +1,18 @@
 {
-    "name": "dompdf/dompdf",
+    "name": "javaabu/nativepdf",
     "type": "library",
-    "description": "DOMPDF is a CSS 2.1 compliant HTML to PDF converter",
-    "homepage": "https://github.com/dompdf/dompdf",
+    "description": "NativePdf is a CSS 2.1 compliant HTML to PDF converter, a fork of dompdf",
+    "homepage": "https://github.com/Javaabu/nativepdf",
     "license": "LGPL-2.1",
     "authors": [
         {
-            "name": "The Dompdf Community",
-            "homepage": "https://github.com/dompdf/dompdf/blob/master/AUTHORS.md"
+            "name": "Javaabu",
+            "homepage": "https://github.com/Javaabu/nativepdf/blob/master/AUTHORS.md"
         }
     ],
     "autoload": {
         "psr-4": {
-            "Dompdf\\": "src/"
+            "NativePdf\\": "src/"
         },
         "classmap": [
             "lib/"
@@ -20,7 +20,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Dompdf\\Tests\\": "tests/"
+            "NativePdf\\Tests\\": "tests/"
         }
     },
     "require": {

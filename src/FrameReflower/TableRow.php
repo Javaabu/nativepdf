@@ -1,20 +1,20 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameReflower;
+namespace NativePdf\FrameReflower;
 
-use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
-use Dompdf\FrameDecorator\Table as TableFrameDecorator;
-use Dompdf\FrameDecorator\TableRow as TableRowFrameDecorator;
-use Dompdf\Exception;
+use NativePdf\FrameDecorator\Block as BlockFrameDecorator;
+use NativePdf\FrameDecorator\Table as TableFrameDecorator;
+use NativePdf\FrameDecorator\TableRow as TableRowFrameDecorator;
+use NativePdf\Exception;
 
 /**
  * Reflows table rows
  *
- * @package dompdf
+ * @package nativepdf
  */
 class TableRow extends AbstractFrameReflower
 {

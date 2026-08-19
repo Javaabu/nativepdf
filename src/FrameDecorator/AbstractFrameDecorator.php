@@ -1,28 +1,28 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameDecorator;
+namespace NativePdf\FrameDecorator;
 
 use DOMElement;
 use DOMNode;
-use Dompdf\Helpers;
-use Dompdf\Dompdf;
-use Dompdf\Exception;
-use Dompdf\Frame;
-use Dompdf\Frame\Factory;
-use Dompdf\Frame\FrameListIterator;
-use Dompdf\Frame\FrameTreeIterator;
-use Dompdf\FrameReflower\AbstractFrameReflower;
-use Dompdf\Css\Style;
-use Dompdf\Positioner\AbstractPositioner;
+use NativePdf\Helpers;
+use NativePdf\NativePdf;
+use NativePdf\Exception;
+use NativePdf\Frame;
+use NativePdf\Frame\Factory;
+use NativePdf\Frame\FrameListIterator;
+use NativePdf\Frame\FrameTreeIterator;
+use NativePdf\FrameReflower\AbstractFrameReflower;
+use NativePdf\Css\Style;
+use NativePdf\Positioner\AbstractPositioner;
 
 /**
  * Base AbstractFrameDecorator class
  *
- * @package dompdf
+ * @package nativepdf
  */
 abstract class AbstractFrameDecorator extends Frame
 {
@@ -36,7 +36,7 @@ abstract class AbstractFrameDecorator extends Frame
      */
     public $bidi_level;
 
-    const DEFAULT_COUNTER = "-dompdf-default-counter";
+    const DEFAULT_COUNTER = "-nativepdf-default-counter";
 
     /**
      * array([id] => counter_value) (for generated content)
@@ -74,11 +74,11 @@ abstract class AbstractFrameDecorator extends Frame
     protected $_reflower;
 
     /**
-     * Reference to the current dompdf instance
+     * Reference to the current nativepdf instance
      *
-     * @var Dompdf
+     * @var NativePdf
      */
-    protected $_dompdf;
+    protected $_nativepdf;
 
     /**
      * First block parent
@@ -126,13 +126,13 @@ abstract class AbstractFrameDecorator extends Frame
      * Class constructor
      *
      * @param Frame $frame   The decoration target
-     * @param Dompdf $dompdf The Dompdf object
+     * @param NativePdf $nativepdf The NativePdf object
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    function __construct(Frame $frame, NativePdf $nativepdf)
     {
         $this->_frame = $frame;
         $this->_root = null;
-        $this->_dompdf = $dompdf;
+        $this->_nativepdf = $nativepdf;
         $frame->set_decorator($this);
     }
 
@@ -179,11 +179,14 @@ abstract class AbstractFrameDecorator extends Frame
         $frame->set_style($style);
 
         if ($node instanceof DOMElement && $node->hasAttribute("id")) {
+            $node->setAttribute("data-nativepdf-original-id", $node->getAttribute("id"));
+            // kept under the old name as well, so selectors and callbacks
+            // written against dompdf still find the split fragment
             $node->setAttribute("data-dompdf-original-id", $node->getAttribute("id"));
             $node->removeAttribute("id");
         }
 
-        $deco = Factory::decorate_frame($frame, $this->_dompdf, $this->_root);
+        $deco = Factory::decorate_frame($frame, $this->_nativepdf, $this->_root);
 
         if ($this instanceof Text) {
             $deco->trailingWs = $this->trailingWs;
@@ -207,11 +210,14 @@ abstract class AbstractFrameDecorator extends Frame
         $frame->set_style($style);
 
         if ($node instanceof DOMElement && $node->hasAttribute("id")) {
+            $node->setAttribute("data-nativepdf-original-id", $node->getAttribute("id"));
+            // kept under the old name as well, so selectors and callbacks
+            // written against dompdf still find the split fragment
             $node->setAttribute("data-dompdf-original-id", $node->getAttribute("id"));
             $node->removeAttribute("id");
         }
 
-        $deco = Factory::decorate_frame($frame, $this->_dompdf, $this->_root);
+        $deco = Factory::decorate_frame($frame, $this->_nativepdf, $this->_root);
 
         if ($this instanceof Text) {
             $deco->trailingWs = $this->trailingWs;
@@ -243,7 +249,7 @@ abstract class AbstractFrameDecorator extends Frame
         $frame = new Frame($node);
         $frame->set_style($child_style);
 
-        return Factory::decorate_frame($frame, $this->_dompdf, $this->_root);
+        return Factory::decorate_frame($frame, $this->_nativepdf, $this->_root);
     }
 
     function reset()
@@ -275,7 +281,7 @@ abstract class AbstractFrameDecorator extends Frame
     protected function reset_generated_content(): void
     {
         if ($this->content_set
-            && $this->get_node()->nodeName === "dompdf_generated"
+            && $this->get_node()->nodeName === "nativepdf_generated"
         ) {
             $content = $this->get_style()->content;
 
@@ -345,11 +351,11 @@ abstract class AbstractFrameDecorator extends Frame
     }
 
     /**
-     * @return Dompdf
+     * @return NativePdf
      */
-    function get_dompdf()
+    function get_nativepdf()
     {
-        return $this->_dompdf;
+        return $this->_nativepdf;
     }
 
     public function get_margin_width(): float

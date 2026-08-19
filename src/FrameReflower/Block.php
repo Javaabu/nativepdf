@@ -1,26 +1,26 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameReflower;
+namespace NativePdf\FrameReflower;
 
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
-use Dompdf\FrameDecorator\ListBullet as ListBulletFrameDecorator;
-use Dompdf\FrameDecorator\TableCell as TableCellFrameDecorator;
-use Dompdf\FrameDecorator\Text as TextFrameDecorator;
-use Dompdf\Exception;
-use Dompdf\Css\Style;
-use Dompdf\Helpers;
-use Dompdf\LineBox;
-use Dompdf\Text\BidiParagraph;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\FrameDecorator\Block as BlockFrameDecorator;
+use NativePdf\FrameDecorator\ListBullet as ListBulletFrameDecorator;
+use NativePdf\FrameDecorator\TableCell as TableCellFrameDecorator;
+use NativePdf\FrameDecorator\Text as TextFrameDecorator;
+use NativePdf\Exception;
+use NativePdf\Css\Style;
+use NativePdf\Helpers;
+use NativePdf\LineBox;
+use NativePdf\Text\BidiParagraph;
 
 /**
  * Reflows block frames
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Block extends AbstractFrameReflower
 {
@@ -613,7 +613,7 @@ class Block extends AbstractFrameReflower
      */
     function vertical_align()
     {
-        $fontMetrics = $this->get_dompdf()->getFontMetrics();
+        $fontMetrics = $this->get_nativepdf()->getFontMetrics();
 
         foreach ($this->_frame->get_line_boxes() as $line) {
             $height = $line->h;
@@ -627,7 +627,7 @@ class Block extends AbstractFrameReflower
             foreach ($line->frames_to_align() as $frame) {
                 $style = $frame->get_style();
                 $isInlineBlock = $style->display !== "inline"
-                    && $style->display !== "-dompdf-list-bullet";
+                    && $style->display !== "-nativepdf-list-bullet";
 
                 $baseline = $fontMetrics->getFontBaseline($style->font_family, $style->font_size);
                 $y_offset = 0;

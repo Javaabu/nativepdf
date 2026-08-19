@@ -1,19 +1,19 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameReflower;
+namespace NativePdf\FrameReflower;
 
-use Dompdf\Frame;
-use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
-use Dompdf\FrameDecorator\Page as PageFrameDecorator;
+use NativePdf\Frame;
+use NativePdf\FrameDecorator\Block as BlockFrameDecorator;
+use NativePdf\FrameDecorator\Page as PageFrameDecorator;
 
 /**
  * Reflows pages
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Page extends AbstractFrameReflower
 {
@@ -28,7 +28,7 @@ class Page extends AbstractFrameReflower
     /**
      * Cache of the canvas
      *
-     * @var \Dompdf\Canvas
+     * @var \NativePdf\Canvas
      */
     private $_canvas;
 
@@ -180,15 +180,15 @@ class Page extends AbstractFrameReflower
     protected function _check_callbacks(string $event, Frame $frame): void
     {
         if (!isset($this->_callbacks)) {
-            $dompdf = $this->get_dompdf();
-            $this->_callbacks = $dompdf->getCallbacks();
-            $this->_canvas = $dompdf->getCanvas();
+            $nativepdf = $this->get_nativepdf();
+            $this->_callbacks = $nativepdf->getCallbacks();
+            $this->_canvas = $nativepdf->getCanvas();
         }
 
         if (isset($this->_callbacks[$event])) {
             $fs = $this->_callbacks[$event];
             $canvas = $this->_canvas;
-            $fontMetrics = $this->get_dompdf()->getFontMetrics();
+            $fontMetrics = $this->get_nativepdf()->getFontMetrics();
 
             foreach ($fs as $f) {
                 $f($frame, $canvas, $fontMetrics);

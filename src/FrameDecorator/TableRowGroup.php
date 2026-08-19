@@ -1,20 +1,20 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameDecorator;
+namespace NativePdf\FrameDecorator;
 
-use Dompdf\Dompdf;
-use Dompdf\Frame;
+use NativePdf\NativePdf;
+use NativePdf\Frame;
 
 /**
  * Table row group decorator
  *
  * Overrides split() method for tbody, thead & tfoot elements
  *
- * @package dompdf
+ * @package nativepdf
  */
 class TableRowGroup extends AbstractFrameDecorator
 {
@@ -23,11 +23,11 @@ class TableRowGroup extends AbstractFrameDecorator
      * Class constructor
      *
      * @param Frame $frame   Frame to decorate
-     * @param Dompdf $dompdf Current dompdf instance
+     * @param NativePdf $nativepdf Current nativepdf instance
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    function __construct(Frame $frame, NativePdf $nativepdf)
     {
-        parent::__construct($frame, $dompdf);
+        parent::__construct($frame, $nativepdf);
     }
 
     /**

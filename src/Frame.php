@@ -1,13 +1,13 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf;
+namespace NativePdf;
 
-use Dompdf\Css\Style;
-use Dompdf\Frame\FrameListIterator;
+use NativePdf\Css\Style;
+use NativePdf\Frame\FrameListIterator;
 
 /**
  * The main Frame class
@@ -18,7 +18,7 @@ use Dompdf\Frame\FrameListIterator;
  * Style} object. Tree structure is maintained via the parent & children
  * links.
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Frame
 {

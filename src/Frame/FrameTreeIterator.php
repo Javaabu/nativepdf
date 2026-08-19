@@ -1,20 +1,20 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Frame;
+namespace NativePdf\Frame;
 
 use Iterator;
-use Dompdf\Frame;
+use NativePdf\Frame;
 
 /**
  * Pre-order Iterator
  *
  * Returns frames in preorder traversal order (parent then children)
  *
- * @package dompdf
+ * @package nativepdf
  */
 class FrameTreeIterator implements Iterator
 {

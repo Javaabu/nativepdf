@@ -16,7 +16,7 @@ const UNICODE_VERSION = "16.0.0";
 $base = "https://www.unicode.org/Public/" . UNICODE_VERSION . "/ucd";
 $outDir = __DIR__ . "/../lib/res/unicode";
 $testDir = __DIR__ . "/../tests/_files/unicode";
-$cacheDir = sys_get_temp_dir() . "/dompdf-ucd-" . UNICODE_VERSION;
+$cacheDir = sys_get_temp_dir() . "/nativepdf-ucd-" . UNICODE_VERSION;
 
 @mkdir($outDir, 0755, true);
 @mkdir($testDir, 0755, true);

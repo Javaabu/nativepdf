@@ -100,7 +100,7 @@ plates = "\n".join(plate_html(p) for p in PLATES)
 ok_rows = "\n".join(f"          <tr><td>{a}</td><td>{b}</td></tr>" for a, b in MATRIX_OK)
 no_rows = "\n".join(f"          <tr><td>{a}</td><td>{b}</td></tr>" for a, b in MATRIX_NO)
 
-HTML = f'''<title>j_dom_pdf Proof Sheet</title>
+HTML = f'''<title>NativePdf Proof Sheet</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -312,7 +312,7 @@ a:focus-visible {{ outline: 2px solid var(--accent); outline-offset: 3px; }}
 
 <header class="masthead">
   <div class="wrap">
-    <p class="eyebrow">j_dom_pdf · demo pack · 19 August 2026</p>
+    <p class="eyebrow">NativePdf · demo pack · 19 August 2026</p>
     <h1>Four proofs from the CSS3 branch</h1>
     <p class="standfirst">
       Flexbox layout, inline SVG with real colour control, and right-to-left Dhivehi —

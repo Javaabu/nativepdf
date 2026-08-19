@@ -1,14 +1,14 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf;
+namespace NativePdf;
 
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameDecorator\Table as TableFrameDecorator;
-use Dompdf\FrameDecorator\TableCell as TableCellFrameDecorator;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\FrameDecorator\Table as TableFrameDecorator;
+use NativePdf\FrameDecorator\TableCell as TableCellFrameDecorator;
 
 /**
  * Maps table cells to the table grid.
@@ -16,7 +16,7 @@ use Dompdf\FrameDecorator\TableCell as TableCellFrameDecorator;
  * This class resolves borders in tables with collapsed borders and helps
  * place row & column spanned table cells.
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Cellmap
 {
@@ -333,7 +333,7 @@ class Cellmap
      */
     public function get_frame_position(Frame $frame)
     {
-        global $_dompdf_warnings;
+        global $_nativepdf_warnings, $_dompdf_warnings;
 
         $key = $frame->get_id();
 
@@ -347,14 +347,18 @@ class Cellmap
         $row = $this->_frames[$key]["rows"][0];
 
         if (!isset($this->_columns[$col])) {
-            $_dompdf_warnings[] = "Frame not found in columns array.  Check your table layout for missing or extra TDs.";
+            $msg = "Frame not found in columns array.  Check your table layout for missing or extra TDs.";
+            $_nativepdf_warnings[] = $msg;
+            $_dompdf_warnings[] = $msg;
             $x = $table_x;
         } else {
             $x = $table_x + $this->_columns[$col]["x"];
         }
 
         if (!isset($this->_rows[$row])) {
-            $_dompdf_warnings[] = "Frame not found in row array.  Check your table layout for missing or extra TDs.";
+            $msg = "Frame not found in row array.  Check your table layout for missing or extra TDs.";
+            $_nativepdf_warnings[] = $msg;
+            $_dompdf_warnings[] = $msg;
             $y = $table_y;
         } else {
             $y = $table_y + $this->_rows[$row]["y"];

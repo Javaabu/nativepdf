@@ -1,20 +1,20 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Css;
+namespace NativePdf\Css;
 
 use DOMElement;
 use DOMXPath;
-use Dompdf\Css\Content\Url;
-use Dompdf\Dompdf;
-use Dompdf\Exception;
-use Dompdf\FontMetrics;
-use Dompdf\Frame\FrameTree;
-use Dompdf\Helpers;
-use Dompdf\InlineSvg;
+use NativePdf\Css\Content\Url;
+use NativePdf\NativePdf;
+use NativePdf\Exception;
+use NativePdf\FontMetrics;
+use NativePdf\Frame\FrameTree;
+use NativePdf\Helpers;
+use NativePdf\InlineSvg;
 
 /**
  * The master stylesheet class
@@ -25,7 +25,7 @@ use Dompdf\InlineSvg;
  * elements.
  *
  * @see Style
- * @package dompdf
+ * @package nativepdf
  */
 class Stylesheet
 {
@@ -88,7 +88,7 @@ class Stylesheet
      *
      * @var string
      */
-    const PATTERN_MEDIA_QUERY = '(?<CSS_MEDIA_QUERY>(?:(?:(?:(?<CSS_MEDIA_QUERY_OP>only|not)\s+)?(?<CSS_MEDIA_QUERY_TYPE>all|aural|bitmap|braille|dompdf|embossed|handheld|paged|print|projection|screen|speech|static|tty|tv|visual))|(?:\(\s*(?<CSS_MEDIA_QUERY_FEATURE>(?:(?:(?:min|max)-)?(?:width|height))|orientation|[^:]*?)\s*(?:\:\s*(?<CSS_MEDIA_QUERY_CONDITION>.*?)\s*)?\))))';
+    const PATTERN_MEDIA_QUERY = '(?<CSS_MEDIA_QUERY>(?:(?:(?:(?<CSS_MEDIA_QUERY_OP>only|not)\s+)?(?<CSS_MEDIA_QUERY_TYPE>all|aural|bitmap|braille|nativepdf|dompdf|embossed|handheld|paged|print|projection|screen|speech|static|tty|tv|visual))|(?:\(\s*(?<CSS_MEDIA_QUERY_FEATURE>(?:(?:(?:min|max)-)?(?:width|height))|orientation|[^:]*?)\s*(?:\:\s*(?<CSS_MEDIA_QUERY_CONDITION>.*?)\s*)?\))))';
 
     /*
      * The highest possible specificity is 0x01000000 (and that is only for author
@@ -96,7 +96,7 @@ class Stylesheet
      * adding multiples of 0x10000000 to the actual specificity. Important
      * declarations are handled in Style; though technically they should be handled
      * here so that user important declarations can be made to take precedence over
-     * user important declarations, this doesn't matter in practice as Dompdf does
+     * user important declarations, this doesn't matter in practice as NativePdf does
      * not support user stylesheets, and user agent stylesheets can not include
      * important declarations.
      */
@@ -114,11 +114,11 @@ class Stylesheet
     const SPEC_NON_CSS = 0x20000000;
 
     /**
-     * Current dompdf instance
+     * Current nativepdf instance
      *
-     * @var Dompdf
+     * @var NativePdf
      */
-    private $_dompdf;
+    private $_nativepdf;
 
     /**
      * Array of currently defined styles
@@ -185,16 +185,16 @@ class Stylesheet
      * http://www.w3.org/TR/REC-html40/types.html
      *   screen, tty, tv, projection, handheld, print, braille, aural, all
      * The following are non standard extensions for undocumented specific environments.
-     *   static, visual, bitmap, paged, dompdf
+     *   static, visual, bitmap, paged, nativepdf
      * Note, even though the generated pdf file is intended for print output,
      * the desired content might be different (e.g. screen or projection view of html file).
-     * Therefore allow specification of content by dompdf setting Options::defaultMediaType.
+     * Therefore allow specification of content by nativepdf setting Options::defaultMediaType.
      * If given, replace media "print" by Options::defaultMediaType.
      * (Previous version $ACCEPTED_MEDIA_TYPES = $ACCEPTED_GENERIC_MEDIA_TYPES + $ACCEPTED_DEFAULT_MEDIA_TYPE)
      */
     static $ACCEPTED_DEFAULT_MEDIA_TYPE = "print";
-    static $ACCEPTED_GENERIC_MEDIA_TYPES = ["all", "static", "visual", "bitmap", "paged", "dompdf"];
-    static $VALID_MEDIA_TYPES = ["all", "aural", "bitmap", "braille", "dompdf", "embossed", "handheld", "paged", "print", "projection", "screen", "speech", "static", "tty", "tv", "visual"];
+    static $ACCEPTED_GENERIC_MEDIA_TYPES = ["all", "static", "visual", "bitmap", "paged", "nativepdf", "dompdf"];
+    static $VALID_MEDIA_TYPES = ["all", "aural", "bitmap", "braille", "nativepdf", "embossed", "handheld", "paged", "print", "projection", "screen", "speech", "static", "tty", "tv", "visual", "dompdf"];
 
     /**
      * @var FontMetrics
@@ -207,10 +207,10 @@ class Stylesheet
      * The base protocol, host & path are initialized to those of
      * the current script.
      */
-    function __construct(Dompdf $dompdf)
+    function __construct(NativePdf $nativepdf)
     {
-        $this->_dompdf = $dompdf;
-        $this->setFontMetrics($dompdf->getFontMetrics());
+        $this->_nativepdf = $nativepdf;
+        $this->setFontMetrics($nativepdf->getFontMetrics());
         $this->_styles = [];
         $this->_loaded_files = [];
         $script = __FILE__;
@@ -252,13 +252,13 @@ class Stylesheet
     }
 
     /**
-     * Return the Dompdf object
+     * Return the NativePdf object
      *
-     * @return Dompdf
+     * @return NativePdf
      */
-    function get_dompdf()
+    function get_nativepdf()
     {
-        return $this->_dompdf;
+        return $this->_nativepdf;
     }
 
     /**
@@ -375,7 +375,7 @@ class Stylesheet
         $protocol = $parsed_url["protocol"];
 
         if ($file !== $this->getDefaultStylesheet()) {
-            $options = $this->_dompdf->getOptions();
+            $options = $this->_nativepdf->getOptions();
             $allowed_protocols = $options->getAllowedProtocols();
             if (!array_key_exists($protocol, $allowed_protocols)) {
                 Helpers::record_warnings(E_USER_WARNING, "Permission denied on $file. The communication protocol is not supported.", __FILE__, __LINE__);
@@ -394,10 +394,10 @@ class Stylesheet
             $parsed = Helpers::parse_data_uri($file);
             $css = $parsed["data"];
         } else {
-            [$css, $http_response_header] = Helpers::getFileContent($file, $this->_dompdf->getHttpContext());
+            [$css, $http_response_header] = Helpers::getFileContent($file, $this->_nativepdf->getHttpContext());
 
             $good_mime_type = true;
-            if (isset($http_response_header) && !$this->_dompdf->getQuirksmode()) {
+            if (isset($http_response_header) && !$this->_nativepdf->getQuirksmode()) {
                 foreach ($http_response_header as $_header) {
                     if (preg_match("@Content-Type:\s*([\w/]+)@i", $_header, $matches) &&
                         ($matches[1] !== "text/css")
@@ -501,7 +501,7 @@ class Stylesheet
             $d++;
         }
 
-        if ($this->_dompdf->getOptions()->getDebugCss()) {
+        if ($this->_nativepdf->getOptions()->getDebugCss()) {
             /*DEBUGCSS*/
             print "<pre>\n";
             /*DEBUGCSS*/
@@ -1292,7 +1292,7 @@ class Stylesheet
 
         $styles = [];
         $xp = new DOMXPath($tree->get_dom());
-        $DEBUGCSS = $this->_dompdf->getOptions()->getDebugCss();
+        $DEBUGCSS = $this->_nativepdf->getOptions()->getDebugCss();
 
         // Add generated content
         foreach ($this->_styles as $selector => $selector_styles) {
@@ -1323,7 +1323,7 @@ class Stylesheet
 
                     foreach (array_keys($query["pseudo_elements"], true, true) as $pos) {
                         // Do not add a new pseudo element if another one already matched
-                        if ($node->hasAttribute("dompdf_{$pos}_frame_id")) {
+                        if ($node->hasAttribute("nativepdf_{$pos}_frame_id")) {
                             continue;
                         }
 
@@ -1354,12 +1354,12 @@ class Stylesheet
                             $new_node = $node->ownerDocument->createElement("img_generated");
                             $new_node->setAttribute("src", $src);
                         } else {
-                            $new_node = $node->ownerDocument->createElement("dompdf_generated");
+                            $new_node = $node->ownerDocument->createElement("nativepdf_generated");
                         }
 
                         $new_node->setAttribute($pos, $pos);
                         $new_frame_id = $tree->insert_node($node, $new_node, $pos);
-                        $node->setAttribute("dompdf_{$pos}_frame_id", $new_frame_id);
+                        $node->setAttribute("nativepdf_{$pos}_frame_id", $new_frame_id);
                     }
                 }
             }
@@ -1398,7 +1398,7 @@ class Stylesheet
         }
 
         // Set the page width, height, and orientation based on the canvas paper size
-        $canvas = $this->_dompdf->getCanvas();
+        $canvas = $this->_nativepdf->getCanvas();
         $paper_width = $canvas->get_width();
         $paper_height = $canvas->get_height();
         $paper_orientation = ($paper_width > $paper_height ? "landscape" : "portrait");
@@ -1478,7 +1478,7 @@ class Stylesheet
 
                 // Merge the new styles with the inherited styles
                 $acceptedmedia = self::$ACCEPTED_GENERIC_MEDIA_TYPES;
-                $acceptedmedia[] = $this->_dompdf->getOptions()->getDefaultMediaType();
+                $acceptedmedia[] = $this->_nativepdf->getOptions()->getDefaultMediaType();
 
                 foreach ($applied_styles as $arr) {
                     /** @var Style $s */
@@ -1668,14 +1668,16 @@ EOL;
 
         $matches = [];
         if (preg_match_all($re, $css, $matches, PREG_SET_ORDER) === false || count($matches) === 0) {
-            global $_dompdf_warnings;
-            $_dompdf_warnings[] = "Unable to parse CSS that starts with: " . substr($str, 0, 100);
+            global $_nativepdf_warnings, $_dompdf_warnings;
+            $msg = "Unable to parse CSS that starts with: " . substr($str, 0, 100);
+            $_nativepdf_warnings[] = $msg;
+            $_dompdf_warnings[] = $msg;
             return;
         }
 
         $media_query_regex = "/{$pattern_media_query}/isx";
         $accepted_media = self::$ACCEPTED_GENERIC_MEDIA_TYPES;
-        $accepted_media[] = $this->_dompdf->getOptions()->getDefaultMediaType();
+        $accepted_media[] = $this->_nativepdf->getOptions()->getDefaultMediaType();
         foreach ($matches as $match) {
             if ($match["CSS_ATRULE_IDENTIFIER"] !== "") {
                 $atrule_identifier = strtolower($match["CSS_ATRULE_IDENTIFIER"]);
@@ -1808,7 +1810,7 @@ EOL;
      */
     public function resolve_url($val, $resolve_blobs = false): string
     {
-        $DEBUGCSS = $this->_dompdf->getOptions()->getDebugCss();
+        $DEBUGCSS = $this->_nativepdf->getOptions()->getDebugCss();
 
         static $pattern = "/" . self::PATTERN_CSS_URL_FN . "/isx";
         if ($val === null || $val === "" || strcasecmp($val, "none") === 0) {
@@ -1835,12 +1837,12 @@ EOL;
                 $this->_base_host,
                 $this->_base_path,
                 $url,
-                $this->_dompdf->getOptions()->getChroot()
+                $this->_nativepdf->getOptions()->getChroot()
             );
 
             if ($path !== null && strpos($path, "blob:") !== 0) {
                 [$protocol] = Helpers::explode_url($path);
-                $options = $this->_dompdf->getOptions();
+                $options = $this->_nativepdf->getOptions();
                 $allowed_protocols = $options->getAllowedProtocols();
                 if (!array_key_exists($protocol, $allowed_protocols)) {
                     Helpers::record_warnings(E_USER_WARNING, "Permission denied on $path. The communication protocol is not supported.", __FILE__, __LINE__);
@@ -1898,7 +1900,7 @@ EOL;
             $this->load_css_file($url, $this->_current_origin);
         } else {
             // Set the page width, height, and orientation based on the canvas paper size
-            $canvas = $this->_dompdf->getCanvas();
+            $canvas = $this->_nativepdf->getCanvas();
             $paper_width = $canvas->get_width();
             $paper_height = $canvas->get_height();
             $paper_orientation = ($paper_width > $paper_height ? "landscape" : "portrait");
@@ -1911,7 +1913,7 @@ EOL;
             }
 
             $acceptedmedia = self::$ACCEPTED_GENERIC_MEDIA_TYPES;
-            $acceptedmedia[] = $this->_dompdf->getOptions()->getDefaultMediaType();
+            $acceptedmedia[] = $this->_nativepdf->getOptions()->getDefaultMediaType();
 
             foreach ($media_queries as $media_query) {
                 $media_query_matches = [];
@@ -2025,7 +2027,7 @@ EOL;
         ];
 
         foreach ($valid_sources as $valid_source) {
-            if ($this->fontMetrics->registerFont($style, $valid_source["path"], $this->_dompdf->getHttpContext())) {
+            if ($this->fontMetrics->registerFont($style, $valid_source["path"], $this->_nativepdf->getHttpContext())) {
                 break;
             }
         }
@@ -2042,7 +2044,7 @@ EOL;
      */
     private function _parse_properties($str)
     {
-        $DEBUGCSS = $this->_dompdf->getOptions()->getDebugCss();
+        $DEBUGCSS = $this->_nativepdf->getOptions()->getDebugCss();
 
         if ($DEBUGCSS) {
             print '[_parse_properties';
@@ -2134,7 +2136,7 @@ EOL;
         // around '>', '.', ':', '+', '~', '#'
         $patterns = ["/\s+/", "/\s+([>.:+~#])\s+/"];
         $replacements = [" ", "\\1"];
-        $DEBUGCSS = $this->_dompdf->getOptions()->getDebugCss();
+        $DEBUGCSS = $this->_nativepdf->getOptions()->getDebugCss();
 
         $sections = explode("}", $str);
         if ($DEBUGCSS) print '[_parse_sections';
@@ -2203,7 +2205,7 @@ EOL;
      */
     public function getDefaultStylesheet()
     {
-        $options = $this->_dompdf->getOptions();
+        $options = $this->_nativepdf->getOptions();
         $rootDir = realpath($options->getRootDir());
         return Helpers::build_url("file://", "", $rootDir, $rootDir . self::DEFAULT_STYLESHEET, $options->getChroot());
     }

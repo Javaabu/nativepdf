@@ -1,15 +1,17 @@
-Dompdf
+NativePdf
 ======
 
-[![Build Status](https://github.com/dompdf/dompdf/actions/workflows/test.yml/badge.svg)](https://github.com/dompdf/dompdf/actions/workflows/test.yml)
-[![PHP Versions Supported](https://poser.pugx.org/dompdf/dompdf/require/php)](https://packagist.org/packages/dompdf/dompdf)
-[![Latest Release](https://poser.pugx.org/dompdf/dompdf/v)](https://packagist.org/packages/dompdf/dompdf)
-[![Total Downloads](https://poser.pugx.org/dompdf/dompdf/downloads)](https://packagist.org/packages/dompdf/dompdf)
-[![License](https://poser.pugx.org/dompdf/dompdf/license)](https://packagist.org/packages/dompdf/dompdf)
- 
-**Dompdf is an HTML to PDF converter**
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/javaabu/nativepdf.svg?style=flat-square)](https://packagist.org/packages/javaabu/nativepdf)
+[![Total Downloads](https://img.shields.io/packagist/dt/javaabu/nativepdf.svg?style=flat-square)](https://packagist.org/packages/javaabu/nativepdf)
+[![PHP Versions Supported](https://img.shields.io/packagist/dependency-v/javaabu/nativepdf/php?style=flat-square)](https://packagist.org/packages/javaabu/nativepdf)
+[![License](https://img.shields.io/packagist/l/javaabu/nativepdf.svg?style=flat-square)](LICENSE.LGPL)
 
-At its heart, dompdf is (mostly) a [CSS 2.1](http://www.w3.org/TR/CSS2/) compliant
+**NativePdf is an HTML to PDF converter**
+
+NativePdf is a fork of [dompdf](https://github.com/dompdf/dompdf) with added
+support for CSS flexbox, bidirectional text (Arabic and Thaana), and inline SVG.
+
+At its heart, nativepdf is (mostly) a [CSS 2.1](http://www.w3.org/TR/CSS2/) compliant
 HTML layout and rendering engine written in PHP. It is a style-driven renderer:
 it will download and read external stylesheets, inline style tags, and the style
 attributes of individual HTML elements. It also supports most presentational
@@ -17,7 +19,7 @@ HTML attributes.
 
 *This document applies to the latest stable code which may not reflect the current 
 release. For released code please
-[navigate to the appropriate tag](https://github.com/dompdf/dompdf/releases).*
+[navigate to the appropriate tag](https://github.com/Javaabu/nativepdf/releases).*
 
 ## Features
 
@@ -96,14 +98,14 @@ https://github.com/dompdf/dompdf/wiki/Requirements
 PDF documents internally support the following fonts: Helvetica, Times-Roman,
 Courier, Zapf-Dingbats, & Symbol. These fonts only support Windows ANSI
 encoding. In order for a PDF to display characters that are not available in
-Windows ANSI, you must supply an external font. Dompdf will embed any referenced
-font in the PDF so long as it has been pre-loaded or is accessible to dompdf and
+Windows ANSI, you must supply an external font. NativePdf will embed any referenced
+font in the PDF so long as it has been pre-loaded or is accessible to nativepdf and
 reference in CSS @font-face rules. See the
 [font overview](https://github.com/dompdf/dompdf/wiki/About-Fonts-and-Character-Encoding)
 for more information on how to use fonts.
 
 The [DejaVu TrueType fonts](https://dejavu-fonts.github.io/) have been pre-installed
-to give dompdf decent Unicode character coverage by default. To use the DejaVu
+to give nativepdf decent Unicode character coverage by default. To use the DejaVu
 fonts reference the font in your stylesheet, e.g. `body { font-family: DejaVu
 Sans; }` (for DejaVu Sans). The following DejaVu 2.34 fonts are available:
 DejaVu Sans, DejaVu Serif, and DejaVu Sans Mono.
@@ -116,7 +118,7 @@ To install with [Composer](https://getcomposer.org/), simply require the
 latest version of this package.
 
 ```bash
-composer require dompdf/dompdf
+composer require javaabu/nativepdf
 ```
 
 Make sure that the autoload file from Composer is loaded.
@@ -129,36 +131,36 @@ require 'vendor/autoload.php';
 
 ### Download and install
 
-Download a packaged archive of dompdf and extract it into the 
-directory where dompdf will reside
+Download a packaged archive of nativepdf and extract it into the 
+directory where nativepdf will reside
 
- * You can download stable copies of dompdf from
-   https://github.com/dompdf/dompdf/releases
+ * You can download stable copies of nativepdf from
+   https://github.com/Javaabu/nativepdf/releases
  * Or download a nightly (the latest, unreleased code) from
    http://eclecticgeek.com/dompdf
 
-Use the packaged release autoloader to load dompdf, libraries,
+Use the packaged release autoloader to load nativepdf, libraries,
 and helper functions in your PHP:
 
 ```php
 // include autoloader
-require_once 'dompdf/autoload.inc.php';
+require_once 'nativepdf/autoload.inc.php';
 ```
 
 Note: packaged releases are named according using semantic
-versioning (_dompdf_MAJOR-MINOR-PATCH.zip_). So the 1.0.0 
-release would be dompdf_1-0-0.zip. Packaged releases include
+versioning (_nativepdf_MAJOR-MINOR-PATCH.zip_). So the 1.0.0 
+release would be nativepdf_1-0-0.zip. Packaged releases include
 the dependency releases available at the time of release
 and are not necessarily updated to include updated dependencies.
 
 ### Install with git
 
-From the command line, switch to the directory where dompdf will
+From the command line, switch to the directory where nativepdf will
 reside and run the following commands:
 
 ```sh
-git clone https://github.com/dompdf/dompdf.git
-cd dompdf/lib
+git clone https://github.com/Javaabu/nativepdf.git
+cd nativepdf/lib
 
 git clone https://github.com/PhenX/php-font-lib.git php-font-lib
 cd php-font-lib
@@ -175,7 +177,7 @@ cd php-css-parser
 git checkout 8.1.0
 ```
 
-Require dompdf and it's dependencies in your PHP.
+Require nativepdf and it's dependencies in your PHP.
 For details see the [autoloader in the utils project](https://github.com/dompdf/utils/blob/master/autoload.inc.php).
 
 ## Framework Integration
@@ -186,64 +188,64 @@ For details see the [autoloader in the utils project](https://github.com/dompdf/
 
 ## Quick Start
 
-Just pass your HTML in to dompdf and stream the output:
+Just pass your HTML in to nativepdf and stream the output:
 
 ```php
-// reference the Dompdf namespace
-use Dompdf\Dompdf;
+// reference the NativePdf namespace
+use NativePdf\NativePdf;
 
-// instantiate and use the dompdf class
-$dompdf = new Dompdf();
-$dompdf->loadHtml('hello world');
+// instantiate and use the nativepdf class
+$nativepdf = new NativePdf();
+$nativepdf->loadHtml('hello world');
 
 // (Optional) Setup the paper size and orientation
-$dompdf->setPaper('A4', 'landscape');
+$nativepdf->setPaper('A4', 'landscape');
 
 // Render the HTML as PDF
-$dompdf->render();
+$nativepdf->render();
 
 // Output the generated PDF to Browser
-$dompdf->stream();
+$nativepdf->stream();
 ```
 
 ### Setting Options
 
-Set options during dompdf instantiation:
+Set options during nativepdf instantiation:
 
 ```php
-use Dompdf\Dompdf;
-use Dompdf\Options;
+use NativePdf\NativePdf;
+use NativePdf\Options;
 
 $options = new Options();
 $options->set('defaultFont', 'Courier');
-$dompdf = new Dompdf($options);
+$nativepdf = new NativePdf($options);
 ```
 
 or at run time
 
 ```php
-use Dompdf\Dompdf;
+use NativePdf\NativePdf;
 
-$dompdf = new Dompdf();
-$options = $dompdf->getOptions();
+$nativepdf = new NativePdf();
+$options = $nativepdf->getOptions();
 $options->setDefaultFont('Courier');
-$dompdf->setOptions($options);
+$nativepdf->setOptions($options);
 ```
 
-See [Dompdf\Options](src/Options.php) for a list of available options.
+See [NativePdf\Options](src/Options.php) for a list of available options.
 
 ### Resource Reference Requirements
 
-In order to protect potentially sensitive information Dompdf imposes 
+In order to protect potentially sensitive information NativePdf imposes 
 restrictions on files referenced from the local file system or the web. 
 
 Files accessed through web-based protocols have the following requirements:
- * The Dompdf option "isRemoteEnabled" must be set to "true"
+ * The NativePdf option "isRemoteEnabled" must be set to "true"
  * PHP must either have the curl extension enabled or the 
    allow_url_fopen setting set to true
    
 Files accessed through the local file system have the following requirement:
- * The file must fall within the path(s) specified for the Dompdf "chroot" option
+ * The file must fall within the path(s) specified for the NativePdf "chroot" option
 
 ## Limitations (Known Issues)
 
@@ -257,7 +259,7 @@ Files accessed through the local file system have the following requirement:
    presentation forms (fonts that only provide shaping through OpenType
    GSUB tables are not supported)
  * Does not support CSS Grid: See https://github.com/dompdf/dompdf/issues/2988
- * A single Dompdf instance should not be used to render more than one HTML document
+ * A single NativePdf instance should not be used to render more than one HTML document
    because persisted parsing and rendering artifacts can impact future renders.
 ---
 

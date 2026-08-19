@@ -1,11 +1,11 @@
 <?php
-namespace Dompdf\Tests\LayoutTest;
+namespace NativePdf\Tests\LayoutTest;
 
-use Dompdf\Dompdf;
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\Helpers;
-use Dompdf\Options;
-use Dompdf\Tests\TestCase;
+use NativePdf\NativePdf;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\Helpers;
+use NativePdf\Options;
+use NativePdf\Tests\TestCase;
 
 class BoxSizingTest extends TestCase
 {
@@ -74,9 +74,9 @@ class BoxSizingTest extends TestCase
         $options = new Options();
 
         // Use callback to inspect frame tree
-        $dompdf = new Dompdf($options);
-        $dompdf->setBasePath(__DIR__);
-        $dompdf->setCallbacks([
+        $nativepdf = new NativePdf($options);
+        $nativepdf->setBasePath(__DIR__);
+        $nativepdf->setCallbacks([
             [
                 "event" => "begin_frame",
                 "f" => function (AbstractFrameDecorator $frame) use (
@@ -98,7 +98,7 @@ class BoxSizingTest extends TestCase
             ]
         ]);
 
-        $dompdf->loadHtml(<<<HTML
+        $nativepdf->loadHtml(<<<HTML
 <!DOCTYPE html>
 <html>
 <head>
@@ -118,7 +118,7 @@ class BoxSizingTest extends TestCase
 </html>
 HTML
         );
-        $dompdf->render();
+        $nativepdf->render();
 
         $checks = [
             "margin width" => [$expectedMarginWidth, $marginWidth],

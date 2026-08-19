@@ -1,14 +1,14 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf;
+namespace NativePdf;
 
 use DOMDocument;
 use DOMElement;
-use Dompdf\Helpers;
+use NativePdf\Helpers;
 
 /**
  * Converts inline `<svg>` elements into `<img>` elements with an SVG data
@@ -16,7 +16,7 @@ use Dompdf\Helpers;
  * Image\Cache, intrinsic sizing, vector rendering via the canvas).
  *
  * The conversion must run on a DOM that still has attribute-case fidelity
- * (e.g. `viewBox`). In Dompdf::loadHtml that means after the Masterminds
+ * (e.g. `viewBox`). In NativePdf::loadHtml that means after the Masterminds
  * HTML5 parse and before the DOMDocument::loadHTML normalization round-trip,
  * which is namespace-blind and lowercases attribute and tag names.
  *
@@ -33,7 +33,7 @@ class InlineSvg
      * Marks the <img> that replaced an inline <svg>, so that `svg` type
      * selectors still match it during style resolution.
      */
-    const CONVERTED_ATTR = "data-dompdf-inline-svg";
+    const CONVERTED_ATTR = "data-nativepdf-inline-svg";
 
     /**
      * The CSS default object size for replaced elements, in CSS px.

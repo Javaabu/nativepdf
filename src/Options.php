@@ -1,15 +1,15 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf;
+namespace NativePdf;
 
 class Options
 {
     /**
-     * The root of your DOMPDF installation
+     * The root of your NativePdf installation
      *
      * @var string
      */
@@ -27,9 +27,9 @@ class Options
     private $tempDir;
 
     /**
-     * The location of the DOMPDF font directory
+     * The location of the NativePdf font directory
      *
-     * The location of the directory where DOMPDF will store fonts and font metrics
+     * The location of the directory where NativePdf will store fonts and font metrics
      * Note: This directory must exist and be writable by the executing process.
      *
      * @var string
@@ -37,9 +37,9 @@ class Options
     private $fontDir;
 
     /**
-     * The location of the DOMPDF font cache directory
+     * The location of the NativePdf font cache directory
      *
-     * This directory contains the cached font metrics for the fonts used by DOMPDF.
+     * This directory contains the cached font metrics for the fonts used by NativePdf.
      * This directory can be the same as $fontDir
      *
      * Note: This directory must exist and be writable by the executing process.
@@ -49,19 +49,19 @@ class Options
     private $fontCache;
 
     /**
-     * dompdf's "chroot"
+     * nativepdf's "chroot"
      *
-     * Utilized by Dompdf's default file:// protocol URI validation rule.
-     * All local files opened by dompdf must be in a subdirectory of the directory
+     * Utilized by NativePdf's default file:// protocol URI validation rule.
+     * All local files opened by nativepdf must be in a subdirectory of the directory
      * or directories specified by this option.
-     * DO NOT set this value to '/' since this could allow an attacker to use dompdf to
+     * DO NOT set this value to '/' since this could allow an attacker to use nativepdf to
      * read any files on the server.  This should be an absolute path.
      *
      * ==== IMPORTANT ====
      * This setting may increase the risk of system exploit. Do not change
      * this settings without understanding the consequences. Additional
-     * documentation is available on the dompdf wiki at:
-     * https://github.com/dompdf/dompdf/wiki
+     * documentation is available on the nativepdf wiki at:
+     * https://github.com/Javaabu/nativepdf/wiki
      *
      * @var array
      */
@@ -99,7 +99,7 @@ class Options
     /**
      * Styles targeted to this media type are applied to the document.
      * This is on top of the media types that are always applied:
-     *    all, static, visual, bitmap, paged, dompdf
+     *    all, static, visual, bitmap, paged, nativepdf
      *
      * @var string
      */
@@ -109,7 +109,7 @@ class Options
      * The default paper size.
      *
      * North America standard is "letter"; other countries generally "a4"
-     * @see \Dompdf\Adapter\CPDF::PAPER_SIZES for valid sizes
+     * @see \NativePdf\Adapter\CPDF::PAPER_SIZES for valid sizes
      *
      * @var string|float[]
      */
@@ -144,7 +144,7 @@ class Options
      * background images can not be overridden and is controlled entirely
      * via this parameter.
      *
-     * For the purposes of DOMPDF, pixels per inch (PPI) = dots per inch (DPI).
+     * For the purposes of NativePdf, pixels per inch (PPI) = dots per inch (DPI).
      * If a size in html is given as px (or without unit as image size),
      * this tells the corresponding size in pt at 72 DPI.
      * This adjusts the relative sizes to be similar to the rendering of the
@@ -173,19 +173,19 @@ class Options
     /**
      * Enable embedded PHP
      *
-     * If this setting is set to true then DOMPDF will automatically evaluate
+     * If this setting is set to true then NativePdf will automatically evaluate
      * embedded PHP contained within <script type="text/php"> ... </script> tags.
      *
      * ==== IMPORTANT ====
      * Enabling this for documents you do not trust (e.g. arbitrary remote html
      * pages) is a security risk. Embedded scripts are run with the same level of
-     * system access available to dompdf. Set this option to false (recommended)
+     * system access available to nativepdf. Set this option to false (recommended)
      * if you wish to process untrusted documents.
      *
      * This setting may increase the risk of system exploit. Do not change
      * this settings without understanding the consequences. Additional
-     * documentation is available on the dompdf wiki at:
-     * https://github.com/dompdf/dompdf/wiki
+     * documentation is available on the nativepdf wiki at:
+     * https://github.com/Javaabu/nativepdf/wiki
      *
      * @var bool
      */
@@ -194,20 +194,20 @@ class Options
     /**
      * Enable remote file access
      *
-     * If this setting is set to true, DOMPDF will access remote sites for
+     * If this setting is set to true, NativePdf will access remote sites for
      * images and CSS files as required.
      *
      * ==== IMPORTANT ====
      * This can be a security risk, in particular in combination with isPhpEnabled and
-     * allowing remote html code to be passed to $dompdf = new DOMPDF(); $dompdf->load_html(...);
+     * allowing remote html code to be passed to $nativepdf = new NativePdf(); $nativepdf->load_html(...);
      * This allows anonymous users to download legally doubtful internet content which on
      * tracing back appears to being downloaded by your server, or allows malicious php code
      * in remote html pages to be executed by your server with your account privileges.
      *
      * This setting may increase the risk of system exploit. Do not change
      * this settings without understanding the consequences. Additional
-     * documentation is available on the dompdf wiki at:
-     * https://github.com/dompdf/dompdf/wiki
+     * documentation is available on the nativepdf wiki at:
+     * https://github.com/Javaabu/nativepdf/wiki
      *
      * @var bool
      */
@@ -244,12 +244,12 @@ class Options
     /**
      * Enable inline JavaScript
      *
-     * If this setting is set to true then DOMPDF will automatically insert
+     * If this setting is set to true then NativePdf will automatically insert
      * JavaScript code contained within <script type="text/javascript"> ... </script>
      * tags as written into the PDF.
      *
      * NOTE: This is PDF-based JavaScript to be executed by the PDF viewer,
-     * not browser-based JavaScript executed by Dompdf.
+     * not browser-based JavaScript executed by NativePdf.
      *
      * @var bool
      */
@@ -322,7 +322,7 @@ class Options
      *
      * Valid settings are 'PDFLib', 'CPDF', 'GD', and 'auto'. 'auto' will
      * look for PDFLib and use it if found, or if not it will fall back on
-     * CPDF. 'GD' renders PDFs to graphic files. {@link Dompdf\CanvasFactory}
+     * CPDF. 'GD' renders PDFs to graphic files. {@link NativePdf\CanvasFactory}
      * ultimately determines which rendering class to instantiate
      * based on this setting.
      *
@@ -379,7 +379,7 @@ class Options
         $this->setHttpContext([
             "http" => [
                 "follow_location" => false,
-                "user_agent" => "Dompdf$ver https://github.com/dompdf/dompdf"
+                "user_agent" => "NativePdf$ver https://github.com/Javaabu/nativepdf"
             ]
         ]);
 

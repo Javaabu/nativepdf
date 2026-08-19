@@ -1,11 +1,11 @@
 <?php
-namespace Dompdf\Tests\LayoutTest;
+namespace NativePdf\Tests\LayoutTest;
 
-use Dompdf\Canvas;
-use Dompdf\Dompdf;
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\Options;
-use Dompdf\Tests\TestCase;
+use NativePdf\Canvas;
+use NativePdf\NativePdf;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\Options;
+use NativePdf\Tests\TestCase;
 
 class WordBreakTest extends TestCase
 {
@@ -17,8 +17,8 @@ class WordBreakTest extends TestCase
     {
         $frames = [];
 
-        $dompdf = new Dompdf(new Options());
-        $dompdf->setCallbacks([
+        $nativepdf = new NativePdf(new Options());
+        $nativepdf->setCallbacks([
             [
                 "event" => "begin_frame",
                 "f" => function (AbstractFrameDecorator $frame, Canvas $canvas) use (&$frames) {
@@ -30,7 +30,7 @@ class WordBreakTest extends TestCase
             ]
         ]);
 
-        $dompdf->loadHtml(<<<HTML
+        $nativepdf->loadHtml(<<<HTML
 <!DOCTYPE html>
 <html>
 <head>
@@ -45,7 +45,7 @@ class WordBreakTest extends TestCase
 </html>
 HTML
         );
-        $dompdf->render();
+        $nativepdf->render();
 
         usort($frames, function ($a, $b) {
             return $a[0] <=> $b[0] ?: $a[1] <=> $b[1];

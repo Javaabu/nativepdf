@@ -1,9 +1,9 @@
 <?php
-namespace Dompdf\Tests\Text;
+namespace NativePdf\Tests\Text;
 
-use Dompdf\Tests\TestCase;
-use Dompdf\Text\ArabicShaper;
-use Dompdf\Text\BidiAnalyzer;
+use NativePdf\Tests\TestCase;
+use NativePdf\Text\ArabicShaper;
+use NativePdf\Text\BidiAnalyzer;
 
 class ArabicShaperTest extends TestCase
 {

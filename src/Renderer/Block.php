@@ -1,18 +1,18 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Renderer;
+namespace NativePdf\Renderer;
 
-use Dompdf\Frame;
-use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
+use NativePdf\Frame;
+use NativePdf\FrameDecorator\Block as BlockFrameDecorator;
 
 /**
  * Renders block frames
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Block extends AbstractRenderer
 {
@@ -54,7 +54,7 @@ class Block extends AbstractRenderer
      */
     protected function debugBlockLayout(Frame $frame, $color, bool $lines = false): void
     {
-        $options = $this->_dompdf->getOptions();
+        $options = $this->_nativepdf->getOptions();
         $debugLayout = $options->getDebugLayout();
 
         if (!$debugLayout) {

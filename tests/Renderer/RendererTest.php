@@ -1,10 +1,10 @@
 <?php
 
-namespace Dompdf\Tests\Renderer;
+namespace NativePdf\Tests\Renderer;
 
-use Dompdf\Dompdf;
-use Dompdf\Renderer;
-use Dompdf\Tests\TestCase;
+use NativePdf\NativePdf;
+use NativePdf\Renderer;
+use NativePdf\Tests\TestCase;
 
 class RendererTest extends TestCase
 {
@@ -16,8 +16,8 @@ class RendererTest extends TestCase
 
     public function setUp() : void
     {
-        $dompdf = new Dompdf();
-        $this->renderer = new Renderer($dompdf);
+        $nativepdf = new NativePdf();
+        $this->renderer = new Renderer($nativepdf);
         $this->resizeBackgroundImageMethod = self::getMethod('_resize_background_image');
     }
 

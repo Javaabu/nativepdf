@@ -1,18 +1,18 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameDecorator;
+namespace NativePdf\FrameDecorator;
 
-use Dompdf\Dompdf;
-use Dompdf\Frame;
+use NativePdf\NativePdf;
+use NativePdf\Frame;
 
 /**
  * Decorates frames for list bullet rendering
  *
- * @package dompdf
+ * @package nativepdf
  */
 class ListBullet extends AbstractFrameDecorator
 {
@@ -40,11 +40,11 @@ class ListBullet extends AbstractFrameDecorator
     /**
      * ListBullet constructor.
      * @param Frame $frame
-     * @param Dompdf $dompdf
+     * @param NativePdf $nativepdf
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    function __construct(Frame $frame, NativePdf $nativepdf)
     {
-        parent::__construct($frame, $dompdf);
+        parent::__construct($frame, $nativepdf);
     }
 
     /**
@@ -110,7 +110,7 @@ class ListBullet extends AbstractFrameDecorator
         // Would be nice to properly refactor that at some point
         $font = $style->font_family;
         $size = $style->font_size;
-        $fontHeight = $this->_dompdf->getFontMetrics()->getFontHeight($font, $size);
+        $fontHeight = $this->_nativepdf->getFontMetrics()->getFontHeight($font, $size);
 
         return ($style->line_height / ($size > 0 ? $size : 1)) * $fontHeight;
     }

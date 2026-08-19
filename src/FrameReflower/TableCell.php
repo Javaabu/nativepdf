@@ -1,22 +1,22 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameReflower;
+namespace NativePdf\FrameReflower;
 
-use Dompdf\Exception;
-use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
-use Dompdf\FrameDecorator\Table as TableFrameDecorator;
-use Dompdf\FrameDecorator\TableCell as TableCellFrameDecorator;
-use Dompdf\Helpers;
-use Dompdf\Text\BidiParagraph;
+use NativePdf\Exception;
+use NativePdf\FrameDecorator\Block as BlockFrameDecorator;
+use NativePdf\FrameDecorator\Table as TableFrameDecorator;
+use NativePdf\FrameDecorator\TableCell as TableCellFrameDecorator;
+use NativePdf\Helpers;
+use NativePdf\Text\BidiParagraph;
 
 /**
  * Reflows table cells
  *
- * @package dompdf
+ * @package nativepdf
  */
 class TableCell extends Block
 {

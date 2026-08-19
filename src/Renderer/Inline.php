@@ -1,17 +1,17 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Renderer;
+namespace NativePdf\Renderer;
 
-use Dompdf\Frame;
+use NativePdf\Frame;
 
 /**
  * Renders inline frames
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Inline extends AbstractRenderer
 {
@@ -61,7 +61,7 @@ class Inline extends AbstractRenderer
         $this->addNamedDest($node);
         $this->addHyperlink($node, $border_box);
 
-        $options = $this->_dompdf->getOptions();
+        $options = $this->_nativepdf->getOptions();
 
         if ($options->getDebugLayout() && $options->getDebugLayoutInline()) {
             $this->debugLayout($border_box, "blue");

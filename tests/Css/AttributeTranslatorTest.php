@@ -1,9 +1,9 @@
 <?php
-namespace Dompdf\Tests\Css;
+namespace NativePdf\Tests\Css;
 
-use Dompdf\Dompdf;
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\Tests\TestCase;
+use NativePdf\NativePdf;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\Tests\TestCase;
 
 final class AttributeTranslatorTest extends TestCase
 {
@@ -88,8 +88,8 @@ HTML
         $styles = array_fill_keys(array_keys($expectedStyles), []);
 
         // Use callback to inspect frame tree
-        $dompdf = new Dompdf();
-        $dompdf->setCallbacks([
+        $nativepdf = new NativePdf();
+        $nativepdf->setCallbacks([
             [
                 "event" => "begin_frame",
                 "f" => function (AbstractFrameDecorator $frame) use ($expectedStyles, &$styles) {
@@ -115,8 +115,8 @@ HTML
             ]
         ]);
 
-        $dompdf->loadHtml("<html><body>$body</body></html>");
-        $dompdf->render();
+        $nativepdf->loadHtml("<html><body>$body</body></html>");
+        $nativepdf->render();
 
         $this->assertSame($expectedStyles, $styles);
     }

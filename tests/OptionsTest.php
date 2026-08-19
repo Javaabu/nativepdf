@@ -1,8 +1,8 @@
 <?php
-namespace Dompdf\Tests;
+namespace NativePdf\Tests;
 
-use Dompdf\Options;
-use Dompdf\Tests\TestCase;
+use NativePdf\Options;
+use NativePdf\Tests\TestCase;
 
 class OptionsTest extends TestCase
 {
@@ -414,7 +414,7 @@ class OptionsTest extends TestCase
 
     public function testValidateLocalUriRejectsSiblingPathWithMatchingPrefix()
     {
-        $baseDir = sys_get_temp_dir() . "/dompdf-options-" . uniqid("", true);
+        $baseDir = sys_get_temp_dir() . "/nativepdf-options-" . uniqid("", true);
         $chrootDir = $baseDir . "/sandbox/root";
         $insideFile = $chrootDir . "/inside.html";
         $prefixedOutsideFile = $baseDir . "/sandbox/root_secret/secret.html";
@@ -446,7 +446,7 @@ class OptionsTest extends TestCase
 
     public function testValidateLocalUriReturnsFileNotFoundForMissingPath()
     {
-        $baseDir = sys_get_temp_dir() . "/dompdf-options-" . uniqid("", true);
+        $baseDir = sys_get_temp_dir() . "/nativepdf-options-" . uniqid("", true);
         $chrootDir = $baseDir . "/sandbox/root";
         $missingFile = $chrootDir . "/missing.html";
 

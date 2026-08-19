@@ -1,7 +1,7 @@
 <?php
-namespace Dompdf\Tests\FrameReflower;
+namespace NativePdf\Tests\FrameReflower;
 
-use Dompdf\FrameReflower\Image;
+use NativePdf\FrameReflower\Image;
 
 class ImageTestReflower extends Image
 {

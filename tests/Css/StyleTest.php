@@ -1,29 +1,29 @@
 <?php
-namespace Dompdf\Tests\Css;
+namespace NativePdf\Tests\Css;
 
-use Dompdf\Css\Content\Attr;
-use Dompdf\Css\Content\CloseQuote;
-use Dompdf\Css\Content\ContentPart;
-use Dompdf\Css\Content\Counter;
-use Dompdf\Css\Content\Counters;
-use Dompdf\Css\Content\NoCloseQuote;
-use Dompdf\Css\Content\NoOpenQuote;
-use Dompdf\Css\Content\OpenQuote;
-use Dompdf\Css\Content\StringPart;
-use Dompdf\Css\Content\Url;
-use Dompdf\Dompdf;
-use Dompdf\Css\Style;
-use Dompdf\Css\Stylesheet;
-use Dompdf\Frame;
-use Dompdf\Options;
-use Dompdf\Tests\TestCase;
+use NativePdf\Css\Content\Attr;
+use NativePdf\Css\Content\CloseQuote;
+use NativePdf\Css\Content\ContentPart;
+use NativePdf\Css\Content\Counter;
+use NativePdf\Css\Content\Counters;
+use NativePdf\Css\Content\NoCloseQuote;
+use NativePdf\Css\Content\NoOpenQuote;
+use NativePdf\Css\Content\OpenQuote;
+use NativePdf\Css\Content\StringPart;
+use NativePdf\Css\Content\Url;
+use NativePdf\NativePdf;
+use NativePdf\Css\Style;
+use NativePdf\Css\Stylesheet;
+use NativePdf\Frame;
+use NativePdf\Options;
+use NativePdf\Tests\TestCase;
 
 class StyleTest extends TestCase
 {
     public function testInitial(): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         $style->set_prop("width", "100pt");
@@ -35,8 +35,8 @@ class StyleTest extends TestCase
 
     public function testUnsetNonInherited(): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $s1 = new Style($sheet);
         $s2 = new Style($sheet);
 
@@ -52,8 +52,8 @@ class StyleTest extends TestCase
 
     public function testUnsetInherited(): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $s1 = new Style($sheet);
         $s2 = new Style($sheet);
 
@@ -190,8 +190,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('lengthInPtProvider')]
     public function testLengthInPt(string $length, ?float $ref_size, $expected, ?int $precision = null): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $s = new Style($sheet);
 
         $result = $s->length_in_pt($length, $ref_size);
@@ -218,8 +218,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('widthProvider')]
     public function testSetWidth(array $properties, ?float $ref_size, $expected, ?int $precision = null): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $s = new Style($sheet);
 
         foreach ($properties as $prop => $value) {
@@ -252,8 +252,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('boxSizingProvider')]
     public function testBoxSizing(string $value, string $expected): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $s = new Style($sheet);
 
         $s->set_prop("box_sizing", $value);
@@ -311,8 +311,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('cssImageNoBaseHrefProvider')]
     public function testCssImageNoBaseHref(string $value, $expected): void
     {
-        $dompdf = new Dompdf(["isRemoteEnabled" => true]);
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf(["isRemoteEnabled" => true]);
+        $sheet = new Stylesheet($nativepdf);
         $sheet->set_base_path(__DIR__); // Treat stylesheet as being located in this directory
         $s = new Style($sheet);
 
@@ -330,11 +330,11 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('cssImageWithBaseHrefProvider')]
     public function testCssImageWithBaseHref(string $value, $expected): void
     {
-        $dompdf = new Dompdf(["isRemoteEnabled" => true]);
-        $dompdf->setProtocol("https://");
-        $dompdf->setBaseHost("example.com");
-        $dompdf->setBasePath("/");
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf(["isRemoteEnabled" => true]);
+        $nativepdf->setProtocol("https://");
+        $nativepdf->setBaseHost("example.com");
+        $nativepdf->setBasePath("/");
+        $sheet = new Stylesheet($nativepdf);
         $sheet->set_base_path(__DIR__); // Treat stylesheet as being located in this directory
         $s = new Style($sheet);
 
@@ -352,8 +352,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('cssImageWithStylesheetBaseHrefProvider')]
     public function testCssImageWithStylesheetBaseHref(string $value, $expected): void
     {
-        $dompdf = new Dompdf(["isRemoteEnabled" => true]);
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf(["isRemoteEnabled" => true]);
+        $sheet = new Stylesheet($nativepdf);
         $sheet->set_protocol("https://");
         $sheet->set_host("example.com");
         $sheet->set_base_path("/");
@@ -435,8 +435,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('backgroundPositionProvider')]
     public function testBackgroundPosition(string $value, $expected): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         $style->set_prop("background_position", $value);
@@ -484,8 +484,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('backgroundSizeProvider')]
     public function testBackgroundSize(string $value, $expected): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         $style->set_prop("background_size", $value);
@@ -512,11 +512,11 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('fontProvider')]
     public function testFont($fontFamily, $fontStyle, $fontWeight, $expected): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
         $style->set_prop("font", "$fontStyle $fontWeight 12pt $fontFamily");
-        $this->assertSame(realpath($dompdf->getOptions()->getRootDir()) . $expected, $style->font_family);
+        $this->assertSame(realpath($nativepdf->getOptions()->getRootDir()) . $expected, $style->font_family);
     }
 
     public static function fontWeightProvider(): array
@@ -574,8 +574,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('fontWeightProvider')]
     public function testFontWeight(string $value, $expected, int $parentWeight = 400): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
         $parentStyle = new Style($sheet);
 
@@ -593,8 +593,8 @@ class StyleTest extends TestCase
         $expected,
         $initialProps = []
     ): void {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         $style->font_size = $fontSize;
@@ -963,8 +963,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('borderSpacingProvider')]
     public function testBorderSpacing(string $value, $expected): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         $style->set_prop("border_spacing", $value);
@@ -1015,8 +1015,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('counterIncrementProvider')]
     public function testCounterIncrement(string $value, $expected): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         $style->set_prop("counter_increment", $value);
@@ -1067,8 +1067,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('counterResetProvider')]
     public function testCounterReset(string $value, $expected): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         $style->set_prop("counter_reset", $value);
@@ -1108,8 +1108,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('quotesProvider')]
     public function testQuotes(string $value, $expected): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         $style->set_prop("quotes", $value);
@@ -1231,8 +1231,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('contentProvider')]
     public function testContent(string $value, $expected): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         $style->set_prop("content", $value);
@@ -1295,8 +1295,8 @@ class StyleTest extends TestCase
     {
         $options = new Options();
         $options->setDefaultPaperSize("A5");
-        $dompdf = new Dompdf($options);
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf($options);
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         $style->set_prop("size", $value);
@@ -1363,8 +1363,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('transformProvider')]
     public function testTransform(string $value, $expected, array $initial = []): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         $style->transform = $initial;
@@ -1451,8 +1451,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('transformOriginProvider')]
     public function testTransformOrigin(string $value, $expected): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         $style->set_prop("transform_origin", $value);
@@ -1492,8 +1492,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('opacityProvider')]
     public function testOpacity(string $value, $expected): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         $style->set_prop("opacity", $value);
@@ -1526,8 +1526,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('zIndexProvider')]
     public function testZIndex(string $value, $expected): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         $style->set_prop("z_index", $value);
@@ -1536,8 +1536,8 @@ class StyleTest extends TestCase
 
     public function testWordBreakBreakWord(): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         $style->set_prop("overflow_wrap", "break-word");
@@ -1648,8 +1648,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('varValueProvider')]
     public function testVar(array $properties, $lookup_property, $expected): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $style = new Style($sheet);
 
         // Set all properties and values.
@@ -1710,8 +1710,8 @@ class StyleTest extends TestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('mergedVarValueProvider')]
     public function testMergeVar(array $styleDefs, $lookup_property, $expected): void
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $styles = [
             new Style($sheet),
             new Style($sheet)
@@ -1828,9 +1828,9 @@ class StyleTest extends TestCase
 
         $styles = [];
 
-        $dompdf = new Dompdf();
+        $nativepdf = new NativePdf();
 
-        $dompdf->setCallbacks(['test' => [
+        $nativepdf->setCallbacks(['test' => [
             'event' => 'end_frame',
             'f' => function (Frame $frame) use (&$styles) {
                 $node = $frame->get_node();
@@ -1842,8 +1842,8 @@ class StyleTest extends TestCase
             }
         ]]);
 
-        $dompdf->loadHtml($html);
-        $dompdf->render();
+        $nativepdf->loadHtml($html);
+        $nativepdf->render();
 
         // Todo: Ideally have the style associated with the div id or something.
         $this->assertEquals($hexval, $styles[$id]);

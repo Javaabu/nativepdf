@@ -1,26 +1,26 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Css;
+namespace NativePdf\Css;
 
-use Dompdf\Adapter\CPDF;
-use Dompdf\Css\Content\Attr;
-use Dompdf\Css\Content\CloseQuote;
-use Dompdf\Css\Content\ContentPart;
-use Dompdf\Css\Content\Counter;
-use Dompdf\Css\Content\Counters;
-use Dompdf\Css\Content\NoCloseQuote;
-use Dompdf\Css\Content\NoOpenQuote;
-use Dompdf\Css\Content\OpenQuote;
-use Dompdf\Css\Content\StringPart;
-use Dompdf\Css\Content\Url;
-use Dompdf\Exception;
-use Dompdf\FontMetrics;
-use Dompdf\Frame;
-use Dompdf\Helpers;
+use NativePdf\Adapter\CPDF;
+use NativePdf\Css\Content\Attr;
+use NativePdf\Css\Content\CloseQuote;
+use NativePdf\Css\Content\ContentPart;
+use NativePdf\Css\Content\Counter;
+use NativePdf\Css\Content\Counters;
+use NativePdf\Css\Content\NoCloseQuote;
+use NativePdf\Css\Content\NoOpenQuote;
+use NativePdf\Css\Content\OpenQuote;
+use NativePdf\Css\Content\StringPart;
+use NativePdf\Css\Content\Url;
+use NativePdf\Exception;
+use NativePdf\FontMetrics;
+use NativePdf\Frame;
+use NativePdf\Helpers;
 
 /**
  * Represents CSS properties.
@@ -193,9 +193,9 @@ use Dompdf\Helpers;
  * @property string               $word_break
  * @property float                $word_spacing                Length in pt
  * @property int|string           $z_index                     Integer value or `auto`
- * @property string               $_dompdf_keep
+ * @property string               $_nativepdf_keep
  *
- * @package dompdf
+ * @package nativepdf
  */
 class Style
 {
@@ -516,11 +516,14 @@ class Style
      * @var array<string, string>
      */
     protected static $_props_alias = [
-        "word_wrap"                           => "overflow_wrap",
-        "_dompdf_background_image_resolution" => "background_image_resolution",
-        "_dompdf_image_resolution"            => "image_resolution",
-        "_webkit_transform"                   => "transform",
-        "_webkit_transform_origin"            => "transform_origin"
+        "word_wrap"                              => "overflow_wrap",
+        "_dompdf_background_image_resolution"    => "background_image_resolution",
+        "_dompdf_image_resolution"               => "image_resolution",
+        "_nativepdf_background_image_resolution" => "background_image_resolution",
+        "_nativepdf_image_resolution"            => "image_resolution",
+        "_dompdf_keep"                           => "_nativepdf_keep",
+        "_webkit_transform"                      => "transform",
+        "_webkit_transform_origin"               => "transform_origin"
     ];
 
     /**
@@ -886,7 +889,7 @@ class Style
             $d["row_gap"] = 0.0;
 
             $d["float"] = "none";
-            $d["font_family"] = $stylesheet->get_dompdf()->getOptions()->getDefaultFont();
+            $d["font_family"] = $stylesheet->get_nativepdf()->getOptions()->getDefaultFont();
             $d["font_size"] = "medium";
             $d["font_style"] = "normal";
             $d["font_variant"] = "normal";
@@ -978,7 +981,7 @@ class Style
             $d["unicode_range"] = "";
 
             // vendor-prefixed properties
-            $d["_dompdf_keep"] = "";
+            $d["_nativepdf_keep"] = "";
 
             // Compute dependent props from dependency map
             foreach (self::$_dependency_map as $props) {
@@ -990,10 +993,10 @@ class Style
             // Compute valid display-type lookup table
             self::$valid_display_types = [
                 "none"                => true,
-                "-dompdf-br"          => true,
-                "-dompdf-image"       => true,
-                "-dompdf-list-bullet" => true,
-                "-dompdf-page"        => true
+                "-nativepdf-br"          => true,
+                "-nativepdf-image"       => true,
+                "-nativepdf-list-bullet" => true,
+                "-nativepdf-page"        => true
             ];
             foreach (self::BLOCK_LEVEL_TYPES as $val) {
                 self::$valid_display_types[$val] = true;
@@ -1152,7 +1155,7 @@ class Style
         static $cache = [];
 
         $font_size = $font_size ?? $this->__get("font_size");
-        $dpi = $this->_stylesheet->get_dompdf()->getOptions()->getDpi();
+        $dpi = $this->_stylesheet->get_nativepdf()->getOptions()->getDpi();
 
         $key = "$l/$dpi/$ref_size/$font_size";
 
@@ -1195,7 +1198,7 @@ class Style
         }
 
         elseif ($unit === "rem") {
-            $tree = $this->_stylesheet->get_dompdf()->getTree();
+            $tree = $this->_stylesheet->get_nativepdf()->getTree();
             $root_style = $tree !== null ? $tree->get_root()->get_style() : null;
             $root_font_size = $root_style === null || $root_style === $this
                 ? $font_size
@@ -1229,7 +1232,7 @@ class Style
 
         elseif ($unit === "ch") {
             // Advance width of the "0" glyph in the current font
-            $metrics = $this->_stylesheet->get_dompdf()->getFontMetrics();
+            $metrics = $this->_stylesheet->get_nativepdf()->getFontMetrics();
             $zero = $metrics->getTextWidth("0", $this->__get("font_family"), $font_size);
             $value = $v * ($zero > 0 ? $zero : $font_size / 2);
 
@@ -1241,7 +1244,7 @@ class Style
             // Viewport-percentage lengths resolve against the initial
             // containing block (the size of the first page; later `@page`
             // size changes are not reflected)
-            $canvas = $this->_stylesheet->get_dompdf()->getCanvas();
+            $canvas = $this->_stylesheet->get_nativepdf()->getCanvas();
 
             if ($canvas === null) {
                 return null;
@@ -1714,8 +1717,10 @@ class Style
             }
 
             if (!isset(self::$_defaults[$prop])) {
-                global $_dompdf_warnings;
-                $_dompdf_warnings[] = "'$prop' is not a recognized CSS property.";
+                global $_nativepdf_warnings, $_dompdf_warnings;
+                $msg = "'$prop' is not a recognized CSS property.";
+                $_nativepdf_warnings[] = $msg;
+                $_dompdf_warnings[] = $msg;
                 return;
             }
         }
@@ -3246,6 +3251,13 @@ class Style
                 break;
             case "inline-grid":
                 $val = "inline-block";
+                break;
+            // the display keywords this engine used under its old name
+            case "-dompdf-br":
+            case "-dompdf-image":
+            case "-dompdf-list-bullet":
+            case "-dompdf-page":
+                $val = "-nativepdf-" . substr($val, 8);
                 break;
         }
 
@@ -4800,7 +4812,7 @@ class Style
             [$l1, $l2] = \array_slice(CPDF::$PAPER_SIZES[$size], 2, 2);
         } elseif ($lengths === []) {
             // Orientation only, use default paper size
-            $dims = $this->_stylesheet->get_dompdf()->getPaperSize();
+            $dims = $this->_stylesheet->get_nativepdf()->getPaperSize();
             [$l1, $l2] = \array_slice($dims, 2, 2);
         } else {
             // Custom paper size

@@ -1,19 +1,19 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameDecorator;
+namespace NativePdf\FrameDecorator;
 
-use Dompdf\Dompdf;
-use Dompdf\Frame;
-use Dompdf\Image\Cache;
+use NativePdf\NativePdf;
+use NativePdf\Frame;
+use NativePdf\Image\Cache;
 
 /**
  * Decorates frames for list bullets with custom images
  *
- * @package dompdf
+ * @package nativepdf
  */
 class ListBulletImage extends ListBullet
 {
@@ -42,15 +42,15 @@ class ListBulletImage extends ListBullet
     /**
      * ListBulletImage constructor.
      * @param Frame $frame
-     * @param Dompdf $dompdf
+     * @param NativePdf $nativepdf
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    function __construct(Frame $frame, NativePdf $nativepdf)
     {
         $style = $frame->get_style();
         $url = $style->list_style_image;
         $frame->get_node()->setAttribute("src", $url);
-        $this->_img = new Image($frame, $dompdf);
-        parent::__construct($this->_img, $dompdf);
+        $this->_img = new Image($frame, $nativepdf);
+        parent::__construct($this->_img, $nativepdf);
 
         $url = $this->_img->get_image_url();
 
@@ -83,7 +83,7 @@ class ListBulletImage extends ListBullet
 
     public function get_margin_height(): float
     {
-        $fontMetrics = $this->_dompdf->getFontMetrics();
+        $fontMetrics = $this->_nativepdf->getFontMetrics();
         $style = $this->get_style();
         $font = $style->font_family;
         $size = $style->font_size;

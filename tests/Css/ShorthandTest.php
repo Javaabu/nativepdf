@@ -1,17 +1,17 @@
 <?php
-namespace Dompdf\Tests\Css;
+namespace NativePdf\Tests\Css;
 
-use Dompdf\Dompdf;
-use Dompdf\Css\Style;
-use Dompdf\Css\Stylesheet;
-use Dompdf\Tests\TestCase;
+use NativePdf\NativePdf;
+use NativePdf\Css\Style;
+use NativePdf\Css\Stylesheet;
+use NativePdf\Tests\TestCase;
 
 class ShorthandTest extends TestCase
 {
     protected function style(): Style
     {
-        $dompdf = new Dompdf();
-        $sheet = new Stylesheet($dompdf);
+        $nativepdf = new NativePdf();
+        $sheet = new Stylesheet($nativepdf);
         $sheet->set_base_path(__DIR__); // Treat stylesheet as being located in this directory
 
         return new Style($sheet);

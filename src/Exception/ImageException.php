@@ -1,17 +1,17 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\Exception;
+namespace NativePdf\Exception;
 
-use Dompdf\Exception;
+use NativePdf\Exception;
 
 /**
- * Image exception thrown by DOMPDF
+ * Image exception thrown by NativePdf
  *
- * @package dompdf
+ * @package nativepdf
  */
 class ImageException extends Exception
 {

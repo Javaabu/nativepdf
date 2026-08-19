@@ -1,25 +1,25 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
 
 // FIXME: Need to sanity check inputs to this class
-namespace Dompdf\Adapter;
+namespace NativePdf\Adapter;
 
-use Dompdf\Canvas;
-use Dompdf\Dompdf;
-use Dompdf\Exception;
-use Dompdf\FontMetrics;
-use Dompdf\Helpers;
-use Dompdf\Image\Cache;
+use NativePdf\Canvas;
+use NativePdf\NativePdf;
+use NativePdf\Exception;
+use NativePdf\FontMetrics;
+use NativePdf\Helpers;
+use NativePdf\Image\Cache;
 use FontLib\Exception\FontNotFoundException;
 
 /**
  * PDF rendering interface
  *
- * Dompdf\Adapter\CPDF provides a simple stateless interface to the stateful one
+ * NativePdf\Adapter\CPDF provides a simple stateless interface to the stateful one
  * provided by the Cpdf class.
  *
  * Unless otherwise mentioned, all dimensions are in points (1/72 in).  The
@@ -29,7 +29,7 @@ use FontLib\Exception\FontNotFoundException;
  * See {@link http://www.ros.co.nz/pdf/} for more complete documentation
  * on the underlying {@link Cpdf} class.
  *
- * @package dompdf
+ * @package nativepdf
  */
 class CPDF implements Canvas
 {
@@ -100,16 +100,16 @@ class CPDF implements Canvas
     ];
 
     /**
-     * The Dompdf object
+     * The NativePdf object
      *
-     * @var Dompdf
+     * @var NativePdf
      */
-    protected $_dompdf;
+    protected $_nativepdf;
 
     /**
      * Instance of Cpdf class
      *
-     * @var \Dompdf\Cpdf
+     * @var \NativePdf\Cpdf
      */
     protected $_pdf;
 
@@ -155,7 +155,7 @@ class CPDF implements Canvas
      */
     protected $_current_opacity = 1;
 
-    public function __construct($paper = "letter", string $orientation = "portrait", ?Dompdf $dompdf = null)
+    public function __construct($paper = "letter", string $orientation = "portrait", ?NativePdf $nativepdf = null)
     {
         if (is_array($paper)) {
             $size = array_map("floatval", $paper);
@@ -168,25 +168,25 @@ class CPDF implements Canvas
             [$size[2], $size[3]] = [$size[3], $size[2]];
         }
 
-        if ($dompdf === null) {
-            $this->_dompdf = new Dompdf();
+        if ($nativepdf === null) {
+            $this->_nativepdf = new NativePdf();
         } else {
-            $this->_dompdf = $dompdf;
+            $this->_nativepdf = $nativepdf;
         }
 
-        $this->_pdf = new \Dompdf\Cpdf(
+        $this->_pdf = new \NativePdf\Cpdf(
             $size,
             true,
-            $this->_dompdf->getOptions()->getFontCache(),
-            $this->_dompdf->getOptions()->getTempDir()
+            $this->_nativepdf->getOptions()->getFontCache(),
+            $this->_nativepdf->getOptions()->getTempDir()
         );
 
-        $this->_pdf->addInfo("Producer", sprintf("%s + CPDF", $this->_dompdf->version));
+        $this->_pdf->addInfo("Producer", sprintf("%s + CPDF", $this->_nativepdf->version));
         $time = substr_replace(date('YmdHisO'), '\'', -2, 0) . '\'';
         $this->_pdf->addInfo("CreationDate", "D:$time");
         $this->_pdf->addInfo("ModDate", "D:$time");
 
-        if ($this->_dompdf->getOptions()->isPdfAEnabled()) {
+        if ($this->_nativepdf->getOptions()->isPdfAEnabled()) {
             $this->_pdf->enablePdfACompliance();
         }
 
@@ -198,15 +198,15 @@ class CPDF implements Canvas
         $this->_pages = [$this->_pdf->getFirstPageId()];
     }
 
-    public function get_dompdf()
+    public function get_nativepdf()
     {
-        return $this->_dompdf;
+        return $this->_nativepdf;
     }
 
     /**
      * Returns the Cpdf instance
      *
-     * @return \Dompdf\Cpdf
+     * @return \NativePdf\Cpdf
      */
     public function get_cpdf()
     {
@@ -612,8 +612,8 @@ class CPDF implements Canvas
             if ($im) {
                 imageinterlace($im, false);
 
-                $tmp_dir = $this->_dompdf->getOptions()->getTempDir();
-                $tmp_name = @tempnam($tmp_dir, "{$type}_dompdf_img_");
+                $tmp_dir = $this->_nativepdf->getOptions()->getTempDir();
+                $tmp_name = @tempnam($tmp_dir, "{$type}_nativepdf_img_");
                 @unlink($tmp_name);
                 $filename = "$tmp_name.png";
 
@@ -637,9 +637,9 @@ class CPDF implements Canvas
 
     public function image($img, $x, $y, $w, $h, $resolution = "normal")
     {
-        [$width, $height, $type] = Helpers::dompdf_getimagesize($img, $this->get_dompdf()->getHttpContext());
+        [$width, $height, $type] = Helpers::nativepdf_getimagesize($img, $this->get_nativepdf()->getHttpContext());
 
-        $debug_png = $this->_dompdf->getOptions()->getDebugPng();
+        $debug_png = $this->_nativepdf->getOptions()->getDebugPng();
 
         if ($debug_png) {
             print "[image:$img|$width|$height|$type]";
@@ -693,8 +693,8 @@ class CPDF implements Canvas
             $pdf->addForm();
         }
 
-        $ft = \Dompdf\Cpdf::ACROFORM_FIELD_CHOICE;
-        $ff = \Dompdf\Cpdf::ACROFORM_FIELD_CHOICE_COMBO;
+        $ft = \NativePdf\Cpdf::ACROFORM_FIELD_CHOICE;
+        $ff = \NativePdf\Cpdf::ACROFORM_FIELD_CHOICE_COMBO;
 
         $id = $pdf->addFormField($ft, rand(), $x, $this->y($y) - $h, $x + $w, $this->y($y), $ff, $size, $color);
         $pdf->setFormFieldOpt($id, $opts);
@@ -710,8 +710,8 @@ class CPDF implements Canvas
             $pdf->addForm();
         }
 
-        $ft = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
-        $ff = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT_MULTILINE;
+        $ft = \NativePdf\Cpdf::ACROFORM_FIELD_TEXT;
+        $ff = \NativePdf\Cpdf::ACROFORM_FIELD_TEXT_MULTILINE;
 
         $pdf->addFormField($ft, rand(), $x, $this->y($y) - $h, $x + $w, $this->y($y), $ff, $size, $color);
     }
@@ -726,19 +726,19 @@ class CPDF implements Canvas
             $pdf->addForm();
         }
 
-        $ft = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
+        $ft = \NativePdf\Cpdf::ACROFORM_FIELD_TEXT;
         $ff = 0;
 
         switch ($type) {
             case 'text':
-                $ft = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
+                $ft = \NativePdf\Cpdf::ACROFORM_FIELD_TEXT;
                 break;
             case 'password':
-                $ft = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT;
-                $ff = \Dompdf\Cpdf::ACROFORM_FIELD_TEXT_PASSWORD;
+                $ft = \NativePdf\Cpdf::ACROFORM_FIELD_TEXT;
+                $ff = \NativePdf\Cpdf::ACROFORM_FIELD_TEXT_PASSWORD;
                 break;
             case 'submit':
-                $ft = \Dompdf\Cpdf::ACROFORM_FIELD_BUTTON;
+                $ft = \NativePdf\Cpdf::ACROFORM_FIELD_BUTTON;
                 break;
         }
 
@@ -751,7 +751,7 @@ class CPDF implements Canvas
 
         $this->_set_fill_color($color);
 
-        $is_font_subsetting = $this->_dompdf->getOptions()->getIsFontSubsettingEnabled();
+        $is_font_subsetting = $this->_nativepdf->getOptions()->getIsFontSubsettingEnabled();
         $pdf->selectFont($font, '', true, $is_font_subsetting);
 
         $pdf->addText($x, $this->y($y) - $pdf->getFontHeight($size), $size, $text, $angle, $word_space, $char_space);
@@ -792,7 +792,7 @@ class CPDF implements Canvas
             return true;
         }
 
-        $subsetting = $this->_dompdf->getOptions()->getIsFontSubsettingEnabled();
+        $subsetting = $this->_nativepdf->getOptions()->getIsFontSubsettingEnabled();
         $this->_pdf->selectFont($font, '', false, $subsetting);
         if (!\array_key_exists($font, $this->_pdf->fonts)) {
             return false;
@@ -851,7 +851,7 @@ class CPDF implements Canvas
      */
     public function get_text_width($text, $font, $size, $word_spacing = 0.0, $char_spacing = 0.0)
     {
-        $this->_pdf->selectFont($font, '', true, $this->_dompdf->getOptions()->getIsFontSubsettingEnabled());
+        $this->_pdf->selectFont($font, '', true, $this->_nativepdf->getOptions()->getIsFontSubsettingEnabled());
         return $this->_pdf->getTextWidth($size, $text, $word_spacing, $char_spacing);
     }
 
@@ -860,7 +860,7 @@ class CPDF implements Canvas
      */
     public function get_font_height($font, $size)
     {
-        $options = $this->_dompdf->getOptions();
+        $options = $this->_nativepdf->getOptions();
         $this->_pdf->selectFont($font, '', true, $options->getIsFontSubsettingEnabled());
 
         return $this->_pdf->getFontHeight($size) * $options->getFontHeightRatio();
@@ -868,7 +868,7 @@ class CPDF implements Canvas
 
     /*function get_font_x_height($font, $size) {
       $this->_pdf->selectFont($font);
-      $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
+      $ratio = $this->_nativepdf->getOptions()->getFontHeightRatio();
       return $this->_pdf->getFontXHeight($size) * $ratio;
     }*/
 
@@ -877,7 +877,7 @@ class CPDF implements Canvas
      */
     public function get_font_baseline($font, $size)
     {
-        $ratio = $this->_dompdf->getOptions()->getFontHeightRatio();
+        $ratio = $this->_nativepdf->getOptions()->getFontHeightRatio();
         return $this->get_font_height($font, $size) / $ratio;
     }
 
@@ -951,7 +951,7 @@ class CPDF implements Canvas
         foreach ($this->_pages as $pid) {
             $this->reopen_object($pid);
 
-            $fontMetrics = $this->_dompdf->getFontMetrics();
+            $fontMetrics = $this->_nativepdf->getFontMetrics();
             $callback($pageNumber, $this->_page_count, $this, $fontMetrics);
 
             $this->close_object();

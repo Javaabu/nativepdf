@@ -1,29 +1,29 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameDecorator;
+namespace NativePdf\FrameDecorator;
 
-use Dompdf\Dompdf;
-use Dompdf\Frame;
+use NativePdf\NativePdf;
+use NativePdf\Frame;
 
 /**
  * Dummy decorator
  *
- * @package dompdf
+ * @package nativepdf
  */
 class NullFrameDecorator extends AbstractFrameDecorator
 {
     /**
      * NullFrameDecorator constructor.
      * @param Frame $frame
-     * @param Dompdf $dompdf
+     * @param NativePdf $nativepdf
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
+    function __construct(Frame $frame, NativePdf $nativepdf)
     {
-        parent::__construct($frame, $dompdf);
+        parent::__construct($frame, $nativepdf);
         $style = $this->_frame->get_style();
         $style->width = 0;
         $style->height = 0;

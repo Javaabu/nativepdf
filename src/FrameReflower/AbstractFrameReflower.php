@@ -1,25 +1,25 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameReflower;
+namespace NativePdf\FrameReflower;
 
-use Dompdf\Css\Content\Attr;
-use Dompdf\Css\Content\CloseQuote;
-use Dompdf\Css\Content\Counter;
-use Dompdf\Css\Content\Counters;
-use Dompdf\Css\Content\NoCloseQuote;
-use Dompdf\Css\Content\NoOpenQuote;
-use Dompdf\Css\Content\OpenQuote;
-use Dompdf\Css\Content\StringPart;
-use Dompdf\Css\Style;
-use Dompdf\Dompdf;
-use Dompdf\Frame;
-use Dompdf\Frame\Factory;
-use Dompdf\FrameDecorator\AbstractFrameDecorator;
-use Dompdf\FrameDecorator\Block;
+use NativePdf\Css\Content\Attr;
+use NativePdf\Css\Content\CloseQuote;
+use NativePdf\Css\Content\Counter;
+use NativePdf\Css\Content\Counters;
+use NativePdf\Css\Content\NoCloseQuote;
+use NativePdf\Css\Content\NoOpenQuote;
+use NativePdf\Css\Content\OpenQuote;
+use NativePdf\Css\Content\StringPart;
+use NativePdf\Css\Style;
+use NativePdf\NativePdf;
+use NativePdf\Frame;
+use NativePdf\Frame\Factory;
+use NativePdf\FrameDecorator\AbstractFrameDecorator;
+use NativePdf\FrameDecorator\Block;
 
 /**
  * Base reflower class
@@ -27,7 +27,7 @@ use Dompdf\FrameDecorator\Block;
  * Reflower objects are responsible for determining the width and height of
  * individual frames.  They also create line and page breaks as necessary.
  *
- * @package dompdf
+ * @package nativepdf
  */
 abstract class AbstractFrameReflower
 {
@@ -65,11 +65,11 @@ abstract class AbstractFrameReflower
     }
 
     /**
-     * @return Dompdf
+     * @return NativePdf
      */
-    function get_dompdf()
+    function get_nativepdf()
     {
-        return $this->_frame->get_dompdf();
+        return $this->_frame->get_nativepdf();
     }
 
     public function reset(): void
@@ -466,7 +466,7 @@ abstract class AbstractFrameReflower
             $inline_max = 0;
 
             // Add all adjacent inline widths together to calculate max width
-            while ($iter->valid() && ($iter->current()->is_inline_level() || $iter->current()->get_style()->display === "-dompdf-image")) {
+            while ($iter->valid() && ($iter->current()->is_inline_level() || $iter->current()->get_style()->display === "-nativepdf-image")) {
                 /** @var AbstractFrameDecorator */
                 $child = $iter->current();
                 $child->get_reflower()->_set_content();
@@ -646,7 +646,7 @@ abstract class AbstractFrameReflower
             $frame->increment_counters($increment);
         }
 
-        if ($frame->get_node()->nodeName === "dompdf_generated") {
+        if ($frame->get_node()->nodeName === "nativepdf_generated") {
             $content = $this->resolve_content();
 
             if ($content !== null) {
@@ -658,7 +658,7 @@ abstract class AbstractFrameReflower
                 $new_frame = new Frame($node);
                 $new_frame->set_style($new_style);
 
-                Factory::decorate_frame($new_frame, $frame->get_dompdf(), $frame->get_root());
+                Factory::decorate_frame($new_frame, $frame->get_nativepdf(), $frame->get_root());
                 $frame->append_child($new_frame);
             }
         }

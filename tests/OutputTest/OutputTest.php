@@ -1,8 +1,8 @@
 <?php
-namespace Dompdf\Tests\OutputTest;
+namespace NativePdf\Tests\OutputTest;
 
 use CallbackFilterIterator;
-use Dompdf\Tests\TestCase;
+use NativePdf\Tests\TestCase;
 use FilesystemIterator;
 use Iterator;
 use PHPUnit\Framework\AssertionFailedError;
@@ -74,7 +74,7 @@ final class OutputTest extends TestCase
     {
         $document = $dataset->render();
         $referenceFile = $dataset->referenceFile()->getPathname();
-        $actualOutputFile = tempnam(sys_get_temp_dir(), "dompdf_test_");
+        $actualOutputFile = tempnam(sys_get_temp_dir(), "nativepdf_test_");
 
         file_put_contents($actualOutputFile, $document->output());
 

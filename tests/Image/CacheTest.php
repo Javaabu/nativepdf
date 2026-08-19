@@ -1,10 +1,10 @@
 <?php
-namespace Dompdf\Tests\Image;
+namespace NativePdf\Tests\Image;
 
-use Dompdf\Helpers;
-use Dompdf\Image;
-use Dompdf\Options;
-use Dompdf\Tests\TestCase;
+use NativePdf\Helpers;
+use NativePdf\Image;
+use NativePdf\Options;
+use NativePdf\Tests\TestCase;
 
 class CacheTest extends TestCase
 {

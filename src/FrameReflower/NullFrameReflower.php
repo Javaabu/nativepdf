@@ -1,18 +1,18 @@
 <?php
 /**
- * @package dompdf
- * @link    https://github.com/dompdf/dompdf
+ * @package nativepdf
+ * @link    https://github.com/Javaabu/nativepdf
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
-namespace Dompdf\FrameReflower;
+namespace NativePdf\FrameReflower;
 
-use Dompdf\Frame;
-use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
+use NativePdf\Frame;
+use NativePdf\FrameDecorator\Block as BlockFrameDecorator;
 
 /**
  * Dummy reflower
  *
- * @package dompdf
+ * @package nativepdf
  */
 class NullFrameReflower extends AbstractFrameReflower
 {

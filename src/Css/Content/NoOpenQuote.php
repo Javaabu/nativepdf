@@ -1,5 +1,5 @@
 <?php
-namespace Dompdf\Css\Content;
+namespace NativePdf\Css\Content;
 
 final class NoOpenQuote extends ContentPart
 {
