@@ -881,6 +881,13 @@ class Helpers
 
         if ($width !== null && $height !== null) {
             switch ($type) {
+                case "svg":
+                    // PHP 8.5 reads SVG in getimagesize() but reports no
+                    // channels or bits, so fall back to the same values the
+                    // SVG parser above sets on older PHP versions.
+                    $channels = $channels > 0 ? $channels : 4;
+                    $bits = $bits > 0 ? $bits : 32;
+                    break;
                 case IMAGETYPE_BMP:
                     $channels = $channels > 0 ? $channels : 4;
                     $bits = $bits > 0 ? $bits : 24;
