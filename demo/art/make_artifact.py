@@ -31,7 +31,7 @@ PLATES = [
               "gradient-filled bar chart", "16 solid and outline icons"],
        shots=["02-inline-svg-1.jpg", "02-inline-svg-2.jpg"]),
   dict(num="03", slug="rtl", file="03-rtl-dhivehi.pdf", title="Right-to-left Dhivehi",
-       blurb="A Mihaaru news story typeset in Thaana with the Faruma face. The headline opens on މ, and the box at the end compares the same characters under three direction settings.",
+       blurb="A Mihaaru news story typeset in Thaana with the Faruma face. The headline opens on މ, and the box at the end shows the bidi engine handling paragraph direction, digits and list bullets.",
        specs=["full UAX #9 bidi over every paragraph", "digits keep LTR order inside an RTL line",
               "dir=\"rtl\" vs dir=\"ltr\" on the same characters", "RTL lists, bullets on the right",
               "RTL flex rows for the figure cards", "Faruma registered for both weights"],
