@@ -194,10 +194,6 @@ ul.dv li { padding-right: 3pt; }
         <span class="sample" dir="ltr">މުވައްޒަފުން Finance Ministry ރިޕޯޓް</span>
     </div>
     <div class="case">
-        <span class="tag">bdo dir="ltr"</span>
-        <span class="sample" dir="rtl"><bdo dir="ltr">މުވައްޒަފުން Finance Ministry ރިޕޯޓް</bdo></span>
-    </div>
-    <div class="case">
         <span class="tag">digits in an rtl line</span>
         <span class="sample" dir="rtl">މިހާރު ތިބި މުވައްޒަފުންގެ އަދަދަކީ 41،667</span>
     </div>
@@ -207,12 +203,11 @@ ul.dv li { padding-right: 3pt; }
     </div>
 
     <p class="why">
-        The first three rows hold exactly the same characters in the same stored order. Only the
+        The first two rows hold exactly the same characters in the same stored order. Only the
         paragraph direction changes, and the Dhivehi words swap sides around the Latin run, because
         dompdf resolves every paragraph with the Unicode bidirectional algorithm (UAX&nbsp;#9).
-        <code>&lt;bdo&gt;</code> turns the algorithm off and forces a visual order, which is why row
-        three reads backwards. Row four shows a number keeping its own left-to-right order inside a
-        right-to-left sentence, and row five shows list bullets moving to the right edge.
+        Row three shows a number keeping its own left-to-right order inside a right-to-left
+        sentence, and row four shows list bullets moving to the right edge.
     </p>
 </div>
 

@@ -33,7 +33,7 @@ PLATES = [
   dict(num="03", slug="rtl", file="03-rtl-dhivehi.pdf", title="Right-to-left Dhivehi",
        blurb="A Mihaaru news story typeset in Thaana with the Faruma face. The headline opens on މ, and the box at the end compares the same characters under three direction settings.",
        specs=["full UAX #9 bidi over every paragraph", "digits keep LTR order inside an RTL line",
-              "dir=\"rtl\" vs dir=\"ltr\" vs &lt;bdo&gt;", "RTL lists, bullets on the right",
+              "dir=\"rtl\" vs dir=\"ltr\" on the same characters", "RTL lists, bullets on the right",
               "RTL flex rows for the figure cards", "Faruma registered for both weights"],
        shots=["03-rtl-dhivehi-1.jpg", "03-rtl-dhivehi-2.jpg"]),
   dict(num="04", slug="report", file="04-dhivehi-report.pdf", title="All three at once",
